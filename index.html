@@ -609,6 +609,157 @@
     text-decoration: none; white-space: nowrap;
   }
 
+  /* Quiz */
+  .quiz-page { max-width: 820px; margin: 0 auto; padding: 32px 28px 80px; }
+  .quiz-page h1 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-weight: 700; font-size: 38px; line-height: 1.15;
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  .quiz-page h1 em {
+    font-style: normal; color: var(--green); background: var(--green-bright);
+    padding: 2px 10px; border-radius: 8px;
+  }
+  .quiz-page .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.6; margin: 0 0 22px; max-width: 640px; }
+  .quiz-score-bar {
+    position: sticky; top: 60px; z-index: 5;
+    margin: 0 0 20px;
+    padding: 16px 22px; border-radius: 12px;
+    background: var(--green); color: #FAF7EC;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    box-shadow: 0 2px 10px rgba(45, 60, 45, 0.15);
+  }
+  .quiz-score-bar .n {
+    font-family: "Fraunces", "Noto Serif SC", serif;
+    font-size: 26px; font-weight: 700;
+  }
+  .quiz-score-bar .txt {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; opacity: 0.9;
+    letter-spacing: 0.05em;
+  }
+  .quiz-list { display: flex; flex-direction: column; gap: 14px; }
+  .quiz-q {
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 22px;
+    transition: border-color .2s ease;
+  }
+  .quiz-q.correct { border-color: #B9CDA7; background: linear-gradient(180deg, var(--bg-panel) 0%, #F0F4E6 100%); }
+  .quiz-q.wrong { border-color: #DBB1A6; background: linear-gradient(180deg, var(--bg-panel) 0%, #FBEEE9 100%); }
+  .quiz-q .q-head {
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;
+  }
+  .quiz-q .q-num {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 999px;
+    background: var(--bg); border: 1.5px solid var(--line);
+    font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .quiz-q.correct .q-num { background: var(--green); color: #FAF7EC; border-color: var(--green); }
+  .quiz-q.wrong .q-num { background: #B08476; color: #FAF7EC; border-color: #B08476; }
+  .quiz-q .q-text {
+    flex: 1 1 auto;
+    font-size: 15px; line-height: 1.55; color: var(--ink);
+    font-weight: 500;
+    padding-top: 4px;
+  }
+  .quiz-q .q-source {
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    color: var(--ink-soft); letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 4px; background: var(--bg);
+    border: 1px solid var(--line);
+    white-space: nowrap; flex: 0 0 auto;
+  }
+  .q-options { display: flex; flex-direction: column; gap: 6px; }
+  .q-opt {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 14px; border-radius: 8px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .q-opt:hover { background: var(--bg); }
+  .q-opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .q-opt .opt-letter {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--bg); border: 1.5px solid var(--line);
+    font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .q-opt .opt-text { flex: 1 1 auto; font-size: 14px; line-height: 1.5; color: var(--ink); padding-top: 2px; }
+  .q-opt.is-selected { background: var(--green-soft); border-color: #B9CDA7; }
+  .q-opt.is-selected .opt-letter { background: var(--green); color: #FAF7EC; border-color: var(--green); }
+  /* post-submit states */
+  .q-opt.is-correct { background: var(--green-soft); border-color: var(--green); }
+  .q-opt.is-correct .opt-letter { background: var(--green); color: #FAF7EC; border-color: var(--green); }
+  .q-opt.is-correct .opt-letter::after { content: " ✓"; }
+  .q-opt.is-wrong { background: #F9E3DC; border-color: #B08476; }
+  .q-opt.is-wrong .opt-letter { background: #B08476; color: #FAF7EC; border-color: #B08476; }
+  .q-opt.is-wrong .opt-letter::after { content: " ✗"; }
+  .q-opt.is-disabled { cursor: default; }
+  .q-opt.is-disabled:hover { background: inherit; }
+  .q-opt.is-disabled.is-correct:hover { background: var(--green-soft); }
+  .q-opt.is-disabled.is-wrong:hover { background: #F9E3DC; }
+
+  .q-explain {
+    margin-top: 12px; padding: 12px 14px;
+    background: var(--bg); border: 1px dashed var(--line);
+    border-radius: 8px;
+    font-size: 13.5px; line-height: 1.55;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;
+  }
+  .q-explain .verdict {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .q-explain .verdict.v-ok { background: var(--green); color: #FAF7EC; }
+  .q-explain .verdict.v-no { background: #B08476; color: #FAF7EC; }
+  .q-explain .src-link {
+    margin-left: auto;
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--green); text-decoration: none;
+  }
+  .q-explain .src-link:hover { text-decoration: underline; }
+  .q-explain .expl { flex: 1 1 100%; color: var(--ink); }
+
+  .quiz-actions {
+    margin-top: 24px;
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .quiz-actions button {
+    padding: 12px 28px; border-radius: 10px;
+    background: var(--green); color: #FAF7EC;
+    border: none; cursor: pointer;
+    font-family: "Noto Serif SC", serif; font-size: 15px; font-weight: 600;
+    transition: opacity .15s ease;
+  }
+  .quiz-actions button:hover { opacity: 0.88; }
+  .quiz-actions button.secondary {
+    background: var(--bg-panel); color: var(--ink); border: 1px solid var(--line);
+  }
+  .quiz-stats {
+    margin: 20px 0 24px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .quiz-stats .stat {
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; text-align: center;
+  }
+  .quiz-stats .stat .k {
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    color: var(--ink-soft); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .quiz-stats .stat .v {
+    font-family: "Fraunces", "Noto Serif SC", serif;
+    font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 4px;
+  }
+  .quiz-stats .stat.good .v { color: var(--green); }
+  .quiz-stats .stat.bad .v { color: #B08476; }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -618,6 +769,8 @@
     .glossary-home h1, .term-page h1 { font-size: 32px; }
     .home .glossary-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
     .home .glossary-cta .btn { margin-left: 0; }
+    .quiz-page h1 { font-size: 30px; }
+    .quiz-q .q-head { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -630,6 +783,7 @@
   <nav class="top-tabs" id="top-tabs">
     <a href="#/" class="tab" data-tab="courses">深入课</a>
     <a href="#/glossary" class="tab" data-tab="glossary">术语库</a>
+    <a href="#/quiz" class="tab" data-tab="quiz">考试</a>
   </nav>
   <div class="lesson-nav" id="lesson-nav"></div>
 </header>
@@ -2148,6 +2302,398 @@ jailbreak 常见套路:
     `;
   }
 
+  /* ============== QUIZ ============== */
+
+  const quiz = [
+    // chat (2)
+    { q: "下面哪一句最准确地描述 ChatGPT 这类 chat 应用的本质?",
+      options: [
+        "模型在服务器端维护了你的全部对话记忆",
+        "每一轮都把完整对话历史重新发给模型, 模型基于历史生成回复",
+        "模型通过数据库查询之前说过的话",
+        "模型有短期和长期两套记忆系统, 自动切换",
+      ], correct: 1,
+      explain: "模型本身无记忆; \"记得\"是每轮把整段历史重发的工程伎俩。",
+      from: { kind: "lesson", slug: "chat" } },
+
+    { q: "关于大模型生成文本的方式, 下列哪项正确?",
+      options: [
+        "模型先想好整段回复, 再一次性输出给你",
+        "模型从预训练语料里检索最匹配的完整句子",
+        "模型一个 token 接一个 token 地预测下一个, 直到觉得该停",
+        "模型按预定义的语法规则组装句子",
+      ], correct: 2,
+      explain: "Next-token prediction 是本质。流式打字效果就是这个过程本身。",
+      from: { kind: "lesson", slug: "chat" } },
+
+    // prompt (3)
+    { q: "关于 system prompt 和 user prompt, 下列哪项正确?",
+      options: [
+        "两者等价, 只是在数组里位置不同",
+        "system 设定人设和规则, 整段对话持续生效; user 是每轮的具体任务",
+        "user 定人设, system 负责具体任务",
+        "system 只在第一轮生效, 之后自动被忘掉",
+      ], correct: 1,
+      explain: "system 是舞台布置, user 是每场台词。",
+      from: { kind: "lesson", slug: "prompt" } },
+
+    { q: "下列哪项描述最准确地区分了 prompt 和 skill?",
+      options: [
+        "Skill 是代码, prompt 是文本",
+        "Skill 是命名并打包起来的 prompt 套路, 可复用; prompt 是单次口述的指令",
+        "Skill 只能给 agent 用, prompt 只能给 chat 用",
+        "两者没本质区别, 只是叫法不同",
+      ], correct: 1,
+      explain: "Skill 把 prompt 套路沉淀下来到处可用; prompt 是当场写的。",
+      from: { kind: "lesson", slug: "skill" } },
+
+    { q: "模型出现 hallucination (幻觉) 最根本的原因是?",
+      options: [
+        "模型故意撒谎骗用户",
+        "训练数据质量不够高",
+        "模型的任务是\"猜合理的下一个 token\", 不负责确保事实对",
+        "上下文窗口太小, 塞不下真实信息",
+      ], correct: 2,
+      explain: "概率生成的本性决定了它会一本正经编事 —— 它就不知道自己不知道。",
+      from: { kind: "term", slug: "hallucination" } },
+
+    // skill (2)
+    { q: "下列哪个最接近 skill 在磁盘上的典型文件结构?",
+      options: [
+        "一段 Python 函数定义",
+        "一个 markdown 文件: frontmatter (name/description) + 正文 (做法)",
+        "一组 JSON schema 规范",
+        "一个二进制模型权重文件",
+      ], correct: 1,
+      explain: "Cursor Rules / Anthropic Skills / GPTs instructions 都是这套路。",
+      from: { kind: "lesson", slug: "skill" } },
+
+    { q: "下列哪种情况最不适合单独做成一个 skill?",
+      options: [
+        "写公司邮件的固定格式和口吻",
+        "一次性回答\"今天星期几\"这种随手问题",
+        "代码审查的常规检查清单",
+        "把客户反馈分类的套路",
+      ], correct: 1,
+      explain: "Skill 是\"打包可复用的套路\", 一次性问题没必要打包。",
+      from: { kind: "lesson", slug: "skill" } },
+
+    // agent (3)
+    { q: "Agent 和 chat 最本质的差别是?",
+      options: [
+        "Agent 用的模型更大",
+        "Agent 能产生对世界的改变 (文件被写、邮件被发、单下了); chat 的输出是文字",
+        "Agent 响应速度更快",
+        "Agent 完全不需要 prompt",
+      ], correct: 1,
+      explain: "Chat 告诉你怎么订机票, agent 帮你订了。",
+      from: { kind: "lesson", slug: "agent" } },
+
+    { q: "下列哪个组合最准确地描述了一个 Agent 的构成?",
+      options: [
+        "LLM + 图形界面",
+        "LLM + 工具 (tools) + 循环 (loop)",
+        "LLM + 数据库 + API 网关",
+        "LLM + 用户界面 + 后台服务",
+      ], correct: 1,
+      explain: "三件套缺一不可; 循环让它能边做边纠。",
+      from: { kind: "lesson", slug: "agent" } },
+
+    { q: "当模型发出 tool_call 时, 下列哪个描述是正确的?",
+      options: [
+        "模型自己把工具跑了, 直接返回结果",
+        "模型只产生一个\"我想调用 X 工具, 参数是 Y\"的请求, 真正执行是运行时程序干的",
+        "tool_call 和普通文本回复在协议上没有区别",
+        "tool_call 必须先经过用户点击确认才会被产生",
+      ], correct: 1,
+      explain: "模型请求 ≠ 实际执行 —— 这是 agent 工程里最常被模糊掉的区分。",
+      from: { kind: "term", slug: "tool-call" } },
+
+    // runtime (2)
+    { q: "Agent 的核心运行循环 while 什么情况下会退出?",
+      options: [
+        "消息总数超过 100",
+        "模型本轮回复里没有 tool_calls, 只有纯文本",
+        "用户按下停止按钮",
+        "累计运行时间超过 60 秒",
+      ], correct: 1,
+      explain: "没有工具调用 = 模型认为任务完成, 返回最终文字。",
+      from: { kind: "lesson", slug: "runtime" } },
+
+    { q: "下列哪一项不是 agent 常见的翻车姿势?",
+      options: [
+        "死循环: 反复调同一个工具不收手",
+        "context 爆: messages 累加撞上窗口上限",
+        "工具返回 500, agent 把错误当答案给用户",
+        "模型推理过程中主动删除自己的权重文件",
+      ], correct: 3,
+      explain: "前三者是生产中必须处理的; D 是胡扯干扰项。",
+      from: { kind: "lesson", slug: "runtime" } },
+
+    // 术语·模型基础 (3)
+    { q: "关于 token, 下列哪项描述最准确?",
+      options: [
+        "Token 就是一个单词, 一词一 token",
+        "Token 就是一个汉字, 一字一 token",
+        "Token 是模型处理文本的最小单位, 粗略是\"字\"或\"半个词\", 具体切法由分词器决定",
+        "Token 是模型的参数数量",
+      ], correct: 2,
+      explain: "英文可能一词是一 token 也可能分多个; 中文大致 1 字 ≈ 1 token。",
+      from: { kind: "term", slug: "token" } },
+
+    { q: "Embedding 的核心作用是?",
+      options: [
+        "压缩文本以节省带宽",
+        "把文本变成一串数字向量, 让语义相近的内容在向量空间里靠得近",
+        "加密文本防止泄露",
+        "把中文自动翻译成英文",
+      ], correct: 1,
+      explain: "Embedding 是\"语义坐标\" —— 是 RAG 和相似度检索的基础。",
+      from: { kind: "term", slug: "embedding" } },
+
+    { q: "当对话越聊越长, 为什么会\"撞上 context window\"?",
+      options: [
+        "模型响应逐渐变慢, 超时报错",
+        "模型一次能读进的最大 token 数有上限, 超过就必须裁掉或压缩旧消息",
+        "浏览器内存不够用",
+        "网络带宽不足",
+      ], correct: 1,
+      explain: "Context window 是模型的物理约束, 比如 GPT-4o 是 128K tokens。",
+      from: { kind: "term", slug: "context-window" } },
+
+    // 术语·推理参数 (2)
+    { q: "Temperature 参数的作用是?",
+      options: [
+        "控制模型推理速度",
+        "控制模型 \"保守 vs 放飞\": 低温稳定重复, 高温有创意但可能走偏",
+        "控制每次调用的 API 费用",
+        "控制模型响应的最大长度",
+      ], correct: 1,
+      explain: "温度 0 几乎每次都一样, 温度 1 有变化, 温度 2 可能把盐换成糖。",
+      from: { kind: "term", slug: "temperature" } },
+
+    { q: "关于流式输出 (streaming), 下列哪项正确?",
+      options: [
+        "流式输出比非流式能更快生成完整回复",
+        "流式只是前端 UI 效果, 后端照常一次性生成完再切成块",
+        "流式是模型每生成一个 token 就立刻传出, 不等整段",
+        "只有付费用户才能用流式",
+      ], correct: 2,
+      explain: "打字机效果就是生成过程本身被直接暴露出来。",
+      from: { kind: "term", slug: "streaming" } },
+
+    // 术语·RAG (3)
+    { q: "RAG (Retrieval-Augmented Generation) 的核心目的是?",
+      options: [
+        "让模型本身跑得更快",
+        "让模型基于外部真实资料回答, 减少 hallucination",
+        "把多个模型的答案平均, 提高准确性",
+        "自动把回答翻译成多种语言",
+      ], correct: 1,
+      explain: "RAG = 开卷考试。查到资料再答, 比靠模型记忆瞎编靠谱。",
+      from: { kind: "term", slug: "rag" } },
+
+    { q: "Vector database 主要被用来做什么?",
+      options: [
+        "存储模型的权重文件",
+        "存 embedding 向量, 并能快速找到与查询向量最相似的几个",
+        "记录用户的对话历史",
+        "缓存模型最近的输出",
+      ], correct: 1,
+      explain: "向量检索 ≠ 关键词检索; 按语义相似度排。",
+      from: { kind: "term", slug: "vector-db" } },
+
+    { q: "关于 RAG 流程里的 chunking (切块), 下列哪项正确?",
+      options: [
+        "切块就是把文档压缩到更小体积",
+        "把长文档切成小块再 embed, 因为检索要精确到段落级别才有用",
+        "切块主要是为了防止模型被长文档\"吓到\"",
+        "切块纯粹是为了节省存储成本",
+      ], correct: 1,
+      explain: "整本书一起比对太粗; 切成段落比对, 才找得准那句话。",
+      from: { kind: "term", slug: "chunking" } },
+
+    // 术语·微调 (2)
+    { q: "Fine-tuning 和 LoRA 的区别是?",
+      options: [
+        "Fine-tuning 更快, LoRA 更慢",
+        "Fine-tuning 一般调原模型全部参数; LoRA 只在旁边加一小组补丁参数, 省算力 100 倍",
+        "Fine-tuning 是免费的, LoRA 要付费",
+        "两者没区别, LoRA 是 fine-tuning 的中文名",
+      ], correct: 1,
+      explain: "LoRA = Low-Rank Adaptation, 是低成本微调的主流做法。",
+      from: { kind: "term", slug: "lora" } },
+
+    { q: "RLHF 的核心机制是?",
+      options: [
+        "用强化学习替代预训练阶段",
+        "让模型自己给自己打分并更新",
+        "让人工标注员对模型输出打分, 用这些偏好数据再训模型去\"更讨人喜欢\"",
+        "自动从互联网爬取反馈数据来训练",
+      ], correct: 2,
+      explain: "ChatGPT 能听话主要靠这个; 替代方案有 DPO 等。",
+      from: { kind: "term", slug: "rlhf" } },
+
+    // 术语·智能体工具 (2)
+    { q: "MCP (Model Context Protocol) 出现的核心价值是?",
+      options: [
+        "让 LLM 能处理更长的 context 窗口",
+        "提供一套标准化协议, 让 LLM 以统一方式接入任意工具/数据源, 不用每人写一遍胶水",
+        "加密 LLM 和服务器之间的通信",
+        "彻底替代 function calling",
+      ], correct: 1,
+      explain: "MCP 之于 agent 工具生态, 像 USB 之于硬件。",
+      from: { kind: "term", slug: "mcp" } },
+
+    { q: "Function calling 和 tool call 的关系是?",
+      options: [
+        "Function calling 是 tool call 的 Python 实现",
+        "两者毫无关系, 属于不同范式",
+        "Function calling 是 tool call 的一种标准化实现: 你描述函数的 JSON schema, 模型按 schema 生成调用",
+        "Tool call 只能用在 agent, function calling 只能用在 chat",
+      ], correct: 2,
+      explain: "Function calling 把\"怎么描述工具、怎么返回调用请求\"规范化了。",
+      from: { kind: "term", slug: "function-calling" } },
+
+    // 术语·评估安全 (1)
+    { q: "关于 benchmark (基准测试), 下列哪项最准确?",
+      options: [
+        "Benchmark 分数高的模型, 实际业务中一定更好用",
+        "Benchmark 是一组固定题库, 让不同模型跑同一套题; 分数能横向比, 但会被\"刷\"",
+        "Benchmark 只测速度, 不测准确率",
+        "Benchmark 是厂商自己内部评估, 外部看不到",
+      ], correct: 1,
+      explain: "MMLU / HumanEval / GSM8K 都是 benchmark; 高分 ≠ 实用好。",
+      from: { kind: "term", slug: "benchmark" } },
+  ];
+
+  // Persistent state across renders (within same page load)
+  let quizAnswers = Array(quiz.length).fill(null);
+  let quizSubmitted = false;
+
+  function quizSourceLabel(from) {
+    if (from.kind === "lesson") {
+      const l = lessons.find(x => x.slug === from.slug);
+      return l ? `深入课 · ${l.num}. ${l.slug}` : "深入课";
+    }
+    if (from.kind === "term") {
+      const t = terms.find(x => x.slug === from.slug);
+      return t ? `术语 · ${t.en}` : "术语库";
+    }
+    return "";
+  }
+
+  function quizSourceHref(from) {
+    if (from.kind === "lesson") return `#/${from.slug}`;
+    if (from.kind === "term") return `#/glossary/${from.slug}`;
+    return "#/";
+  }
+
+  function renderQuiz() {
+    const total = quiz.length;
+    const score = quiz.reduce((s, q, i) => s + (quizAnswers[i] === q.correct ? 4 : 0), 0);
+    const correctCount = quizAnswers.reduce((n, a, i) => n + (a === quiz[i].correct ? 1 : 0), 0);
+    const answered = quizAnswers.filter(a => a !== null).length;
+
+    const scoreBar = quizSubmitted ? `
+      <div class="quiz-score-bar">
+        <div><span class="n">${score}</span> <span class="txt">/ 100</span></div>
+        <div class="txt">答对 ${correctCount} / ${total} · ${score >= 80 ? "基础很稳" : score >= 60 ? "基本概念过了, 还能再读一遍" : "建议回去再看一遍深入课和术语库"}</div>
+      </div>
+    ` : "";
+
+    const items = quiz.map((q, i) => {
+      const userChoice = quizAnswers[i];
+      const isCorrect = quizSubmitted && userChoice === q.correct;
+      const isWrong = quizSubmitted && userChoice !== null && userChoice !== q.correct;
+      const cardClass = quizSubmitted ? (isCorrect ? "correct" : (isWrong ? "wrong" : "")) : "";
+
+      const optionsHtml = q.options.map((opt, j) => {
+        let cls = "q-opt";
+        if (quizSubmitted) {
+          cls += " is-disabled";
+          if (j === q.correct) cls += " is-correct";
+          else if (userChoice === j) cls += " is-wrong";
+        } else if (userChoice === j) {
+          cls += " is-selected";
+        }
+        return `
+          <label class="${cls}">
+            <input type="radio" name="q${i}" value="${j}" ${userChoice === j ? "checked" : ""} ${quizSubmitted ? "disabled" : ""}>
+            <span class="opt-letter">${"ABCD"[j]}</span>
+            <span class="opt-text">${opt}</span>
+          </label>
+        `;
+      }).join("");
+
+      const explain = quizSubmitted ? `
+        <div class="q-explain">
+          <span class="verdict ${isCorrect ? "v-ok" : "v-no"}">${isCorrect ? "答对" : (userChoice === null ? "未作答" : "答错")}</span>
+          <a class="src-link" href="${quizSourceHref(q.from)}">→ ${quizSourceLabel(q.from)}</a>
+          <span class="expl">${q.explain}</span>
+        </div>
+      ` : "";
+
+      return `
+        <div class="quiz-q ${cardClass}">
+          <div class="q-head">
+            <span class="q-num">${i + 1}</span>
+            <span class="q-text">${q.q}</span>
+            <span class="q-source">${quizSourceLabel(q.from)}</span>
+          </div>
+          <div class="q-options">${optionsHtml}</div>
+          ${explain}
+        </div>
+      `;
+    }).join("");
+
+    const statsHtml = quizSubmitted ? `
+      <div class="quiz-stats">
+        <div class="stat good"><div class="k">答对</div><div class="v">${correctCount}</div></div>
+        <div class="stat bad"><div class="k">答错</div><div class="v">${total - correctCount - (total - answered)}</div></div>
+        <div class="stat"><div class="k">未答</div><div class="v">${total - answered}</div></div>
+      </div>
+    ` : "";
+
+    app.innerHTML = `
+      <div class="quiz-page">
+        <h1>考试 · <em>25 题</em> · 100 分</h1>
+        <p class="lede">5 节深入课 + 25 词术语库里的概念都会考。单选, 每题 4 分, 没时限。</p>
+        ${scoreBar}
+        ${statsHtml}
+        <div class="quiz-list">${items}</div>
+        <div class="quiz-actions">
+          ${quizSubmitted
+            ? `<button id="quiz-retry" class="secondary">重做</button>`
+            : `<button id="quiz-submit">提交 · 看分数</button>`}
+        </div>
+      </div>
+    `;
+
+    // Handlers
+    document.querySelectorAll(".q-opt input").forEach(input => {
+      input.addEventListener("change", (e) => {
+        const idx = parseInt(e.target.name.substring(1), 10);
+        quizAnswers[idx] = parseInt(e.target.value, 10);
+      });
+    });
+
+    if (!quizSubmitted) {
+      document.getElementById("quiz-submit")?.addEventListener("click", () => {
+        quizSubmitted = true;
+        renderQuiz();
+        window.scrollTo(0, 0);
+      });
+    } else {
+      document.getElementById("quiz-retry")?.addEventListener("click", () => {
+        quizAnswers = Array(quiz.length).fill(null);
+        quizSubmitted = false;
+        renderQuiz();
+        window.scrollTo(0, 0);
+      });
+    }
+  }
+
   /* ============== ROUTER + RENDER ============== */
 
   const app = document.getElementById("app");
@@ -2157,6 +2703,7 @@ jailbreak 常见套路:
     const h = location.hash.replace(/^#\/?/, "");
     if (!h) return { page: "home" };
     const parts = h.split("/");
+    if (parts[0] === "quiz") return { page: "quiz" };
     if (parts[0] === "glossary") {
       if (!parts[1]) return { page: "glossary-home" };
       const term = terms.find(t => t.slug === parts[1]);
@@ -2176,12 +2723,15 @@ jailbreak 常见套路:
   function renderNav(route) {
     // top-tab active state
     document.querySelectorAll("#top-tabs .tab").forEach(t => t.classList.remove("active"));
-    const activeTab = (route.page === "glossary-home" || route.page === "term") ? "glossary" : "courses";
+    let activeTab = "courses";
+    if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
+    else if (route.page === "quiz") activeTab = "quiz";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
     if (route.page === "home") { nav.innerHTML = `<span class="n-cur">课程首页</span>`; return; }
     if (route.page === "glossary-home") { nav.innerHTML = `<span class="n-cur">术语库</span>`; return; }
+    if (route.page === "quiz") { nav.innerHTML = `<span class="n-cur">考试 · 25 题</span>`; return; }
     if (route.page === "term") {
       nav.innerHTML = `
         <button class="n-btn" onclick="go('glossary')">← 术语库</button>
@@ -2397,6 +2947,7 @@ jailbreak 常见套路:
     if (r.page === "home") { lesson = null; renderHome(); }
     else if (r.page === "glossary-home") { lesson = null; renderGlossaryHome(); }
     else if (r.page === "term") { lesson = null; renderTermPage(r.term); }
+    else if (r.page === "quiz") { lesson = null; renderQuiz(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
