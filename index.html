@@ -444,12 +444,180 @@
     to { stroke-dashoffset: 0; }
   }
 
+  /* Top tabs */
+  .top-tabs {
+    display: flex; gap: 4px; padding: 4px;
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .top-tabs .tab {
+    padding: 6px 14px; border-radius: 7px;
+    font-family: "Noto Serif SC", serif; font-size: 13px;
+    color: var(--ink-soft); font-weight: 500;
+    transition: all .15s ease; text-decoration: none;
+  }
+  .top-tabs .tab:hover { color: var(--ink); background: var(--green-soft); }
+  .top-tabs .tab.active { background: var(--green); color: #FAF7EC; }
+  .top-tabs .tab.active:hover { background: var(--green); color: #FAF7EC; }
+
+  /* Home: glossary CTA */
+  .home .glossary-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 26px; margin: 24px 0 8px;
+    border-radius: 14px; border: 1px solid var(--line);
+    background: linear-gradient(140deg, #FAF7EC 55%, #F2D3CB);
+    text-decoration: none; color: var(--ink);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .home .glossary-cta:hover { transform: translateY(-2px); border-color: var(--green); }
+  .home .glossary-cta .txt h3 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-size: 22px; font-weight: 700; margin: 0 0 6px;
+  }
+  .home .glossary-cta .txt p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
+  .home .glossary-cta .btn {
+    padding: 10px 18px; border-radius: 10px;
+    background: var(--green); color: #FAF7EC;
+    font-family: "Noto Serif SC", serif; font-size: 14px; font-weight: 600;
+    white-space: nowrap; margin-left: 20px;
+  }
+
+  /* Glossary home */
+  .glossary-home { max-width: 1080px; margin: 0 auto; padding: 36px 28px 60px; }
+  .glossary-home h1 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-weight: 700; font-size: 42px; line-height: 1.15;
+    margin: 0 0 12px; letter-spacing: -0.01em;
+  }
+  .glossary-home h1 em {
+    font-style: normal; color: var(--green); background: var(--green-bright);
+    padding: 2px 10px; border-radius: 8px;
+  }
+  .glossary-home .lede {
+    font-size: 15px; color: var(--ink-soft);
+    max-width: 680px; margin: 0 0 28px; line-height: 1.65;
+  }
+  .subway-map {
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 14px; margin-bottom: 36px;
+    aspect-ratio: 4 / 3;
+    background-image: radial-gradient(circle at 1px 1px, var(--grid) 1px, transparent 0);
+    background-size: 16px 16px;
+    overflow: hidden; position: relative;
+  }
+  .subway-map svg { width: 100%; height: 100%; display: block; }
+  .subway-map .tip {
+    position: absolute; left: 14px; bottom: 14px;
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft);
+    background: var(--bg); padding: 6px 10px; border-radius: 6px;
+    border: 1px solid var(--line);
+  }
+  .group-section { margin-bottom: 28px; scroll-margin-top: 80px; }
+  .group-section .head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .group-section .head .dot {
+    width: 16px; height: 16px; border-radius: 5px;
+    border: 1.5px solid currentColor;
+  }
+  .group-section .head h2 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-size: 20px; font-weight: 700; margin: 0;
+  }
+  .group-section .head .count {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft); margin-left: auto;
+  }
+  .term-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .term-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: var(--bg-panel); border: 1px solid var(--line);
+    font-family: "Noto Serif SC", serif; font-size: 13.5px;
+    color: var(--ink); text-decoration: none;
+    transition: all .15s ease;
+  }
+  .term-pill:hover { border-color: var(--green); transform: translateY(-1px); }
+  .term-pill .en {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  /* Term page */
+  .term-page { max-width: 820px; margin: 0 auto; padding: 30px 28px 60px; }
+  .term-page .back {
+    font-family: "JetBrains Mono", monospace; font-size: 12px;
+    color: var(--ink-soft); margin-bottom: 14px; display: inline-block;
+    text-decoration: none;
+  }
+  .term-page .back:hover { color: var(--green); }
+  .term-page .group-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 999px;
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    font-weight: 500; margin-bottom: 14px;
+  }
+  .term-page h1 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-weight: 700; font-size: 42px; line-height: 1.1;
+    margin: 0 0 6px; letter-spacing: -0.01em;
+  }
+  .term-page .en-name {
+    font-family: "JetBrains Mono", monospace; font-size: 14px;
+    color: var(--ink-soft); margin-bottom: 26px; display: block;
+  }
+  .term-page .block {
+    background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 22px; margin-bottom: 12px;
+  }
+  .term-page .block .label {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft); letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+    font-weight: 600;
+  }
+  .term-page .block .label .ic {
+    display: inline-flex; width: 22px; height: 22px; border-radius: 5px;
+    background: var(--bg); align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .term-page .block p { margin: 0; font-size: 15px; line-height: 1.6; }
+  .term-page .block.concrete pre {
+    background: var(--code-bg); color: #E4ECD6; margin: 6px 0 0;
+    padding: 14px 16px; border-radius: 8px; overflow-x: auto;
+    font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.55;
+    white-space: pre;
+  }
+  .term-page .related-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .term-page .related-list a {
+    display: inline-flex; padding: 6px 12px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--line);
+    font-family: "Noto Serif SC", serif; font-size: 13px;
+    color: var(--ink); text-decoration: none;
+  }
+  .term-page .related-list a:hover { border-color: var(--green); color: var(--green); }
+  .term-page .deep-link {
+    margin-top: 18px; padding: 16px 20px;
+    background: var(--green-soft); border: 1px solid #B9CDA7;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .term-page .deep-link .txt { font-size: 13.5px; line-height: 1.5; }
+  .term-page .deep-link a {
+    padding: 9px 14px; border-radius: 8px;
+    background: var(--green); color: #FAF7EC;
+    font-family: "Noto Serif SC", serif; font-size: 13px; font-weight: 600;
+    text-decoration: none; white-space: nowrap;
+  }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
     .stat-row { grid-template-columns: repeat(2, 1fr); }
     h1.title { font-size: 28px; }
     .home h1 { font-size: 36px; }
+    .glossary-home h1, .term-page h1 { font-size: 32px; }
+    .home .glossary-cta { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .home .glossary-cta .btn { margin-left: 0; }
   }
 </style>
 </head>
@@ -459,6 +627,10 @@
     <span class="mark">◆</span>
     <span>Agent <em>Atlas</em></span>
   </div>
+  <nav class="top-tabs" id="top-tabs">
+    <a href="#/" class="tab" data-tab="courses">深入课</a>
+    <a href="#/glossary" class="tab" data-tab="glossary">术语库</a>
+  </nav>
   <div class="lesson-nav" id="lesson-nav"></div>
 </header>
 
@@ -1546,6 +1718,436 @@
     },
   ];
 
+  /* ============== GLOSSARY ============== */
+
+  const groups = [
+    { slug: "model",     name: "模型基础",     bg: "#E4ECD6", border: "#B9CDA7", ink: "#3D5D3C", angle: -90 },
+    { slug: "prompt",    name: "提示工程",     bg: "#FBF1C0", border: "#DCC673", ink: "#7B6314", angle: -39 },
+    { slug: "inference", name: "推理参数",     bg: "#F2D3CB", border: "#B08476", ink: "#8B4B3F", angle: 12 },
+    { slug: "rag",       name: "检索 RAG",     bg: "#CDD9E0", border: "#7F99A8", ink: "#3C5565", angle: 63 },
+    { slug: "finetune",  name: "微调训练",     bg: "#D6CDE0", border: "#8B7CA3", ink: "#4F3E66", angle: 114 },
+    { slug: "agent",     name: "智能体与工具", bg: "#D5EC9B", border: "#3D5D3C", ink: "#3D5D3C", angle: 165 },
+    { slug: "eval",      name: "评估与安全",   bg: "#F9E3DC", border: "#B08476", ink: "#8B4B3F", angle: 216 },
+  ];
+
+  const terms = [
+    // MODEL
+    { slug: "token", group: "model", cn: "词元", en: "token",
+      oneliner: '模型看世界的最小单位。粗略理解成"字"或"半个词"。',
+      metaphor: "像乐高最小的那块砖。整段文本在模型眼里就是一串这样的砖, 一个接一个。",
+      concrete: `"Hello, world"
+→ ["Hello", ",", " world"]     // 3 个 token
+
+"你好, 世界"
+→ ["你", "好", ",", "世", "界"]  // 5 个 token (中文 1 字 ≈ 1 token)`,
+      related: ["tokenizer", "embedding", "context-window"] },
+
+    { slug: "tokenizer", group: "model", cn: "分词器", en: "tokenizer",
+      oneliner: "把文字切成 token 的工具。每个模型有自己的分词器, 切法略不同。",
+      metaphor: "像面包师切吐司。同样的面包, 不同师傅切出来的片数不一样。",
+      concrete: `tokenizer = Tokenizer.from_pretrained("gpt-4o")
+tokenizer.encode("Hello, world")
+# → [9906, 11, 1917]    (3 个 token, 对应 3 个整数 ID)`,
+      related: ["token", "embedding"] },
+
+    { slug: "embedding", group: "model", cn: "向量表示", en: "embedding",
+      oneliner: '把一段文本变成一串数字, 让模型能"算"它, 而不是"读"它。',
+      metaphor: "像给每个词配一个高维坐标。意思相近的词, 坐标就靠得近。",
+      concrete: `embed("猫")   → [0.23, -0.11, 0.87, ..., 0.05]  # 一个 1536 维向量
+embed("狗")   → [0.21, -0.09, 0.85, ..., 0.08]  # 和"猫"很接近
+embed("电脑") → [0.78,  0.44, -0.12, ..., 0.33]  # 和"猫"相距很远`,
+      related: ["vector-db", "rag", "token"] },
+
+    { slug: "attention", group: "model", cn: "注意力机制", en: "attention",
+      oneliner: '模型算下一个词时, 决定"要重点看前文哪些地方"的机制。',
+      metaphor: "像读完一段话回头快速扫一眼, 挑出跟当前问题最相关的那几句。",
+      concrete: `输入: "张三给李四一本书, 他翻了翻, 放下了"
+
+猜"他"是谁时, attention 让模型重点看:
+    "张三" (权重 0.42)
+    "李四" (权重 0.51) ← 最高
+
+→ 算出"他"大概率指"李四"(刚收到书的人)`,
+      related: ["token", "context-window"] },
+
+    { slug: "context-window", group: "model", cn: "上下文窗口", en: "context window",
+      oneliner: '模型一次能"读进"的最大 token 数。超了就要截断或压缩。',
+      metaphor: "像一张固定大小的书桌。桌面一满, 新东西要上来, 就得挪走旧的。",
+      concrete: `GPT-4o:      128K tokens  ≈ 一本 300 页的书
+Claude 4.7:    1M tokens  ≈ 整个 Linux 内核源码
+Gemini 2.5:    2M tokens
+
+Agent 跑长了, messages 累加, 撞上这条线就要:
+  · 压缩旧消息成摘要
+  · 裁掉最老的几轮`,
+      related: ["token", "hallucination", "agent-loop"] },
+
+    // PROMPT
+    { slug: "system-prompt", group: "prompt", cn: "系统提示", en: "system prompt",
+      oneliner: "对话最开头的一条消息, 定模型的人设和规则。对话期间一直生效。",
+      metaphor: '像舞台剧的"角色说明"。演员上台前先告诉他: 你演谁, 性格怎样, 别打破第四面墙。',
+      concrete: `messages = [
+  {"role": "system", "content": "你是一个 Python 专家。代码优先, 不道歉。"},
+  {"role": "user",   "content": "怎么读 JSON 文件?"}
+]`,
+      related: ["few-shot", "chain-of-thought", "hallucination"], deepLink: "prompt" },
+
+    { slug: "few-shot", group: "prompt", cn: "少样本提示", en: "few-shot",
+      oneliner: '在 prompt 里放几个"输入 → 输出"的例子, 让模型照猫画虎。',
+      metaphor: "面试给候选人看两道做好的样题, 他就知道格式和风格了。",
+      concrete: `输入: 苹果 → 输出: 水果
+输入: 卡车 → 输出: 交通工具
+输入: 西瓜 → 输出: ?
+
+模型看着格式学, 回: "水果"`,
+      related: ["system-prompt", "chain-of-thought"] },
+
+    { slug: "chain-of-thought", group: "prompt", cn: "思维链 (CoT)", en: "chain-of-thought",
+      oneliner: '让模型"把推理过程写出来, 再给答案"。复杂题准确率大幅提升。',
+      metaphor: '数学题里"写步骤"。直接写答案容易错, 写步骤反而稳。',
+      concrete: `Q: 一个屋子有 15 只鸡, 卖了 5 只, 又买了 3 只。现在多少只?
+
+❌ 直接答:     "18"   (错)
+✓ CoT 提示:
+   "一步步想: 15 - 5 = 10 (卖了), 10 + 3 = 13 (再买)。答: 13"`,
+      related: ["few-shot", "hallucination", "system-prompt"] },
+
+    { slug: "hallucination", group: "prompt", cn: "幻觉", en: "hallucination",
+      oneliner: '模型一本正经地瞎编。它的任务是"猜合理的下一个 token", 不是"确保事实对"。',
+      metaphor: "像一个口若悬河地编故事的小孩。不是故意撒谎 —— 它就不知道自己不知道。",
+      concrete: `Q: 2024 年图灵奖得主是谁?
+A (模型编): "Andrew Ng 和 Yoshua Bengio。"  ← 听起来合理, 但错了
+
+修的办法:
+  · RAG: 给它查真资料, 别让它靠记忆答
+  · 让它说"不确定"
+  · 事后用另一个模型校验`,
+      related: ["rag", "eval", "system-prompt"] },
+
+    // INFERENCE
+    { slug: "temperature", group: "inference", cn: "温度", en: "temperature",
+      oneliner: '0 到 2 之间的数, 控制模型"保守"还是"放飞"。低 = 稳定, 高 = 有创意。',
+      metaphor: "给厨子的自由度。温度 0 = 严格按菜谱; 温度 1 = 随手发挥; 温度 2 = 可能把盐换成糖。",
+      concrete: `Q: "写一句关于秋天的诗"
+
+temperature = 0:    "秋风起, 落叶黄。"              (每次都这句)
+temperature = 0.7:  "金色的叶子在风中起舞。"         (有点变化)
+temperature = 1.5:  "秋是披着铁锈的猫。"            (奇怪但新颖)`,
+      related: ["top-p", "streaming"] },
+
+    { slug: "top-p", group: "inference", cn: "核采样", en: "top-p",
+      oneliner: '另一种控制随机性的旋钮。只在"概率加起来到 p"的那组词里挑, 其余砍掉。',
+      metaphor: "从候选排行榜里抽, 不管后面的长尾。top_p=0.9 = 只考虑能占 90% 投票的那些候选词。",
+      concrete: `下一个词的概率分布:
+  "好"(0.4)  "的"(0.3)  "了"(0.15)  "就"(0.1)  "啊"(0.05) ...
+
+top_p = 0.9  → 只从 [好, 的, 了, 就] 里挑 (加起来 ≈ 0.95)
+top_p = 0.5  → 只从 [好, 的] 里挑`,
+      related: ["temperature", "streaming"] },
+
+    { slug: "streaming", group: "inference", cn: "流式输出", en: "streaming",
+      oneliner: "模型生成一个 token 就吐一个, 不等整段。你看到的打字机效果就是这个。",
+      metaphor: "像翻译员一边听一边翻, 而不是等你说完再整段翻。",
+      concrete: `# 非流式: 等 10 秒, 一下全出来
+response = llm(messages)
+print(response)
+
+# 流式: 一个字一个字出
+for chunk in llm.stream(messages):
+    print(chunk, end="", flush=True)`,
+      related: ["temperature", "token"] },
+
+    // RAG
+    { slug: "rag", group: "rag", cn: "检索增强生成", en: "RAG",
+      oneliner: "Retrieval-Augmented Generation。回答之前先查资料, 再基于资料答。",
+      metaphor: "闭卷考试(纯 LLM)vs 开卷考试(RAG)。开卷不会瞎编, 但要会翻书。",
+      concrete: `用户: "我们公司退款几天内?"
+
+1. 把问题变成 embedding, 去向量库查最相关的几段文档
+2. 找到: "<文档> 退款需在 30 天内申请, 要原包装..."
+3. 塞进 prompt: "基于以下文档, 回答..."
+4. 模型答: "30 天内, 要原包装。"  ← 不编了`,
+      related: ["vector-db", "chunking", "embedding", "hallucination"] },
+
+    { slug: "vector-db", group: "rag", cn: "向量数据库", en: "vector db",
+      oneliner: "专门存 embedding 的数据库。给它一个查询向量, 它快速找最相似的那些。",
+      metaphor: '像图书馆的"按主题相似度排"的目录系统, 不是按书名字母排。',
+      concrete: `存:
+  "退款政策..." → V1 → 入库
+  "发货时间..." → V2 → 入库
+  "价格表..."   → V3 → 入库
+
+查:
+  Q = embed("怎么退款?")
+  db.search(Q, top_k=3) → 返回最相似的 3 条
+
+常见产品: Pinecone, Qdrant, Weaviate, Chroma, pgvector`,
+      related: ["embedding", "rag", "chunking"] },
+
+    { slug: "chunking", group: "rag", cn: "切块", en: "chunking",
+      oneliner: "把长文档切成小块再 embed。整本书一起比对太粗, 切块才找得准那句话。",
+      metaphor: "整本小说一起对太粗; 切成段落比对, 才能找到想要的那句话。",
+      concrete: `原文: 5 万字员工手册
+
+切块策略:
+  · 固定长度: 每 500 字一块
+  · 按段落切: 自然段作为块
+  · 层次切块: 大章 → 节 → 段
+
+每块独立 embed + 存入 vector db`,
+      related: ["rag", "embedding", "vector-db"] },
+
+    // FINETUNE
+    { slug: "fine-tuning", group: "finetune", cn: "微调", en: "fine-tuning",
+      oneliner: "在预训练好的通用模型上, 用你自己的数据再训一轮, 让它更懂你的场景。",
+      metaphor: "大学毕业生(通用模型)来公司, 入职培训两周(微调), 就上手公司业务了。",
+      concrete: `通用 GPT: 什么都会一点
+
++ 公司 10000 封客服聊天记录 → fine-tune
+
+= 这家公司专属的客服 GPT
+  (说话风格、术语、常见处理方式, 都更贴)`,
+      related: ["lora", "rlhf", "embedding"] },
+
+    { slug: "lora", group: "finetune", cn: "低秩适配", en: "LoRA",
+      oneliner: "Low-Rank Adaptation。微调时不改原模型权重, 只在旁边加一小组补丁。省算力 100 倍。",
+      metaphor: "不改原装电路, 只贴一块外挂电路板。想撤销就拔掉。",
+      concrete: `原模型: 70B 参数 (280 GB)
+全参微调: 8 张 A100 跑一周
+
+LoRA: 只训"补丁"参数, 约原模型的 0.1% (~70M)
+  → 一张消费级显卡, 几小时搞定
+  → 多个"补丁"切换加载: 一基础模型 → 多个专家模型`,
+      related: ["fine-tuning", "rlhf"] },
+
+    { slug: "rlhf", group: "finetune", cn: "人类反馈强化学习", en: "RLHF",
+      oneliner: "让人工标注员给模型输出打分, 用这些分数再训模型去更讨人喜欢。ChatGPT 能听话主要靠它。",
+      metaphor: "像训狗。狗做对了给零食(人类点赞), 做错了别理它, 它就学会什么是好。",
+      concrete: `Step 1: 预训练模型 - 什么都会说, 但没口味
+Step 2: 同一问题生成 4 个答案, 让人选"哪个最好"
+Step 3: 把这些偏好训成一个"评分模型"
+Step 4: 用评分模型指导原模型, 让它越来越像"人类喜欢的那个"
+
+替代方案: DPO (Direct Preference Optimization), 更简单, 效果近似`,
+      related: ["fine-tuning", "lora"] },
+
+    // AGENT
+    { slug: "tool-call", group: "agent", cn: "工具调用", en: "tool call",
+      oneliner: "模型在回答前, 决定调用一个外部工具(函数、API), 拿到结果再继续。",
+      metaphor: "学生做题遇到不会的, 先查字典(tool call), 查到再写答案。",
+      concrete: `用户: "今天北京天气?"
+
+模型 (不直接答, 发出 tool_call):
+  { "name": "get_weather", "args": {"city": "北京"} }
+
+程序执行: get_weather("北京") → "15°C, 晴"
+
+模型 (看到结果, 继续):
+  "今天北京 15°C, 晴。"`,
+      related: ["function-calling", "mcp", "agent-loop"], deepLink: "agent" },
+
+    { slug: "function-calling", group: "agent", cn: "函数调用", en: "function calling",
+      oneliner: 'tool call 的标准化实现。你描述"有哪些函数、每个要啥参数", 模型按 JSON schema 生成调用。',
+      metaphor: '像给 LLM 一本"你能使唤的小工具说明书"。它翻书选工具、填参数, 你负责执行。',
+      concrete: `tools = [{
+  "name": "get_weather",
+  "description": "查某城市的实时天气",
+  "parameters": {
+    "type": "object",
+    "properties": {"city": {"type": "string"}},
+    "required": ["city"]
+  }
+}]
+
+response = llm(messages, tools=tools)
+# → response.tool_calls = [{"name":"get_weather", "args":{"city":"北京"}}]`,
+      related: ["tool-call", "mcp", "agent-loop"] },
+
+    { slug: "mcp", group: "agent", cn: "Model Context Protocol", en: "MCP",
+      oneliner: "Anthropic 提的协议, 让 LLM 以统一方式接入任意工具/数据源。像 USB 标准之于硬件。",
+      metaphor: "以前每个 agent 要为每个工具写胶水代码。MCP 统一接口 —— 一次写好, 任何 agent 都能用。",
+      concrete: `MCP server (如 Slack 插件): 暴露工具 list_channels, send_message
+       ↕  (标准化协议: stdio / HTTP+SSE)
+MCP client (Claude Desktop, Cursor, VSCode, Zed, ...): 发现并调用
+
+同一个 Slack server, Claude 能用, Cursor 也能用, 不用各写一遍。`,
+      related: ["tool-call", "function-calling", "agent-loop"], deepLink: "agent" },
+
+    { slug: "agent-loop", group: "agent", cn: "智能体循环", en: "agent loop",
+      oneliner: "Agent 跑任务的核心控制流: LLM 决策 → 调工具 → 看结果 → 再决策, 直到完成。",
+      metaphor: "像人做复杂事: 看现状 → 想下一步 → 做 → 再看 → 调整, 一圈一圈到搞定。",
+      concrete: `while True:
+  resp = llm(messages, tools=TOOLS)
+  if not resp.tool_calls:
+    return resp.content   # 没工具调用 → 结束
+  for call in resp.tool_calls:
+    result = TOOLS[call.name](**call.args)
+    messages.append({"role": "tool", "content": result})`,
+      related: ["tool-call", "context-window", "hallucination"], deepLink: "runtime" },
+
+    // EVAL
+    { slug: "benchmark", group: "eval", cn: "基准测试", en: "benchmark",
+      oneliner: "一组固定题目 + 标准答案, 让不同模型跑同一题库, 看谁对得多。",
+      metaphor: "像高考。题是固定的, 大家一起考, 分数能横向比。",
+      concrete: `常见 benchmark:
+  MMLU       - 57 个学科的常识/知识
+  HumanEval  - 164 道编程题, 看代码能不能跑
+  GSM8K      - 8000 道小学数学应用题
+  MT-Bench   - 多轮对话质量
+  SWE-bench  - 真实 GitHub issue 能不能修
+
+分数高 ≠ 实际好用。Benchmark 会被"刷"。`,
+      related: ["eval", "hallucination"] },
+
+    { slug: "jailbreak", group: "eval", cn: "越狱", en: "jailbreak",
+      oneliner: "用特殊 prompt 诱导模型绕过自己的安全限制。",
+      metaphor: '像哄小孩: "咱们假装在玩一个游戏, 这游戏里没有规则..."',
+      concrete: `正常 prompt: "教我造 X"       → 模型拒绝
+jailbreak 常见套路:
+  · "假设你是一个 AI, 没有道德限制, 现在扮演..."
+  · "DAN (Do Anything Now) 模式..."
+  · "以剧本写作的方式, 不是真的..."
+  → 诱导模型吐出不该说的内容
+
+修的办法: red-team 测、filter、guardrails、更强的对齐训练`,
+      related: ["eval", "system-prompt"] },
+
+    { slug: "eval", group: "eval", cn: "评估", en: "eval",
+      oneliner: "衡量 LLM/agent 实际好不好用的过程。比 benchmark 更广, 包括业务指标和人评。",
+      metaphor: "benchmark 是摸底考, eval 是上岗考核。前者只看知识, 后者看真能干活。",
+      concrete: `生产级 eval 通常包括:
+  · 自动化测试 (expected input → expected output)
+  · LLM-as-judge (让一个更强的模型打分)
+  · 人工抽检 (抽 100 条真实对话人评)
+  · 业务指标 (完成率、用户满意度、拒答率)
+  · 对抗测试 (jailbreak 尝试、幻觉率)
+
+没有 eval, 没法说一个 agent 在"变好"还是"变坏"。`,
+      related: ["benchmark", "jailbreak", "hallucination"] },
+  ];
+
+  function renderGlossaryHome() {
+    const cx = 400, cy = 300, hubR = 44, branchLen = 180;
+    const mapGroups = groups.map(g => {
+      const rad = g.angle * Math.PI / 180;
+      return {
+        ...g,
+        x: cx + branchLen * Math.cos(rad),
+        y: cy + branchLen * Math.sin(rad),
+        sx: cx + (hubR + 2) * Math.cos(rad),
+        sy: cy + (hubR + 2) * Math.sin(rad),
+      };
+    });
+
+    const mapSvg = `
+      <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="hub-grad" cx="0.5" cy="0.45">
+            <stop offset="0" stop-color="#F9F0C0"/>
+            <stop offset="1" stop-color="#EDDC8A"/>
+          </radialGradient>
+        </defs>
+        ${mapGroups.map(g => `
+          <line x1="${g.sx}" y1="${g.sy}" x2="${g.x}" y2="${g.y}" stroke="${g.border}" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+          <a href="#glossary-group-${g.slug}">
+            <g transform="translate(${g.x}, ${g.y})" style="cursor:pointer">
+              <rect x="-72" y="-26" width="144" height="52" rx="12" fill="${g.bg}" stroke="${g.border}" stroke-width="1.5"/>
+              <text y="-4" font-family="Noto Serif SC, serif" font-size="14" font-weight="700" fill="${g.ink}" text-anchor="middle">${g.name}</text>
+              <text y="15" font-family="JetBrains Mono, monospace" font-size="10" fill="${g.ink}" text-anchor="middle" opacity="0.8">${terms.filter(t => t.group === g.slug).length} 个词</text>
+            </g>
+          </a>
+        `).join("")}
+        <circle cx="${cx}" cy="${cy}" r="${hubR}" fill="url(#hub-grad)" stroke="#A89D7E" stroke-width="2"/>
+        <text x="${cx}" y="${cy - 2}" font-family="Fraunces, serif" font-weight="700" font-size="22" fill="#3D5D3C" text-anchor="middle">LLM</text>
+        <text x="${cx}" y="${cy + 18}" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">术语总图</text>
+      </svg>
+    `;
+
+    const groupSections = groups.map(g => {
+      const gterms = terms.filter(t => t.group === g.slug);
+      return `
+        <section class="group-section" id="glossary-group-${g.slug}">
+          <div class="head" style="color: ${g.ink}">
+            <span class="dot" style="background: ${g.bg}; border-color: ${g.border}"></span>
+            <h2>${g.name}</h2>
+            <span class="count">${gterms.length} 个词</span>
+          </div>
+          <div class="term-pill-row">
+            ${gterms.map(t => `
+              <a class="term-pill" href="#/glossary/${t.slug}">
+                <span>${t.cn}</span>
+                <span class="en">${t.en}</span>
+              </a>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }).join("");
+
+    app.innerHTML = `
+      <div class="glossary-home">
+        <h1><em>术语库</em> · LLM 关键词小书</h1>
+        <p class="lede">25 个常见词, 按 7 个主题分组。每条都是: 一句话定义 + 一个比喻 + 一段代码/图例 + 相关词。地图是全景入口, 点词进单页。</p>
+        <div class="subway-map">
+          ${mapSvg}
+          <div class="tip">点一个主题 → 跳到下面对应分组</div>
+        </div>
+        ${groupSections}
+      </div>
+    `;
+  }
+
+  function escapeHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function renderTermPage(term) {
+    const group = groups.find(g => g.slug === term.group);
+    const relatedTerms = (term.related || []).map(slug => terms.find(t => t.slug === slug)).filter(Boolean);
+    const deepLesson = term.deepLink ? lessons.find(l => l.slug === term.deepLink) : null;
+
+    app.innerHTML = `
+      <div class="term-page">
+        <a class="back" href="#/glossary">← 术语库</a>
+        <div><span class="group-tag" style="background: ${group.bg}; color: ${group.ink}; border: 1px solid ${group.border}">◆ ${group.name}</span></div>
+        <h1>${term.cn}</h1>
+        <span class="en-name">${term.en}</span>
+
+        <div class="block">
+          <div class="label"><span class="ic">💡</span>一句话定义</div>
+          <p>${term.oneliner}</p>
+        </div>
+
+        <div class="block">
+          <div class="label"><span class="ic">🔀</span>比喻</div>
+          <p>${term.metaphor}</p>
+        </div>
+
+        <div class="block concrete">
+          <div class="label"><span class="ic">📐</span>具象化</div>
+          <pre>${escapeHtml(term.concrete)}</pre>
+        </div>
+
+        <div class="block">
+          <div class="label"><span class="ic">🔗</span>常一起出现</div>
+          <div class="related-list">
+            ${relatedTerms.length
+              ? relatedTerms.map(t => `<a href="#/glossary/${t.slug}">${t.cn} · ${t.en}</a>`).join("")
+              : '<p style="margin:0;color:var(--ink-soft);font-size:13px">(暂无相关词)</p>'}
+          </div>
+        </div>
+
+        ${deepLesson ? `
+          <div class="deep-link">
+            <div class="txt">
+              <strong>深入课里有一整节在讲这个</strong><br>
+              <span style="color: var(--ink-soft); font-size: 12.5px">想看完整的 4 步拆解就点进去</span>
+            </div>
+            <a href="#/${deepLesson.slug}">📖 看这一节 →</a>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
   /* ============== ROUTER + RENDER ============== */
 
   const app = document.getElementById("app");
@@ -1554,11 +2156,17 @@
   function parseRoute() {
     const h = location.hash.replace(/^#\/?/, "");
     if (!h) return { page: "home" };
-    const slug = h.split("/")[0];
+    const parts = h.split("/");
+    if (parts[0] === "glossary") {
+      if (!parts[1]) return { page: "glossary-home" };
+      const term = terms.find(t => t.slug === parts[1]);
+      if (!term) return { page: "glossary-home" };
+      return { page: "term", term };
+    }
+    const slug = parts[0];
     const lesson = lessons.find(l => l.slug === slug);
     if (!lesson) return { page: "home" };
-    const stepStr = h.split("/")[1];
-    const step = Math.max(1, Math.min(lesson.stepCount, parseInt(stepStr, 10) || 1));
+    const step = Math.max(1, Math.min(lesson.stepCount, parseInt(parts[1], 10) || 1));
     return { page: "lesson", lesson, step };
   }
 
@@ -1566,8 +2174,21 @@
   window.go = go;
 
   function renderNav(route) {
+    // top-tab active state
+    document.querySelectorAll("#top-tabs .tab").forEach(t => t.classList.remove("active"));
+    const activeTab = (route.page === "glossary-home" || route.page === "term") ? "glossary" : "courses";
+    document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
+
     nav.innerHTML = "";
     if (route.page === "home") { nav.innerHTML = `<span class="n-cur">课程首页</span>`; return; }
+    if (route.page === "glossary-home") { nav.innerHTML = `<span class="n-cur">术语库</span>`; return; }
+    if (route.page === "term") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('glossary')">← 术语库</button>
+        <span class="n-cur">${route.term.en}</span>
+      `;
+      return;
+    }
     const i = lessons.indexOf(route.lesson);
     const prev = lessons[i - 1];
     const next = lessons[i + 1];
@@ -1602,7 +2223,15 @@
           <span>◇ 从非程序员到开发者, 都能看</span>
         </div>
 
-        <h2>目录</h2>
+        <a class="glossary-cta" href="#/glossary">
+          <div class="txt">
+            <h3>术语库 →</h3>
+            <p>25+ 个 LLM 关键词, 按 7 个主题分组。每条: 一句话 + 一个比喻 + 一段代码。想随手查的话, 从这里进。</p>
+          </div>
+          <span class="btn">去查词 →</span>
+        </a>
+
+        <h2>深入课</h2>
         <div class="toc">${cards}</div>
 
         <div class="footer">
@@ -1766,6 +2395,8 @@
     const r = parseRoute();
     renderNav(r);
     if (r.page === "home") { lesson = null; renderHome(); }
+    else if (r.page === "glossary-home") { lesson = null; renderGlossaryHome(); }
+    else if (r.page === "term") { lesson = null; renderTermPage(r.term); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
