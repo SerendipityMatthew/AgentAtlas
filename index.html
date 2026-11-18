@@ -947,7 +947,7 @@
           pill: "机制", pillClass: "idea",
           title: "模型其实在\"猜下一个字\"",
           body: `<p>模型并不是想好整段话再回你。它是<strong>一个 token 一个 token 蹦出来的</strong>——你看到的流式打字效果, 就是这个过程本身。</p>
-            <p>"token"可以粗略理解成"字"或"半个词"。它每次看着前面所有内容, 猜概率最高的下一个; 猜完一个, 接上去, 再猜下一个, 直到它觉得"该结束了"。</p>
+            <p>"token"可以粗略理解成"字"或"半个词" (实际切法由分词器决定)。它每次看着前面所有内容, 猜概率最高的下一个; 猜完一个, 接上去, 再猜下一个, 直到它觉得"该结束了"。</p>
             <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
             <p>这就是 next-token prediction。所有大模型本质上都在做这件事, 区别在于架构和训练数据。</p></div>`,
           next: "下一步: 多轮对话的秘密 →",
@@ -1596,7 +1596,7 @@
             <text x="48" y="160" font-family="JetBrains Mono, monospace" font-size="12" fill="#F2D3CB">send_email,</text>
             <text x="48" y="178" font-family="JetBrains Mono, monospace" font-size="12" fill="#F2D3CB">read_calendar,</text>
             <text x="32" y="196" font-family="JetBrains Mono, monospace" font-size="12" fill="#CDD9E0">],</text>
-            <text x="32" y="214" font-family="JetBrains Mono, monospace" font-size="12" fill="#CDD9E0">model="claude-opus-4"</text>
+            <text x="32" y="214" font-family="JetBrains Mono, monospace" font-size="12" fill="#CDD9E0">model="claude-opus-4-7"</text>
             <text x="16" y="232" font-family="JetBrains Mono, monospace" font-size="12" fill="#D4E0C8">)</text>
             <text x="16" y="252" font-family="JetBrains Mono, monospace" font-size="12" fill="#E4ECD6">agent.run(</text>
             <text x="112" y="252" font-family="JetBrains Mono, monospace" font-size="12" fill="#F2D3CB">"订周五去北京的机票"</text>
@@ -1904,18 +1904,24 @@
       oneliner: '模型看世界的最小单位。粗略理解成"字"或"半个词"。',
       metaphor: "像乐高最小的那块砖。整段文本在模型眼里就是一串这样的砖, 一个接一个。",
       concrete: `"Hello, world"
-→ ["Hello", ",", " world"]     // 3 个 token
+→ ["Hello", ",", " world"]     // ~3 个 token
 
 "你好, 世界"
-→ ["你", "好", ",", "世", "界"]  // 5 个 token (中文 1 字 ≈ 1 token)`,
+→ ["你", "好", ",", "世", "界"]  // ~5 个 token
+
+// 实际切法由模型的 tokenizer 决定。
+// 英文粗略: 1 词 ≈ 1–2 token
+// 中文粗略: 1 字 ≈ 1 token`,
       related: ["tokenizer", "embedding", "context-window"] },
 
     { slug: "tokenizer", group: "model", cn: "分词器", en: "tokenizer",
       oneliner: "把文字切成 token 的工具。每个模型有自己的分词器, 切法略不同。",
       metaphor: "像面包师切吐司。同样的面包, 不同师傅切出来的片数不一样。",
-      concrete: `tokenizer = Tokenizer.from_pretrained("gpt-4o")
-tokenizer.encode("Hello, world")
-# → [9906, 11, 1917]    (3 个 token, 对应 3 个整数 ID)`,
+      concrete: `import tiktoken
+enc = tiktoken.encoding_for_model("gpt-4o")
+enc.encode("Hello, world")
+# → [13225, 11, 2375]   (3 个 token, 对应 3 个整数 ID)
+# ID 具体数值取决于分词器版本, 别照抄`,
       related: ["token", "embedding"] },
 
     { slug: "embedding", group: "model", cn: "向量表示", en: "embedding",
@@ -1941,9 +1947,12 @@ embed("电脑") → [0.78,  0.44, -0.12, ..., 0.33]  # 和"猫"相距很远`,
     { slug: "context-window", group: "model", cn: "上下文窗口", en: "context window",
       oneliner: '模型一次能"读进"的最大 token 数。超了就要截断或压缩。',
       metaphor: "像一张固定大小的书桌。桌面一满, 新东西要上来, 就得挪走旧的。",
-      concrete: `GPT-4o:      128K tokens  ≈ 一本 300 页的书
-Claude 4.7:    1M tokens  ≈ 整个 Linux 内核源码
-Gemini 2.5:    2M tokens
+      concrete: `GPT-4o:      ~128K tokens  ≈ 一本 300 页的书
+Claude 4.7:    ~1M tokens  ≈ 整个 Linux 内核源码
+Gemini 2.5:    ~2M tokens
+
+// 具体数字随版本变化, 以厂商 docs 为准。
+// 装得下 ≠ 用得好 —— 详见 "context-rot" 条。
 
 Agent 跑长了, messages 累加, 撞上这条线就要:
   · 压缩旧消息成摘要
