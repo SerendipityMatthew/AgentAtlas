@@ -2255,7 +2255,7 @@ jailbreak 常见套路:
     app.innerHTML = `
       <div class="glossary-home">
         <h1><em>术语库</em> · LLM 关键词小书</h1>
-        <p class="lede">25 个常见词, 按 7 个主题分组。每条都是: 一句话定义 + 一个比喻 + 一段代码/图例 + 相关词。地图是全景入口, 点词进单页。</p>
+        <p class="lede">${terms.length} 个常见词, 按 7 个主题分组, 含 context / loop / reasoning / workflow-vs-agent 等热词。每条都是: 一句话定义 + 一个比喻 + 一段代码/图例 + 相关词。地图是全景入口, 点词进单页。</p>
         <div class="subway-map">
           ${mapSvg}
           <div class="tip">点一个主题 → 跳到下面对应分组</div>
@@ -2580,6 +2580,174 @@ jailbreak 常见套路:
       explain: "MMLU / HumanEval / GSM8K 都是 benchmark; 高分 ≠ 实用好。",
       from: { kind: "term", slug: "benchmark" } },
   ];
+
+  // --- v2 hot terms (context / loop 系列) 追加 ---
+  terms.push(
+
+    { slug: "context-engineering", group: "prompt", cn: "上下文工程", en: "context engineering",
+      oneliner: "比 prompt engineering 更广: 管理整个送进模型的\"信息环境\" —— 不只 prompt, 还有历史、检索、工具输出、记忆。",
+      metaphor: "Prompt 是一句台词, context engineering 是整个舞台布置: 道具、灯光、背景全部一起排。",
+      concrete: `送进模型的 context 实际是:
+  [system prompt]
+  + [few-shot 例子]
+  + [相关文档 (RAG 检索的)]
+  + [对话历史 (可能压过)]
+  + [工具调用历史]
+  + [当前用户消息]
+
+Context engineering 就是决定:
+  · 哪些必须在, 哪些按需加
+  · 加载顺序、相对位置
+  · 什么时候压缩、什么时候保原文`,
+      related: ["system-prompt", "rag", "context-window", "chunking"] },
+
+    { slug: "context-rot", group: "model", cn: "上下文腐烂", en: "context rot",
+      oneliner: "长 context 下模型质量下降 —— 窗口能装 1M 不代表塞满了还靠谱。中段信息最容易被模型漏看。",
+      metaphor: "一本太厚的笔记本, 翻到中间那几页反而最容易漏看。",
+      concrete: `观察: 把关键信息放 context 中间, 模型召回率
+      常比放开头/结尾时低很多 (Lost in the Middle 现象)。
+
+缓解办法:
+  · 关键信息放最前或最后
+  · 不要装满了就当\"OK\", 在真实任务上测一下
+  · 长 context 场景用 RAG 先过滤, 别全塞`,
+      related: ["context-window", "rag", "attention"] },
+
+    { slug: "prompt-caching", group: "inference", cn: "提示缓存", en: "prompt caching",
+      oneliner: "把 prompt 的\"固定前缀\"在模型侧缓存, 下次复用 —— 省时间, 省钱。Agent 场景收益巨大。",
+      metaphor: "给朗读者递同一本书的不同页: 书他翻过了, 不用每次从头重读。",
+      concrete: `一个 agent 跑 100 轮, 每轮都带着同样的:
+  - 2000 字的 system prompt
+  - 10 个 skill 的 markdown
+  - 5 KB 的工具 schema
+
+没缓存: 每轮都要让模型重新处理这堆 (~8K tokens)
+有缓存: 第一次算全量, 之后只处理新增 ——
+  Anthropic 现价缓存读价是普通 input 的 1/10,
+  延迟也降一大截。`,
+      related: ["context-window", "system-prompt", "agent-loop"] },
+
+    { slug: "reasoning-model", group: "model", cn: "推理模型 / 延长思考", en: "reasoning model",
+      oneliner: "回答前先大段\"自己想\"的模型 (o1 / Claude extended thinking)。思考过程消耗 token, 复杂题准确率显著提升。",
+      metaphor: "从\"直接报答案\"变成\"开卷还打草稿\"。学生做数学题就是这路子。",
+      concrete: `普通模型:
+  Q: "35% 的 180 是多少?"
+  A: "63"     (直接猜, 可能错)
+
+Reasoning 模型:
+  Q: 同上
+  <thinking>
+    35% × 180 = 0.35 × 180
+              = (0.3 × 180) + (0.05 × 180)
+              = 54 + 9 = 63
+  </thinking>
+  A: "63"     (稳得多)
+
+代价: 思考过程 token 要算钱, 延迟更长。`,
+      related: ["chain-of-thought", "context-window", "hallucination"] },
+
+    { slug: "react", group: "agent", cn: "推理+行动模式", en: "ReAct",
+      oneliner: "Reasoning + Acting 的循环: 想一句 → 做一步 → 看结果 → 再想 → 再做, 直到搞定。",
+      metaphor: "侦探破案: 想一个假设 → 查个证据 → 根据证据再调整假设。",
+      concrete: `Thought: 用户问"北京今天天气", 需要查实时数据。
+Action:  get_weather(city="北京")
+Observation: {"temp": 15, "condition": "sunny"}
+Thought: 够了, 可以回答。
+Action:  reply("今天北京 15°C, 晴。")
+
+这是 agent loop 最常见的具体实现模式。
+对比 planning: ReAct 是"边走边看", planning 是"先排完计划"。`,
+      related: ["agent-loop", "tool-call", "chain-of-thought", "planning"] },
+
+    { slug: "reflection", group: "agent", cn: "自我反思", en: "reflection",
+      oneliner: "Agent 生成初稿后, 让它(或另一个模型)再评审一次、找出问题、改进。像自我 code review。",
+      metaphor: "作家写完初稿放一晚, 第二天自己读一遍, 改掉废话。",
+      concrete: `agent 流程加一步:
+  1. 生成初稿答案 / 代码 / 计划
+  2. (Reflection) 让模型批评这版:
+         "有什么漏洞? 哪里能更好?"
+  3. 根据批评再改一版
+  4. (可选) 循环 2-3 直到满意或达上限
+
+代价: 多几轮 LLM 调用。
+收益: 复杂任务上质量常明显提升 (Reflexion 论文有数据)。`,
+      related: ["agent-loop", "chain-of-thought", "eval"] },
+
+    { slug: "planning", group: "agent", cn: "规划-执行模式", en: "planning / plan-and-execute",
+      oneliner: "先让模型列一个完整计划, 再按步骤执行 —— 对比 ReAct 的\"边走边看\"。",
+      metaphor: "旅行前把日程排完再出门 vs 走到哪算到哪。",
+      concrete: `用户: "帮我做市场调研并写一份报告"
+
+Plan (一次性生成):
+  1. 搜 5 家竞品官网
+  2. 提取每家的定价/功能
+  3. 列对比表
+  4. 写结论和建议
+
+然后按 1-4 顺序执行, 每步可以调工具。
+
+优点: 结构清晰, 适合要先和用户确认计划的场景。
+缺点: 计划一旦定了不灵活, 中途变故要重做。`,
+      related: ["react", "agent-loop", "tool-call"] },
+
+    { slug: "sub-agent", group: "agent", cn: "子智能体", en: "sub-agent",
+      oneliner: "主 agent 遇到专门任务时, 派给一个专用\"子 agent\"去跑, 收到结果再继续。",
+      metaphor: "项目经理分派任务给专业小组, 自己只看结果汇总。",
+      concrete: `主 agent (产品经理 agent) 要做市场分析:
+  → 派 "搜索 agent" 去收集资料
+  → 派 "分析 agent" 去归纳
+  → 派 "写作 agent" 去出稿
+  → 主 agent 组合各组结果
+
+好处:
+  · 每个子 agent 的 context 短、专注、可独立 debug
+  · 子任务能并行
+
+风险:
+  · 协作成本、信息损耗
+  · 容易过度工程 —— 简单任务别拆
+
+Claude Code / Cursor 的 subagent 就是这个概念。`,
+      related: ["agent-loop", "context-window", "tool-call", "workflow-vs-agent"] },
+
+    { slug: "workflow-vs-agent", group: "agent", cn: "工作流 vs 智能体", en: "workflow vs agent",
+      oneliner: "工作流 = 开发者预定好的步骤 + 条件分支; 智能体 = LLM 自己决定下一步。能写死就写死, 别乱上 agent。",
+      metaphor: "工作流是地铁线路图, agent 是叫网约车让司机自己选路。",
+      concrete: `Anthropic《Building Effective Agents》观点:
+
+  ┌────────────────────┬─────────────────────┐
+  │ Workflow (静态)    │ Agent (动态)         │
+  ├────────────────────┼─────────────────────┤
+  │ 开发者写好流程      │ LLM 决定下一步       │
+  │ 可预测, 易调试      │ 灵活, 难调试         │
+  │ 任务规则明确时用    │ 任务开放/未知时用    │
+  │ 便宜、快            │ 贵、慢               │
+  └────────────────────┴─────────────────────┘
+
+反模式: 本质是 "Q→API→A" 的简单流程硬包成 agent ——
+既贵又不稳。先试 workflow, 不够再升 agent。`,
+      related: ["agent-loop", "planning", "react"] },
+
+    { slug: "parallel-tool-calls", group: "agent", cn: "并行工具调用", en: "parallel tool calls",
+      oneliner: "模型一轮里同时发出多个 tool_call, 由运行时并发执行, 比串行省大一截时间。",
+      metaphor: "一次吩咐助理\"顺路买咖啡、取快递、问下会议室\", 不是一件一件回来问。",
+      concrete: `用户: "北京、上海、纽约今天天气分别如何?"
+
+串行 (老办法):
+  get_weather("北京")   →  2s
+  get_weather("上海")   →  2s
+  get_weather("纽约")   →  2s
+  (总共 ~6s)
+
+并行 (新模型都支持):
+  [get_weather("北京"),
+   get_weather("上海"),
+   get_weather("纽约")]   →  同时发, ~2s 全回来
+
+GPT-4o / Claude 4.5+ 都原生支持。`,
+      related: ["tool-call", "function-calling", "agent-loop"] },
+
+  );
 
   const quizDeep = [
     { q: "你的 agent 回复过于礼貌客套, 用户觉得啰嗦。你最该先调什么?",
@@ -2924,7 +3092,7 @@ jailbreak 常见套路:
         <a class="glossary-cta" href="#/glossary">
           <div class="txt">
             <h3>术语库 →</h3>
-            <p>25+ 个 LLM 关键词, 按 7 个主题分组。每条: 一句话 + 一个比喻 + 一段代码。想随手查的话, 从这里进。</p>
+            <p>35+ 个 LLM 关键词, 按 7 个主题分组, 覆盖 context、loop、reasoning、workflow-vs-agent 等热词。每条都是一句话 + 比喻 + 代码。想随手查就从这里进。</p>
           </div>
           <span class="btn">去查词 →</span>
         </a>
