@@ -786,6 +786,40 @@
     .quiz-page h1 { font-size: 30px; }
     .quiz-q .q-head { flex-wrap: wrap; }
   }
+
+  /* Phone — wrap header into 2 rows, shrink everything */
+  @media (max-width: 640px) {
+    header {
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      gap: 10px 12px;
+    }
+    .logo { font-size: 16px; white-space: nowrap; gap: 8px; }
+    .logo .mark { width: 24px; height: 24px; font-size: 13px; }
+    .top-tabs {
+      order: 2;
+      flex-basis: 100%;
+      justify-content: center;
+    }
+    .top-tabs .tab {
+      white-space: nowrap;
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+    .lesson-nav { font-size: 10px; gap: 6px; }
+    .lesson-nav .n-btn { padding: 4px 8px; font-size: 10px; }
+    .lesson-nav .n-cur { padding: 3px 8px; }
+
+    main, .home, .glossary-home, .term-page, .quiz-page {
+      padding-left: 16px; padding-right: 16px;
+    }
+    .home { padding-top: 32px; padding-bottom: 48px; }
+    .home h1 { font-size: 30px; }
+    .home .meta { flex-wrap: wrap; }
+
+    /* Give the SVG canvas room; don't hard-force 4:3 on narrow screens */
+    .canvas { aspect-ratio: auto; min-height: 320px; }
+  }
 </style>
 </head>
 <body>
