@@ -849,6 +849,61 @@
     border: 1px dashed var(--line); font-family: "Noto Serif SC", serif; font-style: italic;
   }
 
+  /* RAG Simulator */
+  .rag-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .rag-controls .box .ctrl-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .rag-controls .box .ctrl-row:first-of-type { margin-top: 0; }
+  .rag-controls .box .ctrl-label { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-soft); min-width: 86px; }
+  .rag-controls .pill-btn {
+    font-family: "JetBrains Mono", monospace; font-size: 12px;
+    padding: 5px 11px; border: 1px solid var(--line); background: var(--bg-panel);
+    border-radius: 999px; cursor: pointer; color: var(--ink);
+  }
+  .rag-controls .pill-btn:hover { background: var(--green-soft); border-color: #B9CDA7; }
+  .rag-controls .pill-btn.active { background: var(--green); color: var(--bg-panel); border-color: var(--green); }
+  .rag-controls .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .chunk-list { display: flex; flex-direction: column; gap: 6px; }
+  .chunk-item {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center;
+    padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg-panel); font-size: 13px; line-height: 1.5;
+  }
+  .chunk-item.hit { border-color: var(--green); background: var(--green-bright); }
+  .chunk-item .cid { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft); }
+  .chunk-item .ctxt { color: var(--ink); overflow-wrap: anywhere; }
+  .chunk-item .sim { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-soft); }
+
+  .ranked-list { display: flex; flex-direction: column; gap: 8px; }
+  .ranked-item {
+    display: grid; grid-template-columns: 36px 1fr 120px auto; gap: 12px; align-items: center;
+    padding: 10px 14px; border: 1px solid #B9CDA7; background: var(--green-bright);
+    border-radius: 8px; font-size: 13px; line-height: 1.5;
+  }
+  .ranked-item .rank { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 14px; color: var(--green); }
+  .ranked-item .bar { height: 8px; background: rgba(78, 102, 73, 0.12); border-radius: 4px; overflow: hidden; }
+  .ranked-item .bar > span { display: block; height: 100%; background: var(--green); }
+
+  .prompt-preview {
+    background: var(--code-bg); color: #D4E0C8;
+    border-radius: 10px; padding: 14px 16px; margin-top: 10px;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .prompt-preview .tag { color: #A6C19E; }
+
+  .rag-section { margin-top: 24px; }
+  .rag-section h3 {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 500;
+    color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase; margin: 0 0 10px;
+  }
+  .rag-tips {
+    margin-top: 18px; padding: 14px 18px; border: 1px dashed var(--line);
+    border-radius: 10px; background: var(--bg-panel);
+    font-size: 13px; line-height: 1.7; color: var(--ink-soft);
+  }
+  .rag-tips strong { color: var(--ink); font-weight: 600; }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -863,6 +918,9 @@
     .play-hub h1 { font-size: 34px; }
     .play-page .pp-grid { grid-template-columns: 1fr; }
     .play-page h1 { font-size: 28px; }
+    .rag-controls { grid-template-columns: 1fr; gap: 14px; }
+    .ranked-item { grid-template-columns: 30px 1fr; gap: 8px; }
+    .ranked-item .bar, .ranked-item .sim { grid-column: 2; }
   }
 
   /* Phone — wrap header into 2 rows, shrink everything */
@@ -3484,6 +3542,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     if (parts[0] === "quiz") return { page: "quiz" };
     if (parts[0] === "play") {
       if (parts[1] === "prompt") return { page: "play-prompt" };
+      if (parts[1] === "rag") return { page: "play-rag" };
       return { page: "play-hub" };
     }
     if (parts[0] === "glossary") {
@@ -3508,7 +3567,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
-    else if (route.page === "play-hub" || route.page === "play-prompt") activeTab = "play";
+    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag") activeTab = "play";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
@@ -3520,6 +3579,13 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       nav.innerHTML = `
         <button class="n-btn" onclick="go('play')">← 实验</button>
         <span class="n-cur">prompt playground</span>
+      `;
+      return;
+    }
+    if (route.page === "play-rag") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('play')">← 实验</button>
+        <span class="n-cur">rag simulator</span>
       `;
       return;
     }
@@ -3759,11 +3825,11 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             <h3>Prompt Playground</h3>
             <p>换 system prompt, 看同一个问题的回答怎么跟着换"人设"。呼应 Lesson 2 "什么是 prompt"。</p>
           </a>
-          <div class="sim-card soon">
-            <div class="label">02 · 排期中</div>
+          <a class="sim-card" href="#/play/rag">
+            <div class="label">02 · 已上线</div>
             <h3>RAG Simulator</h3>
-            <p>调 chunk size 和 top-K, 看检索结果变化。</p>
-          </div>
+            <p>给 LLM 一本员工手册, 调 chunk 大小和 top-K, 看检索结果和模型答案怎么跟着变。呼应术语库里的 RAG / chunking / embedding。</p>
+          </a>
           <div class="sim-card soon">
             <div class="label">03 · 排期中</div>
             <h3>Agent Workflow</h3>
@@ -3891,6 +3957,188 @@ JSON 文件就是那张说明书。
     });
   }
 
+  function renderPlayRag() {
+    const corpusChunks = {
+      small: [
+        { id: "S1",  text: "周一至周五 9:30-18:30 为公司工作时间, 周五可申请远程办公, 需提前一天报备直属主管。" },
+        { id: "S2",  text: "午餐时间 12:00-13:00, 不计入工作时长。" },
+        { id: "S3",  text: "年假按工龄计算: 1-3 年享 10 天, 3-5 年享 15 天, 5 年以上享 20 天。" },
+        { id: "S4",  text: "请假需提前 3 个工作日提交申请, 急事或病假可当日电话通知直属主管。" },
+        { id: "S5",  text: "晚上 20:00 之后仍在工作视为加班, 按 1.5 倍工资发放, 周末 2 倍, 法定节假日 3 倍。" },
+        { id: "S6",  text: "加班须由直属主管书面确认, 无确认的加班时间不计入薪资。" },
+        { id: "S7",  text: "产品购买后 30 天内可申请全额退款, 须保留完整订单号及支付凭证。" },
+        { id: "S8",  text: "退货须在 15 天内, 商品完好且包装完整, 来回邮费由买家承担, 超过期限不予受理。" },
+        { id: "S9",  text: "员工因公出差, 住宿费每天不超过 200 元, 餐饮补贴每天 100 元, 票据实报实销。" },
+        { id: "S10", text: "新员工试用期为 3 个月, 期间工资为转正工资的 80%, 试用期内离职需提前 7 天书面通知。" },
+      ],
+      medium: [
+        { id: "M1", text: "周一至周五 9:30-18:30 为公司工作时间, 周五可远程, 需提前一天报备。午餐 12:00-13:00 不计入工时。" },
+        { id: "M2", text: "年假按工龄计算: 1-3 年 10 天, 3-5 年 15 天, 5 年以上 20 天。请假需提前 3 工作日提交, 急事病假可当日电话通知。" },
+        { id: "M3", text: "20:00 之后工作视为加班, 按 1.5 倍工资发放, 周末 2 倍, 节假日 3 倍。加班须主管书面确认, 否则不计入薪资。" },
+        { id: "M4", text: "产品购买后 30 天内可全额退款, 须留订单号及凭证。退货须 15 天内, 商品完好且包装完整, 邮费买家承担, 超期不受理。" },
+        { id: "M5", text: "员工因公出差, 住宿每天不超过 200 元, 餐饮补贴 100 元, 票据实报实销。新员工试用期 3 个月, 工资为转正 80%, 离职需提前 7 天书面通知。" },
+      ],
+      large: [
+        { id: "L1", text: "工作时间: 周一至周五 9:30-18:30, 周五可远程 (提前一天报备), 午餐 12:00-13:00 不计工时。年假: 1-3 年 10 天, 3-5 年 15 天, 5 年以上 20 天。请假提前 3 工作日, 急事病假可当日电话通知。" },
+        { id: "L2", text: "加班: 20:00 后算加班, 1.5 倍工资, 周末 2 倍, 节假日 3 倍, 需主管书面确认否则不计薪资。退款: 30 天内可全额退款, 须留订单号及凭证。退货: 15 天内, 商品完好且包装完整, 邮费买家承担, 超期不受理。" },
+        { id: "L3", text: "差旅: 住宿 200 元/天上限, 餐饮补贴 100 元/天, 票据实报实销。试用期: 新员工 3 个月, 工资为转正 80%, 试用期内离职需提前 7 天书面通知。" },
+      ],
+    };
+
+    const queries = [
+      { key: "refund",   text: "退款多少天内?",     answer: "根据员工手册, 产品购买后 30 天内可以申请全额退款, 需保留完整订单号及支付凭证。如涉及退货, 期限更短: 必须 15 天内, 商品完好且包装完整, 来回邮费由买家承担, 超过期限不予受理。" },
+      { key: "leave",    text: "年假有几天?",       answer: "根据员工手册, 年假按工龄计算: 工龄 1-3 年享 10 天, 3-5 年享 15 天, 5 年以上享 20 天。请假需提前 3 个工作日提交申请, 急事或病假可当日电话通知直属主管。" },
+      { key: "overtime", text: "加班工资怎么算?",   answer: "根据员工手册, 晚上 20:00 之后仍在工作视为加班, 按 1.5 倍工资发放; 周末加班为 2 倍, 法定节假日加班为 3 倍。所有加班须由直属主管书面确认, 否则不计入薪资。" },
+    ];
+
+    // 预算好的 cosine similarity (教学用, 并非真实 embedding 结果)
+    const scores = {
+      refund:   { small: [0.12, 0.08, 0.22, 0.28, 0.14, 0.11, 0.91, 0.78, 0.32, 0.38],
+                  medium: [0.18, 0.31, 0.13, 0.84, 0.35],
+                  large:  [0.24, 0.70, 0.31] },
+      leave:    { small: [0.12, 0.08, 0.93, 0.68, 0.15, 0.11, 0.22, 0.18, 0.21, 0.42],
+                  medium: [0.19, 0.85, 0.13, 0.23, 0.38],
+                  large:  [0.72, 0.25, 0.39] },
+      overtime: { small: [0.19, 0.08, 0.14, 0.15, 0.92, 0.76, 0.14, 0.09, 0.22, 0.28],
+                  medium: [0.16, 0.19, 0.86, 0.14, 0.26],
+                  large:  [0.21, 0.72, 0.27] },
+    };
+
+    const chunkSizeLabel = {
+      small:  "小 ≈ 40 字 / 10 chunks",
+      medium: "中 ≈ 80 字 / 5 chunks",
+      large:  "大 ≈ 160 字 / 3 chunks",
+    };
+
+    const state = { qKey: "refund", level: "small", k: 3 };
+
+    app.innerHTML = `
+      <div class="play-page">
+        <div class="crumb"><a href="#/play">← 实验</a> / 02 · RAG Simulator</div>
+        <h1>RAG Simulator</h1>
+        <p class="lede">给 LLM 一本小型"员工手册" (10 段), 换问题、改 chunk 大小、调 top-K, 看哪些片段会被送进 prompt, 模型最后答什么。embedding 相似度是预算好的, 教学用, 不是真跑 vector db。</p>
+
+        <div class="rag-controls">
+          <div class="box">
+            <div class="b-head">query (用户问题)</div>
+            <div class="presets" id="rag-queries">
+              ${queries.map(q => `<button class="preset ${q.key===state.qKey?'active':''}" data-qkey="${q.key}">${q.text}</button>`).join("")}
+            </div>
+            <div class="note">点一个预设问题, 看完整的 "检索 → 增强 → 生成" 三步。</div>
+          </div>
+          <div class="box">
+            <div class="b-head">参数</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Chunk 大小</span>
+              <div class="pill-group" id="rag-level">
+                <button class="pill-btn active" data-level="small">小</button>
+                <button class="pill-btn" data-level="medium">中</button>
+                <button class="pill-btn" data-level="large">大</button>
+              </div>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Top-K</span>
+              <div class="pill-group" id="rag-k">
+                ${[1,2,3,4,5].map(n => `<button class="pill-btn ${n===state.k?'active':''}" data-k="${n}">${n}</button>`).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rag-section">
+          <h3>当前 chunking <span id="rag-size-label" style="text-transform:none;font-family:'Noto Serif SC',serif;color:var(--ink-soft);letter-spacing:0;">(${chunkSizeLabel[state.level]})</span></h3>
+          <div class="chunk-list" id="rag-chunks"></div>
+        </div>
+
+        <div class="rag-section">
+          <h3>命中的 top-<span id="rag-k-echo">${state.k}</span> chunks · 按相似度降序</h3>
+          <div class="ranked-list" id="rag-ranked"></div>
+        </div>
+
+        <div class="rag-section">
+          <h3>送进 LLM 的 prompt (检索后 "增强" 过)</h3>
+          <div class="prompt-preview" id="rag-prompt"></div>
+        </div>
+
+        <div class="rag-section">
+          <h3>模型回答 (mock)</h3>
+          <div class="output" id="rag-answer"></div>
+        </div>
+
+        <div class="rag-tips">
+          <strong>拨几下看规律</strong> · chunk 切太小 → 相关内容被拆开, 可能要加大 top-K 才覆盖得全; 切太大 → 一个 chunk 混太多主题, 相似度被稀释, prompt 也变长; top-K 太小 → 可能漏答案 (试 top-1 看"退款多少天"够不够), 太大 → 塞进无关内容, 模型容易跑偏。
+        </div>
+      </div>
+    `;
+
+    function update() {
+      const level = state.level;
+      const q = queries.find(x => x.key === state.qKey);
+      const chunks = corpusChunks[level];
+      const sims = scores[state.qKey][level];
+      const actualK = Math.min(state.k, chunks.length);
+
+      const ranked = chunks.map((c, i) => ({ c, sim: sims[i], i }))
+        .sort((a, b) => b.sim - a.sim);
+      const topIds = new Set(ranked.slice(0, actualK).map(x => x.c.id));
+
+      document.getElementById("rag-chunks").innerHTML = chunks.map((c, i) => `
+        <div class="chunk-item ${topIds.has(c.id) ? 'hit' : ''}">
+          <span class="cid">${c.id}</span>
+          <span class="ctxt">${escapeHtml(c.text)}</span>
+          <span class="sim">${sims[i].toFixed(2)}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("rag-ranked").innerHTML = ranked.slice(0, actualK).map((r, idx) => `
+        <div class="ranked-item">
+          <span class="rank">#${idx+1}</span>
+          <span class="ctxt">[${r.c.id}] ${escapeHtml(r.c.text)}</span>
+          <div class="bar"><span style="width:${(r.sim*100).toFixed(0)}%"></span></div>
+          <span class="sim">${r.sim.toFixed(2)}</span>
+        </div>
+      `).join("");
+
+      const promptBody = ranked.slice(0, actualK).map(r =>
+        `<span class="tag">[${r.c.id}]</span> ${escapeHtml(r.c.text)}`
+      ).join("\n");
+      document.getElementById("rag-prompt").innerHTML =
+`请根据以下片段回答问题, 片段里没有就说没有, 不要编造。
+
+${promptBody}
+
+问题: ${escapeHtml(q.text)}`;
+
+      document.getElementById("rag-answer").textContent = q.answer;
+      document.getElementById("rag-size-label").textContent = `(${chunkSizeLabel[level]})`;
+      document.getElementById("rag-k-echo").textContent = actualK;
+    }
+
+    document.querySelectorAll("#rag-queries .preset").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.qKey = btn.dataset.qkey;
+        document.querySelectorAll("#rag-queries .preset").forEach(b => b.classList.toggle("active", b.dataset.qkey === state.qKey));
+        update();
+      });
+    });
+    document.querySelectorAll("#rag-level .pill-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.level = btn.dataset.level;
+        document.querySelectorAll("#rag-level .pill-btn").forEach(b => b.classList.toggle("active", b.dataset.level === state.level));
+        update();
+      });
+    });
+    document.querySelectorAll("#rag-k .pill-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.k = parseInt(btn.dataset.k, 10);
+        document.querySelectorAll("#rag-k .pill-btn").forEach(b => b.classList.toggle("active", parseInt(b.dataset.k, 10) === state.k));
+        update();
+      });
+    });
+
+    update();
+  }
+
   function route() {
     const r = parseRoute();
     renderNav(r);
@@ -3900,6 +4148,7 @@ JSON 文件就是那张说明书。
     else if (r.page === "quiz") { lesson = null; renderQuiz(); }
     else if (r.page === "play-hub") { lesson = null; renderPlayHub(); }
     else if (r.page === "play-prompt") { lesson = null; renderPlayPrompt(); }
+    else if (r.page === "play-rag") { lesson = null; renderPlayRag(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
