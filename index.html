@@ -789,6 +789,66 @@
   .quiz-stats .stat.good .v { color: var(--green); }
   .quiz-stats .stat.bad .v { color: #B08476; }
 
+  /* Play (Simulator) pages */
+  .play-hub { max-width: 1080px; margin: 0 auto; padding: 36px 28px 60px; }
+  .play-hub h1 { font-family: "Noto Serif SC", "Fraunces", serif; font-weight: 700; font-size: 44px; line-height: 1.1; margin: 0 0 16px; }
+  .play-hub h1 em { font-style: normal; color: var(--green); background: var(--green-bright); padding: 2px 10px; border-radius: 8px; }
+  .play-hub .lede { font-size: 16px; color: var(--ink-soft); line-height: 1.6; max-width: 640px; margin: 0 0 32px; }
+  .play-hub .sims { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .play-hub .sim-card {
+    display: block; padding: 22px 24px;
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px;
+    text-decoration: none; color: var(--ink);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .play-hub .sim-card:hover { transform: translateY(-2px); border-color: var(--green); }
+  .play-hub .sim-card .label { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase; }
+  .play-hub .sim-card h3 { font-family: "Noto Serif SC", serif; font-size: 22px; margin: 8px 0 8px; }
+  .play-hub .sim-card p { color: var(--ink-soft); font-size: 14px; line-height: 1.5; margin: 0; }
+  .play-hub .sim-card.soon { opacity: .55; cursor: not-allowed; }
+  .play-hub .sim-card.soon:hover { transform: none; border-color: var(--line); }
+
+  .play-page { max-width: 1080px; margin: 0 auto; padding: 36px 28px 60px; }
+  .play-page .crumb { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-soft); margin-bottom: 12px; }
+  .play-page h1 { font-family: "Noto Serif SC", "Fraunces", serif; font-weight: 700; font-size: 36px; margin: 0 0 8px; }
+  .play-page .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.6; margin: 0 0 24px; max-width: 640px; }
+  .play-page .pp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .play-page .box { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .play-page .box .b-head { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+  .play-page textarea {
+    width: 100%; min-height: 110px; resize: vertical;
+    font-family: "JetBrains Mono", monospace; font-size: 13px; line-height: 1.5;
+    background: transparent; color: var(--ink); border: none; outline: none; padding: 0;
+    box-sizing: border-box;
+  }
+  .play-page .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .play-page .preset {
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--bg); border: 1px solid var(--line);
+    font-family: "Noto Serif SC", serif; font-size: 12px; color: var(--ink);
+    cursor: pointer;
+  }
+  .play-page .preset:hover { background: var(--green-soft); border-color: #B9CDA7; }
+  .play-page .preset.active { background: var(--green); color: var(--bg-panel); border-color: var(--green); }
+  .play-page .note { margin-top: 12px; font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
+  .play-page .run-row { display: flex; justify-content: flex-end; margin: 20px 0 10px; }
+  .play-page .run-btn {
+    padding: 10px 22px; border-radius: 10px;
+    background: var(--green); color: var(--bg-panel); border: none;
+    font-family: "Noto Serif SC", serif; font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  .play-page .run-btn:hover { opacity: .88; }
+  .play-page .output {
+    background: var(--code-bg); color: #D4E0C8;
+    border-radius: 10px; padding: 16px 18px; min-height: 120px;
+    font-family: "JetBrains Mono", monospace; font-size: 13px; line-height: 1.65;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .play-page .output.empty {
+    background: var(--bg-panel); color: var(--ink-soft);
+    border: 1px dashed var(--line); font-family: "Noto Serif SC", serif; font-style: italic;
+  }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -800,6 +860,9 @@
     .home .glossary-cta .btn { margin-left: 0; }
     .quiz-page h1 { font-size: 30px; }
     .quiz-q .q-head { flex-wrap: wrap; }
+    .play-hub h1 { font-size: 34px; }
+    .play-page .pp-grid { grid-template-columns: 1fr; }
+    .play-page h1 { font-size: 28px; }
   }
 
   /* Phone — wrap header into 2 rows, shrink everything */
@@ -846,6 +909,7 @@
   <nav class="top-tabs" id="top-tabs">
     <a href="#/" class="tab" data-tab="courses">深入课</a>
     <a href="#/glossary" class="tab" data-tab="glossary">术语库</a>
+    <a href="#/play" class="tab" data-tab="play">实验</a>
     <a href="#/quiz" class="tab" data-tab="quiz">考试</a>
   </nav>
   <div class="lesson-nav" id="lesson-nav"></div>
@@ -3418,6 +3482,10 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     if (!h) return { page: "home" };
     const parts = h.split("/");
     if (parts[0] === "quiz") return { page: "quiz" };
+    if (parts[0] === "play") {
+      if (parts[1] === "prompt") return { page: "play-prompt" };
+      return { page: "play-hub" };
+    }
     if (parts[0] === "glossary") {
       if (!parts[1]) return { page: "glossary-home" };
       const term = terms.find(t => t.slug === parts[1]);
@@ -3440,12 +3508,21 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
+    else if (route.page === "play-hub" || route.page === "play-prompt") activeTab = "play";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
     if (route.page === "home") { nav.innerHTML = `<span class="n-cur">课程首页</span>`; return; }
     if (route.page === "glossary-home") { nav.innerHTML = `<span class="n-cur">术语库</span>`; return; }
     if (route.page === "quiz") { nav.innerHTML = `<span class="n-cur">考试</span>`; return; }
+    if (route.page === "play-hub") { nav.innerHTML = `<span class="n-cur">实验</span>`; return; }
+    if (route.page === "play-prompt") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('play')">← 实验</button>
+        <span class="n-cur">prompt playground</span>
+      `;
+      return;
+    }
     if (route.page === "term") {
       nav.innerHTML = `
         <button class="n-btn" onclick="go('glossary')">← 术语库</button>
@@ -3498,6 +3575,14 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             <p>35+ 个 LLM 关键词, 按 7 个主题分组, 覆盖 context、loop、reasoning、workflow-vs-agent 等热词。每条都是一句话 + 比喻 + 代码。想随手查就从这里进。</p>
           </div>
           <span class="btn">去查词 →</span>
+        </a>
+
+        <a class="glossary-cta" href="#/play" style="background: linear-gradient(140deg, #FAF7EC 55%, #E3EBF0); margin-top: 14px;">
+          <div class="txt">
+            <h3>实验 Playground →</h3>
+            <p>能动手改的 Prompt Playground 已上线 (换 system prompt 看回答怎么变)。后面还会补 RAG、Agent workflow 等 mock 版 simulator。</p>
+          </div>
+          <span class="btn">去玩玩 →</span>
         </a>
 
         <h2>深入课</h2>
@@ -3661,6 +3746,151 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     else if (e.key.toLowerCase() === "r") { replay(); }
   });
 
+  /* ============== PLAY (Simulators) ============== */
+
+  function renderPlayHub() {
+    app.innerHTML = `
+      <div class="play-hub">
+        <h1>实验 <em>Playground</em></h1>
+        <p class="lede">能动手改一改、跑一跑的互动组件。回答是预设的 (不连真 LLM, 省事也可控), 用来把一些"书上看不透"的规律——比如换 prompt 行为就会变、chunk 切太大检索就糊——实实在在看一遍。</p>
+        <div class="sims">
+          <a class="sim-card" href="#/play/prompt">
+            <div class="label">01 · 已上线</div>
+            <h3>Prompt Playground</h3>
+            <p>换 system prompt, 看同一个问题的回答怎么跟着换"人设"。呼应 Lesson 2 "什么是 prompt"。</p>
+          </a>
+          <div class="sim-card soon">
+            <div class="label">02 · 排期中</div>
+            <h3>RAG Simulator</h3>
+            <p>调 chunk size 和 top-K, 看检索结果变化。</p>
+          </div>
+          <div class="sim-card soon">
+            <div class="label">03 · 排期中</div>
+            <h3>Agent Workflow</h3>
+            <p>播放一次 ReAct 循环的时间线, 含"翻车模式"。</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPlayPrompt() {
+    const presets = [
+      {
+        key: "python",
+        label: "Python 专家",
+        system: "你是一个 Python 专家。用户问代码问题时, 先给能跑的代码, 再解释。",
+        output: `with open("f.json") as f:
+    data = json.load(f)
+
+# data 是 dict / list, 可以直接访问, 比如:
+print(data["user"]["name"])
+
+解释: json.load(f) 读 file 对象 → 自动 decode 成 Python 的 dict / list / str / number / None, 跟 JSON 的类型一一对应。
+- 读字符串版本用 json.loads(s)
+- 写回去用 json.dump(data, f, ensure_ascii=False, indent=2)`
+      },
+      {
+        key: "teacher",
+        label: "幼儿园老师",
+        system: "你是一个耐心的老师, 对完全不懂编程的小朋友说话。用比喻, 不用代码。",
+        output: `想象一个装饼干的盒子, 盒子外面贴了一张说明书 ——
+说明书用一种很整齐的格式写着: 盒子里有什么, 每样有几个。
+
+JSON 文件就是那张说明书。
+
+"读 JSON" 就是让电脑把说明书抄下来, 这样它就知道盒子里是巧克力还是草莓饼干。
+
+它只做三件事:
+一 · 打开那张纸
+二 · 一行一行念
+三 · 把念到的东西记在小本本上
+
+记完了, 电脑就"懂"了。`
+      },
+      {
+        key: "support",
+        label: "客服, 礼貌正式",
+        system: "你是一位专业客服, 用礼貌正式的语气, 先确认用户需求, 再分条给步骤。",
+        output: `您好! 感谢您的咨询。
+
+为了给您提供最准确的解决方案, 可否先与您确认: 您希望使用哪种编程语言完成 JSON 文件的读取操作呢?
+
+以 Python 为例, 建议按以下步骤进行:
+
+一. 请确认目标文件路径正确;
+二. 使用 open() 以只读模式打开文件;
+三. 调用 json.load() 方法, 将文件内容解析为 Python 字典或列表;
+四. 妥善处理可能出现的 FileNotFoundError 与 JSONDecodeError 异常。
+
+如需 JavaScript / Java 等其它语言的示例, 欢迎随时告知, 期待您的回复。`
+      },
+    ];
+    const canonicalUser = "怎么读 JSON 文件?";
+
+    app.innerHTML = `
+      <div class="play-page">
+        <div class="crumb"><a href="#/play">← 实验</a> / 01 · Prompt Playground</div>
+        <h1>Prompt Playground</h1>
+        <p class="lede">同一个问题, 换一下 system prompt, 回答的"人设"就全变了。选预设, 或直接改 textarea, 再点"运行"。</p>
+
+        <div class="pp-grid">
+          <div class="box">
+            <div class="b-head">system prompt (模型人设)</div>
+            <textarea id="pp-sys">${escapeHtml(presets[0].system)}</textarea>
+            <div class="presets">
+              ${presets.map((p, i) => `<button class="preset ${i===0?'active':''}" data-key="${p.key}">${p.label}</button>`).join("")}
+            </div>
+          </div>
+          <div class="box">
+            <div class="b-head">user prompt (用户问题)</div>
+            <textarea id="pp-user">${escapeHtml(canonicalUser)}</textarea>
+            <div class="note">这个 playground 只预设了一个问题: "${canonicalUser}" × 3 种人设 = 3 个响应。user 或 system 改了, 预设就不命中, 会给提示。</div>
+          </div>
+        </div>
+
+        <div class="run-row">
+          <button class="run-btn" id="pp-run">运行 →</button>
+        </div>
+
+        <div class="output empty" id="pp-out">点"运行"看看当前人设下的回答。</div>
+      </div>
+    `;
+
+    const sysEl = document.getElementById("pp-sys");
+    const userEl = document.getElementById("pp-user");
+    const outEl = document.getElementById("pp-out");
+
+    document.querySelectorAll(".preset").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const p = presets.find(x => x.key === btn.dataset.key);
+        sysEl.value = p.system;
+        userEl.value = canonicalUser;
+        document.querySelectorAll(".preset").forEach(b => b.classList.toggle("active", b.dataset.key === btn.dataset.key));
+      });
+    });
+
+    sysEl.addEventListener("input", () => {
+      document.querySelectorAll(".preset").forEach(b => b.classList.remove("active"));
+    });
+
+    document.getElementById("pp-run").addEventListener("click", () => {
+      const sys = sysEl.value.trim();
+      const user = userEl.value.trim();
+      const match = presets.find(p => p.system.trim() === sys);
+      outEl.classList.remove("empty");
+      if (match && user === canonicalUser) {
+        outEl.textContent = match.output;
+      } else if (match) {
+        outEl.classList.add("empty");
+        outEl.textContent = `只预设了 "${canonicalUser}" 的回答。把 user prompt 改回原题再试, 或后面做其它 simulator 时会补更多预设。`;
+      } else {
+        outEl.classList.add("empty");
+        outEl.textContent = `这个 playground 是 mock 的, 只对三个预设 system prompt 有响应。点上面三个预设按钮之一, 就能看到对应人设的回答。`;
+      }
+    });
+  }
+
   function route() {
     const r = parseRoute();
     renderNav(r);
@@ -3668,6 +3898,8 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     else if (r.page === "glossary-home") { lesson = null; renderGlossaryHome(); }
     else if (r.page === "term") { lesson = null; renderTermPage(r.term); }
     else if (r.page === "quiz") { lesson = null; renderQuiz(); }
+    else if (r.page === "play-hub") { lesson = null; renderPlayHub(); }
+    else if (r.page === "play-prompt") { lesson = null; renderPlayPrompt(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
