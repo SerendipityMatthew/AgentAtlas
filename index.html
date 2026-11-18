@@ -157,6 +157,8 @@
     background: var(--green-soft); color: var(--green);
     border: 1px solid #B9CDA7; font-size: 10px; font-weight: 500;
   }
+  .home .card .pill.cont { background: var(--yellow-soft); color: #7B6314; border-color: #DCC673; }
+  .home .card .pill.done { background: var(--green); color: var(--bg-panel); border-color: var(--green); }
   .home .card.c1 { background: linear-gradient(140deg, #FAF7EC 60%, #E4ECD6); }
   .home .card.c2 { background: linear-gradient(140deg, #FAF7EC 60%, #FBF1C0); }
   .home .card.c3 { background: linear-gradient(140deg, #FAF7EC 60%, #F9E3DC); }
@@ -3335,6 +3337,26 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
   const app = document.getElementById("app");
   const nav = document.getElementById("lesson-nav");
 
+  // Reading progress (per-device, localStorage; silent on failure — private mode etc.)
+  const PROG_KEY = "agentatlas.progress.v1";
+  function readProg() {
+    try { return JSON.parse(localStorage.getItem(PROG_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveProg(slug, step) {
+    try {
+      const p = readProg();
+      p[slug] = Math.max(p[slug] || 0, step);
+      localStorage.setItem(PROG_KEY, JSON.stringify(p));
+    } catch {}
+  }
+  function progBadge(lesson) {
+    const s = readProg()[lesson.slug] || 0;
+    if (!s) return `<span class="pill">开始 →</span>`;
+    if (s >= lesson.stepCount) return `<span class="pill done">✓ 读完 · 复习</span>`;
+    return `<span class="pill cont">继续 · 第 ${s}/${lesson.stepCount} 步 →</span>`;
+  }
+
   function parseRoute() {
     const h = location.hash.replace(/^#\/?/, "");
     if (!h) return { page: "home" };
@@ -3387,17 +3409,22 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
   }
 
   function renderHome() {
-    const cards = lessons.map((l, i) => `
-      <a class="card c${i+1}" href="#/${l.slug}">
+    const prog = readProg();
+    const cards = lessons.map((l, i) => {
+      const s = prog[l.slug] || 0;
+      const href = s && s < l.stepCount ? `#/${l.slug}/${s}` : `#/${l.slug}`;
+      return `
+      <a class="card c${i+1}" href="${href}">
         <div class="num">0${l.num} · ${l.level}</div>
         <h3>${l.title}</h3>
         <p>${l.short}</p>
         <div class="foot">
           <span>${l.duration} · ${l.stepCount} 步</span>
-          <span class="pill">开始 →</span>
+          ${progBadge(l)}
         </div>
       </a>
-    `).join("");
+    `;
+    }).join("");
 
     app.innerHTML = `
       <div class="home">
@@ -3563,6 +3590,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     });
 
     history.replaceState(null, "", "#/" + lesson.slug + "/" + (cur + 1));
+    saveProg(lesson.slug, cur + 1);
   }
 
   function nextStep() { if (cur < lesson.stepCount - 1) { cur++; renderStep(); } }
