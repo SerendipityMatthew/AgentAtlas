@@ -2579,6 +2579,107 @@ jailbreak 常见套路:
       ], correct: 1,
       explain: "MMLU / HumanEval / GSM8K 都是 benchmark; 高分 ≠ 实用好。",
       from: { kind: "term", slug: "benchmark" } },
+
+    // --- v2 新词配套 (基础) ---
+    { q: "下列哪项最准确地描述 context engineering 和 prompt engineering 的关系?",
+      options: [
+        "两者是同一件事的中英文叫法",
+        "Context engineering 是 prompt engineering 的子集, 只管 system prompt",
+        "Context engineering 范围更广, 除了 prompt 还包括对话历史、RAG 检索、工具输出、记忆等整个\"信息环境\"",
+        "Context engineering 已经完全取代了 prompt engineering",
+      ], correct: 2,
+      explain: "Prompt 是一句台词, context engineering 是整个舞台布置。",
+      from: { kind: "term", slug: "context-engineering" } },
+
+    { q: "关于长 context (比如 1M token) 下的模型表现, 下列哪项正确?",
+      options: [
+        "窗口越大, 模型表现一定越好, 没有副作用",
+        "中段位置的信息常被模型漏看 (Lost in the Middle), 装满了不等于稳",
+        "长 context 对模型完全无影响, 只是 API 更贵",
+        "长 context 模式下模型会自动压缩旧内容",
+      ], correct: 1,
+      explain: "这就是 context rot; 关键信息放最前或最后, 别全塞。",
+      from: { kind: "term", slug: "context-rot" } },
+
+    { q: "Agent 跑长了, 每轮都带着同一段 8K 的 system/skill/tools prompt。启用 prompt caching 的直接收益是?",
+      options: [
+        "模型回答质量变高",
+        "固定前缀第一次算全量, 之后复用, 省时间和 input 费用",
+        "可以绕过 context window 上限",
+        "启用后就不再需要 system prompt",
+      ], correct: 1,
+      explain: "Anthropic 现价缓存读 ~1/10 input 价, 延迟也降一大截。",
+      from: { kind: "term", slug: "prompt-caching" } },
+
+    { q: "推理模型 (o1 / Claude extended thinking) 和普通模型最主要的区别是?",
+      options: [
+        "推理模型完全不会 hallucinate",
+        "推理模型回答前先\"大段自己想\", 消耗额外的 thinking token, 复杂题准确率明显提升",
+        "推理模型只能用于数学题",
+        "推理模型不支持 tool calling",
+      ], correct: 1,
+      explain: "典型 trade-off: 用 thinking token 换质量, 延迟和成本也上去。",
+      from: { kind: "term", slug: "reasoning-model" } },
+
+    { q: "ReAct 模式的核心循环是?",
+      options: [
+        "Read - Act - Compare",
+        "Reason (想) - Act (调工具) - Observe (看结果) - 再 Reason, 直到搞定",
+        "Reinforcement - Attention - Classification",
+        "Retrieve - Augment - Create - Transmit",
+      ], correct: 1,
+      explain: "ReAct = Reasoning + Acting, 是 agent loop 最常见的实现模式。",
+      from: { kind: "term", slug: "react" } },
+
+    { q: "Reflection 模式在 agent 流程里具体做什么?",
+      options: [
+        "让模型反过来总结训练数据",
+        "生成初稿后, 让模型 (或另一个模型) 批评一次、找漏洞、再改一版",
+        "把对话镜像到两个 agent 互相问",
+        "在回答前反射用户情绪",
+      ], correct: 1,
+      explain: "像自我 code review; 多几轮调用, 换质量提升。",
+      from: { kind: "term", slug: "reflection" } },
+
+    { q: "Planning (plan-and-execute) 和 ReAct 的主要差别是?",
+      options: [
+        "Planning 用 Python, ReAct 用 JavaScript",
+        "Planning 先一次性列完整计划再逐步执行; ReAct 边走边决定下一步",
+        "Planning 只给 chat 用, ReAct 只给 agent 用",
+        "两者没区别, 只是叫法不同",
+      ], correct: 1,
+      explain: "Planning 结构清晰适合要先确认计划的场景; ReAct 灵活应变。",
+      from: { kind: "term", slug: "planning" } },
+
+    { q: "Sub-agent 模式的核心价值是?",
+      options: [
+        "让主 agent 跑得更快",
+        "主 agent 把专门任务派给专用子 agent, 每个子 agent 的 context 更短更聚焦, 可并行",
+        "允许无限递归调用",
+        "替代所有 function calling",
+      ], correct: 1,
+      explain: "Claude Code / Cursor 的 subagent 就是这个; 风险是协作成本和过度工程。",
+      from: { kind: "term", slug: "sub-agent" } },
+
+    { q: "按 Anthropic 《Building Effective Agents》建议, 下列哪种任务更适合用 workflow 而不是 agent?",
+      options: [
+        "开放式研究, 不知道要查几步",
+        "本质是 \"Q → 调一个 API → 回答\" 的简单流程, 规则明确",
+        "需要动态决定下一步的任务",
+        "跟多个外部系统交互且无法预先定义顺序",
+      ], correct: 1,
+      explain: "能写死就写死; agent 适合\"下一步未知\"的开放任务。",
+      from: { kind: "term", slug: "workflow-vs-agent" } },
+
+    { q: "用户问 \"北京、上海、纽约三地今天天气如何?\", 支持 parallel tool calls 的现代模型, 最佳行为是?",
+      options: [
+        "串行调三次 get_weather, 一次等上一次完",
+        "一轮里并行发三个 tool_call, 运行时同时执行, 三份结果同时回",
+        "必须拒绝, 让用户每次只问一地",
+        "调用一次 get_weather(\"北京,上海,纽约\"), 由工具自己拆",
+      ], correct: 1,
+      explain: "GPT-4o / Claude 4.5+ 都原生支持; 一轮多 call, 延迟降到 ~1/N。",
+      from: { kind: "term", slug: "parallel-tool-calls" } },
   ];
 
   // --- v2 hot terms (context / loop 系列) 追加 ---
@@ -2849,6 +2950,57 @@ GPT-4o / Claude 4.5+ 都原生支持。`,
       ], correct: 2,
       explain: "Benchmark 和实际业务常脱节; 业务 eval 要真实样本 + 混合评估(自动 + 人工)。",
       from: { kind: "term", slug: "eval" } },
+
+    // --- v2 新词配套 (深度) ---
+    { q: "你的 agent 在长对话里越来越犯迷糊, 最近几轮答非所问。下面哪一步最有可能直接缓解?",
+      options: [
+        "换成一个 context window 更大的模型",
+        "把旧对话压缩成摘要, 只把最近 N 轮和摘要一起发给模型 (context 压缩策略)",
+        "把 temperature 调高, 让模型更灵活",
+        "让用户每次都重新表述问题",
+      ], correct: 1,
+      explain: "这是 context engineering 的常见手艺; 不是靠扩窗口蛮力。",
+      from: { kind: "term", slug: "context-engineering" } },
+
+    { q: "下列哪种 agent 场景中, prompt caching 收益最大?",
+      options: [
+        "每轮 user prompt 都完全不同, 而且 system prompt 很短",
+        "有 2000 字 system prompt + 大量 tool schema, agent 要跑 50-100 轮",
+        "只调用模型一次, 一问一答结束",
+        "流式输出任务, 不涉及重复调用",
+      ], correct: 1,
+      explain: "缓存的是固定前缀; 前缀越大、复用次数越多, 收益越大。",
+      from: { kind: "term", slug: "prompt-caching" } },
+
+    { q: "一个代码审查 agent 总是漏边角 case。切换到 reasoning model (如 o1) 的预期最合理的是?",
+      options: [
+        "质量显著提升, 但延迟和成本会上一个量级",
+        "完全消除所有漏洞",
+        "响应速度变得更快",
+        "不再需要 system prompt",
+      ], correct: 0,
+      explain: "Reasoning model 用 thinking token 换质量; 典型 trade-off, 不是银弹。",
+      from: { kind: "term", slug: "reasoning-model" } },
+
+    { q: "你在设计一个会计报表 agent, 每次任务步骤都明确(取数 → 核对 → 格式化 → 生成)。按模式选, 下面哪种最合适?",
+      options: [
+        "ReAct: 每步走完再想下一步",
+        "Plan-and-Execute: 一次列完计划再按步骤跑",
+        "必须用 multi-agent 协作",
+        "必须加 reflection, 否则会错",
+      ], correct: 1,
+      explain: "步骤明确的任务 planning 更稳可预测; ReAct 适合步骤未知的开放场景。",
+      from: { kind: "term", slug: "planning" } },
+
+    { q: "你要做一个 \"用户提 bug → 自动归类 → 分给对应 team\" 系统。规则很明确(关键词匹配 + 固定映射表)。按 Anthropic 的建议, 下列哪种实现最合适?",
+      options: [
+        "做一个 LLM agent, 让它自己决定分给哪个 team",
+        "简单 workflow: 关键词匹配 + 固定映射表, 只在模糊归类时让 LLM 兜底",
+        "用 multi-agent 多轮讨论归属",
+        "必须用 agent, workflow 做不了这种事",
+      ], correct: 1,
+      explain: "规则明确就写死; agent 是\"不得已才上\"的工具, 不是默认选择。",
+      from: { kind: "term", slug: "workflow-vs-agent" } },
   ];
 
   // Runtime state
@@ -2886,22 +3038,25 @@ GPT-4o / Claude 4.5+ 都原生支持。`,
     const correctCount = answers.reduce((n, a, i) => n + (a === quiz[i].correct ? 1 : 0), 0);
     const answered = answers.filter(a => a !== null).length;
 
-    const modeTitle = quizMode === "basic" ? `<em>25 题</em> · 100 分 · 基础` : `<em>10 题</em> · 100 分 · 深度`;
+    const fullScore = total * points;
+    const modeName = quizMode === "basic" ? "基础" : "深度";
+    const modeTitle = `<em>${total} 题</em> · ${fullScore} 分 · ${modeName}`;
     const modeLede = quizMode === "basic"
-      ? "5 节深入课 + 25 词术语库里的概念。单选, 每题 4 分, 没时限。"
-      : "场景/辨析/取舍/调试, 比基础考难一个台阶。单选, 每题 10 分, 没时限。";
+      ? `覆盖 5 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
+      : `场景 / 辨析 / 取舍 / 调试, 比基础考难一个台阶。单选, 每题 ${points} 分, 没时限。`;
 
     const modeTabs = `
       <div class="quiz-mode-tabs">
-        <button class="qmtab ${quizMode === "basic" ? "active" : ""}" data-mode="basic">基础 · 25 题</button>
-        <button class="qmtab ${quizMode === "deep" ? "active" : ""}" data-mode="deep">深度 · 10 题</button>
+        <button class="qmtab ${quizMode === "basic" ? "active" : ""}" data-mode="basic">基础 · ${quizBasic.length} 题</button>
+        <button class="qmtab ${quizMode === "deep" ? "active" : ""}" data-mode="deep">深度 · ${quizDeep.length} 题</button>
       </div>
     `;
 
+    const pct = fullScore > 0 ? score / fullScore : 0;
     const scoreBar = submitted ? `
       <div class="quiz-score-bar">
-        <div><span class="n">${score}</span> <span class="txt">/ 100</span></div>
-        <div class="txt">答对 ${correctCount} / ${total} · ${score >= 80 ? (quizMode === "basic" ? "基础很稳" : "深度也拿下了") : score >= 60 ? "过了, 还能再读一遍" : (quizMode === "basic" ? "建议回去再看一遍深入课和术语库" : "场景题要结合实践, 回头看看 lesson 4/5")}</div>
+        <div><span class="n">${score}</span> <span class="txt">/ ${fullScore}</span></div>
+        <div class="txt">答对 ${correctCount} / ${total} · ${pct >= 0.8 ? (quizMode === "basic" ? "基础很稳" : "深度也拿下了") : pct >= 0.6 ? "过了, 还能再读一遍" : (quizMode === "basic" ? "建议回去再看一遍深入课和术语库" : "场景题要结合实践, 回头看看 lesson 4/5")}</div>
       </div>
     ` : "";
 
