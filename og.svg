@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#E5DFC8" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#F0ECE0"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g transform="translate(96, 108)">
+    <path d="M 0 24 L 24 0 L 48 24 L 24 48 Z" fill="#3D5D3C"/>
+    <text x="68" y="38" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="600" fill="#2C2820" letter-spacing="2">AGENT ATLAS</text>
+  </g>
+
+  <g transform="translate(96, 240)">
+    <text font-family="Georgia, 'Times New Roman', serif" font-size="104" font-weight="700" fill="#2C2820">
+      <tspan x="0" y="0">一本关于</tspan>
+      <tspan x="0" y="128" fill="#3D5D3C">AI Agent</tspan>
+      <tspan dx="20" fill="#2C2820">的小书</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(96, 540)" font-family="'SF Mono', Menlo, monospace" font-size="24" fill="#6B6454">
+    <text x="0" y="0">5 节深入课</text>
+    <text x="170" y="0">·</text>
+    <text x="200" y="0">41 词术语库</text>
+    <text x="380" y="0">·</text>
+    <text x="410" y="0">56 题测验</text>
+  </g>
+
+  <g transform="translate(1024, 560)">
+    <text font-family="Georgia, serif" font-size="18" fill="#6B6454" text-anchor="end">agentatlas-85r.pages.dev</text>
+  </g>
+</svg>
