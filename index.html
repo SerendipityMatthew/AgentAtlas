@@ -40,6 +40,67 @@
     --purple: #D6CDE0;
     --code-bg: #262319;
   }
+  :root[data-theme="dark"] {
+    --bg: #1A1812;
+    --bg-panel: #24221A;
+    --ink: #E8E1CF;
+    --ink-soft: #A8A190;
+    --green: #A6C19E;
+    --green-bright: #3F5A34;
+    --green-soft: #2E3626;
+    --line: #3A3625;
+    --grid: #28251C;
+    --yellow: #DAC070;
+    --yellow-soft: #3A3220;
+    --pink: #D8A89C;
+    --pink-soft: #3B2924;
+    --blue: #A8BCC8;
+    --blue-soft: #2A3540;
+    --purple: #B9A8C8;
+    --code-bg: #121009;
+  }
+  /* Dark-mode fixups for hardcoded colors that break readability */
+  :root[data-theme="dark"] .callout.yellow .label { color: #E5C870; }
+  :root[data-theme="dark"] .callout.pink .label { color: #E8B9AB; }
+  :root[data-theme="dark"] .callout.yellow { border-color: #8A7838; }
+  :root[data-theme="dark"] .callout.pink { border-color: #8B5E52; }
+  :root[data-theme="dark"] .callout { border-color: #5A6F4D; }
+  :root[data-theme="dark"] .home .card:hover { border-color: var(--green); }
+  :root[data-theme="dark"] .home .card .pill.cont { background: var(--yellow-soft); color: #E5C870; border-color: #8A7838; }
+  :root[data-theme="dark"] .home .card { background: var(--bg-panel); }
+  :root[data-theme="dark"] .home .card.c1 { background: linear-gradient(140deg, #24221A 60%, #2E3626); }
+  :root[data-theme="dark"] .home .card.c2 { background: linear-gradient(140deg, #24221A 60%, #3A3220); }
+  :root[data-theme="dark"] .home .card.c3 { background: linear-gradient(140deg, #24221A 60%, #3B2924); }
+  :root[data-theme="dark"] .home .card.c4 { background: linear-gradient(140deg, #24221A 60%, #2A3540); }
+  :root[data-theme="dark"] .home .card.c5 { background: linear-gradient(140deg, #24221A 60%, #332A3A); }
+  :root[data-theme="dark"] .home .card.c6 { background: linear-gradient(140deg, #24221A 60%, #332E22); }
+  :root[data-theme="dark"] .home .card.c7 { background: linear-gradient(140deg, #24221A 60%, #28313A); }
+  :root[data-theme="dark"] .home .card.c8 { background: linear-gradient(140deg, #24221A 60%, #3D2E24); }
+  :root[data-theme="dark"] .home .card.c9 { background: linear-gradient(140deg, #24221A 60%, #302D26); }
+  :root[data-theme="dark"] .home .card.c10 { background: linear-gradient(140deg, #24221A 60%, #263430); }
+  :root[data-theme="dark"] .home .card.c11 { background: linear-gradient(140deg, #24221A 60%, #342C34); }
+  :root[data-theme="dark"] .home .card.c12 { background: linear-gradient(140deg, #24221A 60%, #35301F); }
+  :root[data-theme="dark"] .home .glossary-cta { background: linear-gradient(140deg, #24221A 55%, #3B2924); }
+  :root[data-theme="dark"] .home .glossary-cta.cta-play { background: linear-gradient(140deg, #24221A 55%, #28313A); }
+  :root[data-theme="dark"] .home .glossary-cta .btn { color: var(--bg); }
+  :root[data-theme="dark"] .home .card .pill.done { color: var(--bg); }
+  :root[data-theme="dark"] .logo em { color: #1A1812; }
+  :root[data-theme="dark"] h1.title em { color: #1A1812; }
+  :root[data-theme="dark"] .home h1 em { color: #1A1812; }
+  :root[data-theme="dark"] .pill.idea,
+  :root[data-theme="dark"] .pill.tech { color: #1A1812; }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); background: var(--bg-panel);
+    color: var(--ink-soft); font-size: 16px; cursor: pointer;
+    transition: background .18s, border-color .18s, color .18s;
+    margin-left: 6px;
+  }
+  .theme-toggle:hover { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
@@ -502,6 +563,9 @@
     background: var(--green); color: #FAF7EC;
     font-family: "Noto Serif SC", serif; font-size: 14px; font-weight: 600;
     white-space: nowrap; margin-left: 20px;
+  }
+  .home .glossary-cta.cta-play {
+    background: linear-gradient(140deg, #FAF7EC 55%, #E3EBF0);
   }
 
   /* Glossary home */
@@ -1154,6 +1218,18 @@
     .canvas { aspect-ratio: auto; min-height: 320px; }
   }
 </style>
+<script>
+  // Theme init: localStorage > system preference. Run early to avoid flash.
+  (function() {
+    try {
+      var saved = localStorage.getItem("theme");
+      var sysDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", saved || (sysDark ? "dark" : "light"));
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  })();
+</script>
 </head>
 <body>
 <header>
@@ -1168,6 +1244,7 @@
     <a href="#/quiz" class="tab" data-tab="quiz">考试</a>
   </nav>
   <div class="lesson-nav" id="lesson-nav"></div>
+  <button class="theme-toggle" id="theme-toggle" title="切换明暗主题" onclick="toggleTheme()">☾</button>
 </header>
 
 <div id="app"></div>
@@ -5747,6 +5824,23 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
   function go(hash) { location.hash = hash ? ("#/" + hash) : ""; }
   window.go = go;
 
+  function updateThemeGlyph() {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    btn.textContent = isDark ? "☀" : "☾";
+    btn.setAttribute("aria-label", isDark ? "切换到亮色模式" : "切换到暗色模式");
+  }
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    updateThemeGlyph();
+  }
+  window.toggleTheme = toggleTheme;
+  updateThemeGlyph();
+
   function renderNav(route) {
     // top-tab active state
     document.querySelectorAll("#top-tabs .tab").forEach(t => t.classList.remove("active"));
@@ -5850,7 +5944,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
           <span class="btn">去查词 →</span>
         </a>
 
-        <a class="glossary-cta" href="#/play" style="background: linear-gradient(140deg, #FAF7EC 55%, #E3EBF0); margin-top: 14px;">
+        <a class="glossary-cta cta-play" href="#/play" style="margin-top: 14px;">
           <div class="txt">
             <h3>实验 Playground →</h3>
             <p>能动手改的 Prompt Playground 已上线 (换 system prompt 看回答怎么变)。后面还会补 RAG、Agent workflow 等 mock 版 simulator。</p>
