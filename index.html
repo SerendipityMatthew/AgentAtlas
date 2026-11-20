@@ -84,11 +84,13 @@
   :root[data-theme="dark"] .home .glossary-cta.cta-play { background: linear-gradient(140deg, #24221A 55%, #28313A); }
   :root[data-theme="dark"] .home .glossary-cta .btn { color: var(--bg); }
   :root[data-theme="dark"] .home .card .pill.done { color: var(--bg); }
-  :root[data-theme="dark"] .logo em { color: #1A1812; }
-  :root[data-theme="dark"] h1.title em { color: #1A1812; }
-  :root[data-theme="dark"] .home h1 em { color: #1A1812; }
+  :root[data-theme="dark"] .logo em { color: var(--ink); }
+  :root[data-theme="dark"] h1.title em { color: var(--ink); }
+  :root[data-theme="dark"] .home h1 em { color: var(--ink); }
   :root[data-theme="dark"] .pill.idea,
   :root[data-theme="dark"] .pill.tech { color: #1A1812; }
+  :root[data-theme="dark"] .top-tabs .tab.active,
+  :root[data-theme="dark"] .top-tabs .tab.active:hover { background: var(--green-bright); color: var(--ink); }
 
   /* Theme toggle button */
   .theme-toggle {
@@ -119,6 +121,16 @@
   }
   a { color: var(--green); text-decoration: none; }
   a:hover { opacity: .8; }
+  :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
+  #app:focus-visible { outline: none; }
+  .skip-link {
+    position: absolute; left: 10px; top: -40px;
+    padding: 8px 14px; border-radius: 6px;
+    background: var(--green); color: #FAF7EC;
+    font-family: "JetBrains Mono", monospace; font-size: 12px;
+    z-index: 100;
+  }
+  .skip-link:focus { top: 10px; opacity: 1; }
 
   /* Header */
   header {
@@ -253,7 +265,7 @@
   }
 
   /* LESSON */
-  main {
+  .lesson-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 24px;
@@ -575,7 +587,7 @@
     transition: transform .15s ease, border-color .15s ease;
   }
   .home .glossary-cta:hover { transform: translateY(-2px); border-color: var(--green); }
-  .home .glossary-cta .txt h3 {
+  .home .glossary-cta .txt h2 {
     font-family: "Noto Serif SC", "Fraunces", serif;
     font-size: 22px; font-weight: 700; margin: 0 0 6px;
   }
@@ -1234,7 +1246,7 @@
   .mem-tips strong { color: var(--ink); font-weight: 600; }
 
   @media (max-width: 920px) {
-    main { grid-template-columns: 1fr; }
+    .lesson-layout { grid-template-columns: 1fr; }
     aside.panel { position: static; }
     .stat-row { grid-template-columns: repeat(2, 1fr); }
     h1.title { font-size: 28px; }
@@ -1281,7 +1293,7 @@
     .lesson-nav .n-btn { padding: 4px 8px; font-size: 10px; }
     .lesson-nav .n-cur { padding: 3px 8px; }
 
-    main, .home, .glossary-home, .term-page, .quiz-page {
+    .lesson-layout, .home, .glossary-home, .term-page, .quiz-page {
       padding-left: 16px; padding-right: 16px;
     }
     .home { padding-top: 32px; padding-bottom: 48px; }
@@ -1306,22 +1318,23 @@
 </script>
 </head>
 <body>
+<a href="#app" class="skip-link">跳到正文</a>
 <header>
-  <div class="logo" onclick="go('')">
-    <span class="mark">◆</span>
+  <a class="logo" href="#/" aria-label="回首页 Agent Atlas">
+    <span class="mark" aria-hidden="true">◆</span>
     <span>Agent <em>Atlas</em></span>
-  </div>
-  <nav class="top-tabs" id="top-tabs">
+  </a>
+  <nav class="top-tabs" id="top-tabs" aria-label="主导航">
     <a href="#/" class="tab" data-tab="courses">深入课</a>
     <a href="#/glossary" class="tab" data-tab="glossary">术语库</a>
     <a href="#/play" class="tab" data-tab="play">实验</a>
     <a href="#/quiz" class="tab" data-tab="quiz">考试</a>
   </nav>
   <div class="lesson-nav" id="lesson-nav"></div>
-  <button class="theme-toggle" id="theme-toggle" title="切换明暗主题" onclick="toggleTheme()">☾</button>
+  <button class="theme-toggle" id="theme-toggle" title="切换明暗主题" aria-label="切换明暗主题" onclick="toggleTheme()">☾</button>
 </header>
 
-<div id="app"></div>
+<main id="app" tabindex="-1"></main>
 
 <script>
   /* ============== LESSONS ============== */
@@ -4765,7 +4778,7 @@ jailbreak 常见套路:
     });
 
     const mapSvg = `
-      <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="术语库地图: 7 个主题分组, 点一个跳到对应分组">
         <defs>
           <radialGradient id="hub-grad" cx="0.5" cy="0.45">
             <stop offset="0" stop-color="#F9F0C0"/>
@@ -5994,12 +6007,13 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
 
   function renderNav(route) {
     // top-tab active state
-    document.querySelectorAll("#top-tabs .tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll("#top-tabs .tab").forEach(t => { t.classList.remove("active"); t.removeAttribute("aria-current"); });
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
     else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow" || route.page === "play-mcp" || route.page === "play-memory") activeTab = "play";
-    document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
+    const activeEl = document.querySelector(`#top-tabs [data-tab="${activeTab}"]`);
+    if (activeEl) { activeEl.classList.add("active"); activeEl.setAttribute("aria-current", "page"); }
 
     nav.innerHTML = "";
     if (route.page === "home") { nav.innerHTML = `<span class="n-cur">课程首页</span>`; return; }
@@ -6089,7 +6103,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
 
         <a class="glossary-cta" href="#/glossary">
           <div class="txt">
-            <h3>术语库 →</h3>
+            <h2>术语库 →</h2>
             <p>35+ 个 LLM 关键词, 按 7 个主题分组, 覆盖 context、loop、reasoning、workflow-vs-agent 等热词。每条都是一句话 + 比喻 + 代码。想随手查就从这里进。</p>
           </div>
           <span class="btn">去查词 →</span>
@@ -6097,7 +6111,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
 
         <a class="glossary-cta cta-play" href="#/play" style="margin-top: 14px;">
           <div class="txt">
-            <h3>实验 Playground →</h3>
+            <h2>实验 Playground →</h2>
             <p>能动手改的 Prompt Playground 已上线 (换 system prompt 看回答怎么变)。后面还会补 RAG、Agent workflow 等 mock 版 simulator。</p>
           </div>
           <span class="btn">去玩玩 →</span>
@@ -6124,7 +6138,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     const nextLesson = lessons[i + 1];
 
     app.innerHTML = `
-      <main>
+      <div class="lesson-layout">
         <section class="stage">
           <div class="crumb"><a href="#/">◆ Agent Atlas</a>  /  ${String(lesson.num).padStart(2, "0")} · ${lesson.level} / 第 ${lesson.num} 节, 共 ${lessons.length} 节</div>
           <h1 class="title">${lesson.title}<span class="tags"><span class="tag yellow">⏱ ${lesson.duration}</span><span class="tag green">◈ ${lesson.level}</span><span class="tag blue">⋮ ${lesson.stepCount} 步</span></span></h1>
@@ -6137,7 +6151,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             ${lesson.stats.map((k, j) => `<div class="stat"><div class="k">${k}</div><div class="v" id="s-${j}">—</div></div>`).join("")}
           </div>
           <div class="canvas">
-            <svg id="scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">${lesson.svg}</svg>
+            <svg id="scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${lesson.svg}</svg>
             <div class="ctrls">
               <button id="replay" title="回放 (R)">↻</button>
               <button id="pause" title="下一步 (Space)">▶</button>
@@ -6191,7 +6205,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
           </div>
           ` : ""}
         </aside>
-      </main>
+      </div>
     `;
 
     document.getElementById("btn-next").addEventListener("click", nextStep);
@@ -7060,7 +7074,7 @@ prompts: [
 
         <div class="mcp-grid">
           <div class="mcp-canvas">
-            <svg viewBox="0 0 520 390" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 520 390" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MCP 架构图: 点击 Host / Client / Server / Capabilities 四个区域查看职责">
               <defs>
                 <marker id="mcp-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                   <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
