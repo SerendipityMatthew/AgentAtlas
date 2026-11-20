@@ -1519,7 +1519,7 @@
           body: `<p>这堆数字从哪来? 两步:</p>
             <p><strong>预训练</strong>——用整个互联网的文本喂给一个随机数字组成的模型, 让它一个 token 一个 token 猜下一个, 猜错了就调整参数。几千个 GPU 跑几个月, 烧几千万美元。训练完, 文件就不变了, 冻住。</p>
             <p><strong>推理</strong>——就是你平时用它。文件不动, 只是把你的输入塞进去, 算出下一个 token。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>训练贵得吓人, 推理摊得很薄: 一次 $5,000 万的训练, 可能支撑十亿次推理。所以"微调一个模型"≠"训一个模型"——微调只调一小撮参数, 不从头烧。</p></div>`,
           next: "下一步: 推理具体在干嘛 →",
           stats: ["~700 亿", "~140 GB", "预训练 → 推理", "—"],
@@ -1529,7 +1529,7 @@
           title: "推理只做一件事: 猜下一个 token",
           body: `<p>推理的时候, 模型做的事情<strong>非常简单</strong>: 把你给的所有文本 (系统提示 + 历史对话 + 新输入) 切成一串 token, 整串送进模型, 模型在<strong>整个词表</strong> (大约 10 万个 token) 里给每个候选打一个概率分。</p>
             <p>按概率抽一个 (默认抽最大的), 加到末尾, 再把新一串整个送回去, 再抽。直到抽到 <code>&lt;end&gt;</code> 为止。你看到的"流式打字"效果, 就是这个循环本身。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>它不"懂"你在问什么。它只是基于前面出现过的 token, 对下一个 token 做一个概率分布预测——行话 <code>next-token prediction</code>。所有其他的"智能", 都是这个最简单机制的副作用。</p></div>`,
           next: "下一步: 它和软件的区别 →",
           stats: ["~700 亿", "~140 GB", "推理", "token 概率"],
@@ -1541,7 +1541,7 @@
             <p><strong>一 · 概率输出</strong>——同样问题问两次, 可能答得不一样 (temperature &gt; 0 的时候)。</p>
             <p><strong>二 · 会幻觉 (hallucination)</strong>——它从没见过的事也会一本正经地编。因为它只会"续写最像的那个 token", 不会主动说"我不知道"。</p>
             <p><strong>三 · 知识冻在参数里</strong>——所有"事实"都藏在那几百亿个数字里, 没法单独打开查、也没法像改 bug 一样改一行。要调整行为, 要么重新训练, 要么在 prompt 里补信息 (下一节就讲)。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>这三条决定了 LLM 周围必须要"工程": 验证、重试、RAG、工具调用、人审批。单独一个模型不是应用, 得给它配一身"外套"——后面几节讲的就是这身外套。</p></div>`,
           next: "本节完成 ✓",
           stats: ["~700 亿", "~140 GB", "推理", "概率 · 会编"],
@@ -1689,7 +1689,7 @@
           title: "模型其实在\"猜下一个字\"",
           body: `<p>模型并不是想好整段话再回你。它是<strong>一个 token 一个 token 蹦出来的</strong>——你看到的流式打字效果, 就是这个过程本身。</p>
             <p>"token"可以粗略理解成"字"或"半个词" (实际切法由分词器决定)。它每次看着前面所有内容, 猜概率最高的下一个; 猜完一个, 接上去, 再猜下一个, 直到它觉得"该结束了"。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>这就是 next-token prediction。所有大模型本质上都在做这件事, 区别在于架构和训练数据。</p></div>`,
           next: "下一步: 多轮对话的秘密 →",
           stats: ["1", "2", "—", "~10 tokens"],
@@ -1699,7 +1699,7 @@
           title: "多聊几轮, 其实每次都把整段历史重发一遍",
           body: `<p>你发第二句"你会写代码吗?", 感觉模型"记得"你们之前打过招呼。但模型本身<strong>没有任何记忆</strong>——两次请求之间, 它什么都不留。</p>
             <p>"记得"的假象是因为: 每一轮, 前端 / API 会把<strong>之前所有消息 + 新这句</strong>一起打包, 整包发给模型。模型看完整段历史后再回。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>模型没记忆。"记忆"是"每轮重发"的工程伎俩。这一点想透了, 后面所有东西都顺。</p></div>`,
           next: "下一步: 代码里长啥样 →",
           stats: ["2", "3", "无", "~30 tokens"],
@@ -1709,7 +1709,7 @@
           title: "在代码里, 一段对话就是一个数组",
           body: `<p>剥掉界面, 发给模型的就是一个列表: 每条是 <code>{role, content}</code>——"谁说的, 说了啥"。</p>
             <p>每多聊一轮, 就往数组末尾加一条, 整个重发。所以越聊越长, 直到撞到<strong>上下文窗口</strong>的上限——最早的消息会被丢掉或压缩, "记忆"就开始漏。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>这也是为啥"上下文工程"是门手艺: 窗口有限, 塞什么、压缩什么、什么时候裁掉旧的, 决定了 agent 跑得好不好。下一节讲 <code>prompt</code> 时我们会回来。</p></div>`,
           next: "本节完成 ✓",
           stats: ["N", "2N+", "无", "累加直到爆窗"],
@@ -1928,7 +1928,7 @@
           title: "一个像样的 prompt 的结构",
           body: `<p>一个能上生产的 system prompt, 大致包含几块: <strong>身份</strong> · <strong>风格</strong> · <strong>该 / 不该做</strong> · <strong>输出格式</strong> · 可选的<strong>例子</strong>(few-shot)。</p>
             <p>然后 user 消息就负责"这一轮到底要干嘛"。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>把 prompt 当函数的 docstring: 输入、输出、边界、例子讲清楚, 模型就稳。讲不清, 它就瞎猜——这叫 "hallucination" 常见诱因之一。</p></div>`,
           next: "本节完成 ✓",
           stats: ["≥2", "~100-500", "可预测", "明确约束"],
@@ -2110,7 +2110,7 @@
           title: "重复的痛: 每次都得把同样的指令说一遍",
           body: `<p>你让 ChatGPT 帮你写邮件。第一次你写了一大段: "语气礼貌但不要太客气, 别写期待您的回复, 结尾用..."。</p>
             <p>第二次, 得再说一遍。第三次, 还是。<strong>同样的套路, 每次重新说一遍, 很蠢。</strong></p>
-            <div class="callout pink"><div class="label"><span class="ic">🙄</span>你会想到</div>
+            <div class="callout pink"><div class="label">你会想到</div>
             <p>"要是能一次写好, 以后直接叫名字就行就好了。"——这就是 skill 的起点。</p></div>`,
           next: "下一步: 打包成 skill →",
           stats: ["1", "0", "单次", "靠记忆"],
@@ -2130,7 +2130,7 @@
           title: "一套 skill 库, 多个 agent 共用",
           body: `<p>skill 的真正威力不是"省打字", 是<strong>把专业知识沉淀下来</strong>: 你团队里会写邮件的那个人, 把他脑子里的原则写成一个 write-email.md ——之后<strong>所有 agent 都会写邮件</strong>。</p>
             <p>关键点: <strong>skill 是用人话写的, 不是代码</strong>。产品经理可以写一个, 运营可以写一个, 不用会编程。</p>
-            <div class="callout"><div class="label"><span class="ic">💡</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>Skill 把"<strong>会不会</strong>" 从"<strong>这个模型本身</strong>"挪到了 "<strong>这个项目的 skill 库</strong>" 。换模型, 技能不丢。</p></div>`,
           next: "下一步: 一个 skill 文件长啥样 →",
           stats: ["N agent", "0", "全库", "共享目录"],
@@ -2140,7 +2140,7 @@
           title: "一个 skill 文件的样子",
           body: `<p>多数框架里, 一个 skill 就是一个 markdown 文件: <strong>frontmatter 里是元信息</strong>(名字、何时用), <strong>正文是具体做法</strong>。</p>
             <p>Agent 启动时扫描整个 skills 目录, 把每个 skill 的 description 记住。任务来了, 按 description 找合适的, 把对应 skill 的正文"展开"到当前 prompt 里。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>Anthropic Skills、Cursor Rules、OpenAI GPTs 的 instructions —— 本质都是这套。换个名字而已。</p></div>`,
           next: "本节完成 ✓",
           stats: ["∞", "0", "按需调用", "md 文件"],
@@ -2382,7 +2382,7 @@
           title: "厉害之处: 观察 → 思考 → 行动, 能循环校正",
           body: `<p>模型会错、工具会失败、世界会变。单次 chat 没救——它说完就没了。</p>
             <p>Agent 的三角循环让它<strong>看一眼结果, 再决定下一步</strong>: 航班搜出来是空的? 换个日期再搜。工具返回错误? 换个参数重试。用户改主意? 推翻重来。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>Agent 的能力上限<strong>不来自模型多强, 而来自循环多久</strong>。给它时间和工具, 一个中等模型也能完成惊人的任务。</p></div>`,
           next: "下一步: 看代码 →",
           stats: ["多个", "N 轮", "可纠偏", "较高"],
@@ -2392,7 +2392,7 @@
           title: "最小 agent: 三件套 + 一个循环",
           body: `<p>拆到最小, 定义一个 agent 就是: <code>system_prompt</code>(人设) + <code>tools</code>(能力) + <code>model</code>, 然后 <code>.run(任务)</code> 启动那个循环。</p>
             <p>Agent 框架(LangChain / LlamaIndex / Anthropic SDK / OpenAI Assistants)无一例外是这个形状, 多出来的都是<strong>工程细节</strong>: 重试、记忆、权限、追踪。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>加 skill = 在 system 里引用 skill 库; 加记忆 = 循环间保留部分消息; 加权限 = tools 里做授权检查。都是围绕这三件套长出来的。</p></div>`,
           next: "本节完成 ✓ 看循环 →",
           stats: ["N", "N 轮", "完整", "可调"],
@@ -2584,7 +2584,7 @@
             2. 工具回: <code>{temp: 15, sunny}</code><br>
             3. 它看到结果 → 决定不再调工具 → 回你一段话</p>
             <p>两轮大模型调用, 一次工具调用。<strong>messages 从 1 条涨到 4 条</strong>。</p>
-            <div class="callout"><div class="label"><span class="ic">💡</span>看清一件事</div>
+            <div class="callout"><div class="label">看清一件事</div>
             <p><code>tool_call</code> 和 <code>tool_result</code> <strong>都是消息</strong>, 都会堆进 messages 里, 都占上下文窗口。</p></div>`,
           next: "下一步: 拆开那个 while 循环 →",
           stats: ["2", "1", "1 → 4", "低"],
@@ -2596,7 +2596,7 @@
             <p>· 问 LLM "基于当前所有消息, 下一步做啥?"<br>
             · 如果它想调工具 → 调, 把结果塞回 messages<br>
             · 如果它只给文字 → 收工, 返回</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>所有"企业级 agent 框架"剥到底都是这段。它们多出来的, 都是在这段<strong>边上打补丁</strong>: 重试、记忆、权限、追踪。</p></div>`,
           next: "下一步: 它会怎么翻车 →",
           stats: ["N", "每轮 0~k", "线性增长", "中"],
@@ -2861,7 +2861,7 @@
           body: `<p>Memory 分两层:</p>
             <p><strong>短期</strong>——塞在 context window 里 (那个 128K 的大窗口)。system prompt、本次对话历史、临时笔记, 都在里面。模型看得见, 但<strong>关会话 = 全没</strong>。</p>
             <p><strong>长期</strong>——存在外部 (数据库、向量库、文件)。跨 session / 跨设备保留, 要用的时候 读出来 → 拼到 system prompt 里 送给模型。模型其实还是只在读 context, 只是 context 的某些部分来自 "之前存的"。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>所有 memory 系统归根结底都是 "怎么把合适的东西写进 / 读回 context"。模型本身永远只看 context, memory 的工程全在它之外。</p></div>`,
           next: "下一步: 长期存怎么做 →",
           stats: ["短期 / 长期", "context / 外部", "本轮 / 跨 session", "token / 存储"],
@@ -2873,7 +2873,7 @@
             <p><strong>一 · 结构化 KV</strong>——像 ChatGPT 的 user memory。存 <code>"name": "张三"</code> <code>"diet": "不吃辣"</code>。精确、占 token 少, 但要先想好结构, 非结构化的东西塞不进去。</p>
             <p><strong>二 · 对话摘要</strong>——定期让 LLM 自己总结 "过去 50 轮里用户在做什么、偏好什么"。摘要本身塞进 system prompt。开箱即用, 坏处是摘错了就丢细节。</p>
             <p><strong>三 · 检索式</strong>——把所有过往对话都 embed 存进向量库, 新问题来了先检索相关历史 (本质上就是 RAG, 只是索引的是对话历史不是文档)。原汁原味、可追溯, 但慢, 而且可能检索偏。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>实战常见</div>
+            <div class="callout"><div class="label">实战常见</div>
             <p>生产里经常三种一起用: KV 存 "用户是谁"、摘要存 "最近在搞什么"、检索式存 "去年某次具体对话"。ChatGPT 自己就是这个组合。</p></div>`,
           next: "下一步: 和 RAG 的区别 →",
           stats: ["长期", "KV·摘要·检索", "持久", "读写开销"],
@@ -2884,7 +2884,7 @@
           body: `<p>Memory 和 RAG 技术栈常常重叠——都用 embedding、都查向量库、都把检索结果拼进 prompt。区别不在技术, 在<strong>查的是什么</strong>:</p>
             <p><strong>RAG</strong> 查 "知识"——公司文档、产品手册、法律条文、API 文档。外部客观事实, 用来回答 "这事是什么" 这种问题。</p>
             <p><strong>Memory</strong> 记 "你"——你是谁、你偏好什么、你和它的过往互动。主观、个性化, 用来让 agent 认得你, 不要每次从头介绍自己。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>一个像样的 agent 通常两套都要: memory 让它 "记得你是谁", RAG 让它 "知道事实"。架构上可以合, 概念上要分清, 不然评估和调试全会乱。</p></div>`,
           next: "本节完成 ✓",
           stats: ["Memory vs RAG", "都用向量库", "记你 vs 查事实", "合用"],
@@ -3138,7 +3138,7 @@
             <p>(1) 拦住这段 JSON, 不要塞回模型 —— 那是下一步。</p>
             <p>(2) 从 JSON 里取 <code>name</code>, 到预先注册的 <code>tools</code> 表里查到真正的函数 <code>getWeather</code>。</p>
             <p>(3) 把 <code>args</code> 展开, 正经调这个函数 —— 它可能发 HTTP 请求, 可能查数据库, 可能跑 shell。结果拿到一个真的返回值。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>这一步是纯你的代码, 完全没模型参与。所以: 权限校验、参数校验、超时、重试、熔断、审计日志 —— <strong>只能</strong>在这里做, 别指望模型自觉。</p></div>`,
           next: "下一步: 结果怎么告诉模型 →",
           stats: ["等", "跑真函数 + 校验", "2 条", "2/4"],
@@ -3148,7 +3148,7 @@
           title: "把工具结果包成 tool 消息, 塞回 messages",
           body: `<p>函数跑完了, 结果怎么让模型知道? 简单: <strong>包成一条新 message, 拼到 messages 数组末尾</strong>, 这条消息的 role 叫 <code>tool</code>。</p>
             <p>格式 (OpenAI / Anthropic 大同小异): <code>{role: "tool", tool_call_id: "call_abc123", content: "{temp: 8, ...}"}</code>。<code>tool_call_id</code> 把这条和刚才那条 <code>assistant.tool_call</code> 配对 —— 多个工具并发调时, 靠 id 认领各自的结果, 不然模型会糊。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>messages 不是只有 user / assistant。还有 <code>tool</code> (运行时填) 和 <code>system</code> (初始指令)。四种 role 构成了整个"对话协议"。</p></div>`,
           next: "下一步: 模型拿到结果以后 →",
           stats: ["等", "拼 tool 消息", "3 条 (+tool)", "3/4"],
@@ -3159,7 +3159,7 @@
           body: `<p>运行时把<strong>完整的、更新过的 messages</strong> (现在 3 条) 再发一次给模型。模型看到 tool 消息里的天气数据, 现在有两个选择:</p>
             <p><strong>A · 直接写答复</strong> (最常见): 输出 "北京今天 8°C, 晴, 适合出门。" —— 结束。</p>
             <p><strong>B · 再调一个工具</strong>: 输出另一段 tool_call JSON (比如 get_aqi 查空气质量) —— 回到 step 2, 再跑一轮。这就是 agent loop。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>"function calling" (OpenAI 命名) / "tool use" (Anthropic 命名) / "工具调用" —— 都是这同一件事。协议细节 (JSON 字段名、是否 streaming) 各家略不同, 这 4 步 dance 的本质全一样。</p></div>`,
           next: "本节完成 ✓",
           stats: ["读结果 + 回话", "等下一轮", "4 条 (+assistant)", "4/4 ✓"],
@@ -3440,7 +3440,7 @@
             <p><strong>① Host</strong>: 运行 LLM 的 app 本身 (Claude Desktop / Cursor / Zed / 你写的 agent)。它只需要懂一次 MCP, 就能用上所有 MCP server。</p>
             <p><strong>② Client</strong>: host 里的一个库。每连一个 server 起一个 client 实例, 管一条 stdio 或 SSE 长连接。</p>
             <p><strong>③ Server</strong>: 一个独立进程, 把某个具体服务 (Slack / 数据库 / 你的 API) 包装成标准接口, 对外暴露 <code>tools</code> (能做啥) + <code>resources</code> (能读啥) + <code>prompts</code> (模板)。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>类比 USB</div>
+            <div class="callout yellow"><div class="label">类比 USB</div>
             <p>USB 之前每种外设自带一种口, USB 之后一种口接所有。MCP 对 LLM 应用 ≈ USB 对外设: host 只认协议, 不认对面是 Slack 还是 Postgres。</p></div>`,
           next: "下一步: 一个真的 server →",
           stats: ["N + M 清", "MCP 加一层", "统一 client ↔ server", "能"],
@@ -3452,7 +3452,7 @@
             <p><strong>① 配置</strong>: 在 Claude Desktop 的 config 加一段, 告诉它 "slack 这个 server 怎么起" —— 通常是 <code>npx @mcp/slack</code>, 加上 SLACK_TOKEN 环境变量。</p>
             <p><strong>② 启动</strong>: Claude Desktop 启动时 fork 一个子进程跑 slack-server, 自家 client 跟它握手, 调 <code>list_tools()</code> 拿到清单 —— <code>send_message</code> / <code>list_channels</code> / <code>read_history</code>。</p>
             <p><strong>③ 用</strong>: 用户问 "总结 #general 最近消息", LLM 看到这些 tool 可用, 就 emit tool_call(read_history, channel="general", limit=20) —— 剩下的和 Lesson 07 一模一样 (只是执行方从 "你的代码" 换成了 "通过 client 转给 server")。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>分工</div>
+            <div class="callout"><div class="label">分工</div>
             <p>host 不懂 Slack 的 OAuth 和分页, server 不懂 LLM 协议, 两边只认 MCP。写 slack-server 的人和写 Claude Desktop 的人互不认识, 也能对上。</p></div>`,
           next: "下一步: 和 function calling 怎么分 →",
           stats: ["1 host · M server", "stdio / SSE", "子进程 / 长连接", "每个 server 都复用"],
@@ -3463,7 +3463,7 @@
           body: `<p>Lesson 07 讲的 function calling 是 "模型 → 一段 JSON → 你的代码跑函数"。MCP <strong>没有替代</strong>它, 而是在外面加了一层: <strong>怎么发现有哪些 tool 能用</strong>, <strong>怎么连到各个 server 上</strong>。</p>
             <p><strong>只用 FC</strong>: 你的 agent 代码里写死几个 tool, LLM 从里面挑。轻量, 掌控强, 但换个 agent 项目要重写, 也没法让别人 "装上你的 tool"。</p>
             <p><strong>FC + MCP</strong>: 你的 agent 通过 client 连多个独立 server, 每个 server 对外暴露自己的 tool。多一层, 但每个 server 独立维护 / 复用, 任何 MCP host 都能装上。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>什么时候用 MCP: 要连多个外部系统 / 想发布给别人用 / host 已支持。什么时候不用: 一个小 agent 几个 custom tool 直接 FC 就好; 后端 web service 自己管所有工具, 没 host 这层。协议是 Anthropic 2024-11 发起, 开源, 多家实现。</p></div>`,
           next: "本节完成 ✓",
           stats: ["FC vs MCP", "FC 协议内 / MCP 协议外", "直接 / 发现", "FC 轻 · MCP 复用"],
@@ -3761,7 +3761,7 @@
             <p>① <strong>文档</strong> → ② <strong>chunk</strong> (切成小段, 通常 300 字 + 50 字重叠) → ③ <strong>embed</strong> (每段过 embedding 模型, 得到 ~1536 维向量) → ④ <strong>store</strong> (存到向量数据库, 比如 Pinecone / Qdrant / pgvector)</p>
             <p><strong>在线查询</strong> (每次用户问都跑):</p>
             <p>⑤ <strong>retrieve</strong> (query 也 embed, 在向量库里 cosine 相似度查 top-K) → ⑥ <strong>augment</strong> (把 top-K 片段拼进 system prompt) → ⑦ <strong>generate</strong> (LLM 看到拼好的 context, 回答)</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>实际项目里 "六步" 有时并成 "五步" (把 augment 并进 generate), 名字不重要, 分工是一样的。重点是记住 "离线建库, 在线查+拼+答" 这个节奏。</p></div>`,
           next: "下一步: 看一次真的查 →",
           stats: ["开卷", "6 步流水线", "取决于 embed/chunk", "chunk · K · model"],
@@ -3775,7 +3775,7 @@
             <p><strong>3 · retrieve</strong>: 向量库里跑 cosine 相似度, 返回 top-3 片段 + 分数: #7 (退款, 0.91) / #8 (退货, 0.78) / #10 (试用期, 0.38)。</p>
             <p><strong>4 · augment</strong>: 把 top-3 片段拼进 system prompt, 配一句约束 "根据以下片段回答, 没有就说没有, 不要编造"。</p>
             <p><strong>5 · generate</strong>: 这段 system + 原 user query 一起发给 LLM, 模型基于拼好的内容生成答案 + 可引用的来源。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>动手感受</div>
+            <div class="callout"><div class="label">动手感受</div>
             <p>这 5 步每一步都可以在 <a href="#/play/rag">实验 → RAG Simulator</a> 里实时看: 换 query 看相似度分变化, 调 chunk 大小看切法, 改 top-K 看送进 prompt 的内容差异。</p></div>`,
           next: "下一步: 常见坑和改进 →",
           stats: ["开卷实例", "retrieve + generate", "top-3 cosine", "可见分数"],
@@ -3787,7 +3787,7 @@
             <p><strong>① Chunk 大小</strong>: 太大 (&gt; 1000 字) 一段混多个主题, 相似度被稀释, prompt 变长费用上升; 太小 (&lt; 100 字) 上下文被切散, 要加大 top-K 才覆盖得全。通常 <strong>300 字 + 50 字重叠</strong> 起步。</p>
             <p><strong>② Reranking (两阶段检索)</strong>: 先用 cosine 粗召回 top-50 (快, 不精), 再用更贵的 cross-encoder (cohere-rerank / bge-reranker) 精排序, 最后取 top-5 送 LLM。精度明显涨, 延迟稍增。</p>
             <p><strong>③ Hybrid 检索</strong>: 向量检索擅长 "语义相近" (说法变了也能找到), BM25 关键词擅长 "原文精确" (专有名词 / 代码 / 标识符)。两种一起 + 分数融合 (加权 / RRF), 补向量的盲点。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>建议路径</div>
+            <div class="callout yellow"><div class="label">建议路径</div>
             <p>先跑最朴素一版 (chunk=300, top-K=5, 纯向量, 不 rerank) 看效果 → 收 20 个真实 query 的烂答案 → 对症加 rerank / hybrid / 改 chunk 策略。别一上来就堆复杂架构。评估本身也难, 通常要 LLM-as-judge 或者人工打分。</p></div>`,
           next: "本节完成 ✓",
           stats: ["调优", "rerank / hybrid", "可观察 + 评估", "多个旋钮"],
@@ -4046,7 +4046,7 @@
           body: `<p>第一种办法: 把 agent 分成明确两段。</p>
             <p><strong>① Plan</strong>: 先调一次 LLM, 让它把任务拆成一个可执行的步骤列表 (一个 JSON 数组)。这一步<strong>只调 LLM, 不执行任何工具</strong>, 只是拿 "想法"。</p>
             <p><strong>② Execute</strong>: 一个普通的 <code>for step in plan</code> 循环, 按顺序调 tool。某步失败? 回头调 LLM 重新 plan 剩下的部分 (replan)。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>特点</div>
+            <div class="callout yellow"><div class="label">特点</div>
             <p>结构清晰, 可审计 —— plan 列出来人一眼看完, 每步都能停、都能让人审批, 适合流程相对固定的任务 (订票 / 报销 / CI 发布)。坏处是不好应对 "中途变化": 本来想订火车, 查到当天停运, 整个 plan 就作废, 要 replan。</p></div>`,
           next: "下一步: ReAct 循环 →",
           stats: ["Planning", "开头 plan 一次", "按 plan 顺序走", "中等 (需 replan)"],
@@ -4059,7 +4059,7 @@
             <p><strong>Act</strong>: 模型 emit 一个 tool_call —— 和 Lesson 07 讲的 tool calling 一模一样。</p>
             <p><strong>Observe</strong>: 运行时跑完, 把结果塞回 messages。</p>
             <p>再回 Think, 读新的 observation, 决定下一步。循环直到模型给出 answer 为止。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>特点</div>
+            <div class="callout"><div class="label">特点</div>
             <p>每步看真实结果再决定下一步, 对中途意外适应性很强——查到车停运, 下一轮它自然会想 "换个日期 / 换高铁"。坏处是没整体视图, 可能原地打转, 必须配 <code>max_iter</code> 兜底。<code>ReAct = Reason + Act</code>, Yao et al. 2023 的论文名字。</p></div>`,
           next: "下一步: 两种怎么选 →",
           stats: ["ReAct", "每一轮都决定", "think → act → observe 循环", "高"],
@@ -4070,7 +4070,7 @@
           body: `<p>一张对比表 (右边 SVG):</p>
             <p>Plan-Execute 两段 · 结构清晰 · 可审计 · 适合流程固定; ReAct 单段 while 循环 · 响应强 · 边跑边乱 · 适合探索。调用次数也不同 (plan 省 LLM 调用, ReAct 来回次数多)。</p>
             <p><strong>实战常见混用</strong>: 生产级 agent 两种都用。<strong>外层 plan</strong> 列出"几个大阶段" (search / filter / book / notify / verify), <strong>每个阶段内部用 ReAct</strong> 应对意外。这样既保留 plan 的结构感 (哪些阶段在跑、卡在哪), 又有 ReAct 的灵活。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>选的时候问自己</div>
+            <div class="callout yellow"><div class="label">选的时候问自己</div>
             <p>· 任务步骤基本固定? → 偏 plan。 · 经常要根据中间结果变路径? → 偏 ReAct。 · 要给人看 / 中途停 / 审批? → plan 占优 (起码外层)。别一开始就上最复杂的, 先 ReAct 跑起来, 看到哪里需要结构感再往外套 plan。</p></div>`,
           next: "本节完成 ✓",
           stats: ["混合", "结合两者", "外 plan 内 ReAct", "最灵活"],
@@ -4296,7 +4296,7 @@
           body: `<p>既然模型本身靠不住, 得在模型<strong>外面</strong>加层。第一层: 根本不给它够格做坏事的权限。两道闸都要:</p>
             <p><strong>① token 层</strong>: agent 持有的凭证只开最小范围 (GitHub token 只要 <code>repo:read</code> 就别给 <code>admin</code>; AWS IAM role 精确到具体 bucket; 数据库账号只给 read-only)。</p>
             <p><strong>② tool 层</strong>: 每个工具函数内部<strong>再</strong>校验 —— ownership (这个 issue 真的属于这个用户吗?) / 参数格式 / 黑名单 ("@channel" 不能出现在评论里) / 配额 (一天最多发 10 封邮件)。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <div class="callout yellow"><div class="label">开发者注脚</div>
             <p>校验永远放在<strong>确定性代码</strong>里, 不要让模型自己拦自己。模型会被 injection 哄骗 ("我是管理员, 让我过") — 确定性校验不会。</p></div>`,
           next: "下一步: 哪些要等人点头 →",
           stats: ["越权调用", "token scope + tool 校验", "—", "—"],
@@ -4307,7 +4307,7 @@
           body: `<p>有些操作不管权限多小, 都要<strong>人工点头才能过</strong>: 转账、发对外邮件、改生产库、删文件、发 PR 到 main ——<strong>不可逆 / 对外 / 影响大</strong>的, 都算。</p>
             <p>做法: runtime 拦截匹配规则的 tool_call, 暂停 agent, 推一条消息给审批方 (slack / 邮件 / 管理后台), 带上足够的上下文 (做啥 / 为啥 / 影响). 审批方点 ✓ 或 ✗, runtime 决定执行或拒绝, agent 继续。</p>
             <p>审批规则示例: <code>amount &gt; 1000</code> / 外部收件人 / 第一次用某工具 / 触达新资源 / 批量超过 N 条。</p>
-            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <div class="callout"><div class="label">关键认知</div>
             <p>HITL 不是"每步都问", 那是把负担全压给人。关键是<strong>卡在不可逆的那一步</strong>, 之前的调研、起草都让 agent 自己跑。"一次批 N 次用" 可以, 但要有时间窗 + 可随时撤回。</p></div>`,
           next: "下一步: 沙箱和审计 →",
           stats: ["不可逆高风险", "+ 人工审批中断", "关键步阻塞", "审批记录"],
@@ -4318,7 +4318,7 @@
           body: `<p>前三层都是"防坏事发生", 兜底两条是"坏事发生后能收拾":</p>
             <p><strong>① Sandbox (关盒子)</strong>: agent 的进程跑在 docker / VM / seccomp 里。文件系统只能读写 <code>/workdir</code>; 网络走白名单 + 出站代理; CPU / 内存 / 时间都限。<strong>只要 agent 能 run_shell / exec_code, 沙箱不是可选</strong>。坏事也出不了这个盒子, 一个 agent 一个盒不互相污染。</p>
             <p><strong>② Audit Log (录像)</strong>: 每一次 tool_call、每一次 HITL 审批、每一个输入输出, 都带时间戳 + 调用者 + 结果记录。出事时能查谁在哪一步做了什么, 能回放整个 trace 复盘。</p>
-            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>四层加起来</div>
+            <div class="callout yellow"><div class="label">四层加起来</div>
             <p>① 不信 context · ② 最小权限 · ③ 关键步 HITL · ④ sandbox + audit。从外到里一层层挡, 任何一层漏, 下一层能救, 所有行为都能回溯。<strong>没银弹, 只有分层</strong> —— 生产级 agent 的 "完全态", 四条都要有。</p></div>`,
           next: "本节完成 ✓",
           stats: ["代码 / 文件逃逸", "+ sandbox + audit log", "审计复盘", "全链路可查"],
@@ -4751,22 +4751,22 @@ jailbreak 常见套路:
         <span class="en-name">${term.en}</span>
 
         <div class="block">
-          <div class="label"><span class="ic">💡</span>一句话定义</div>
+          <div class="label">一句话定义</div>
           <p>${term.oneliner}</p>
         </div>
 
         <div class="block">
-          <div class="label"><span class="ic">🔀</span>比喻</div>
+          <div class="label">比喻</div>
           <p>${term.metaphor}</p>
         </div>
 
         <div class="block concrete">
-          <div class="label"><span class="ic">📐</span>具象化</div>
+          <div class="label">具象化</div>
           <pre>${escapeHtml(term.concrete)}</pre>
         </div>
 
         <div class="block">
-          <div class="label"><span class="ic">🔗</span>常一起出现</div>
+          <div class="label">常一起出现</div>
           <div class="related-list">
             ${relatedTerms.length
               ? relatedTerms.map(t => `<a href="#/glossary/${t.slug}">${t.cn} · ${t.en}</a>`).join("")
@@ -4780,13 +4780,13 @@ jailbreak 常见套路:
               <strong>深入课里有一整节在讲这个</strong><br>
               <span style="color: var(--ink-soft); font-size: 12.5px">第 ${deepLesson.num} 节 · ${deepLesson.title}</span>
             </div>
-            <a href="#/${deepLesson.slug}">📖 看这一节 →</a>
+            <a href="#/${deepLesson.slug}">看这一节 →</a>
           </div>
         ` : ""}
 
         ${alsoIn.length ? `
           <div class="block">
-            <div class="label"><span class="ic">📖</span>也在这几节出现</div>
+            <div class="label">也在这几节出现</div>
             <div class="related-list">
               ${alsoIn.map(l => `<a href="#/${l.slug}">第 ${l.num} 节 · ${l.title}</a>`).join("")}
             </div>
