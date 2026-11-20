@@ -975,6 +975,61 @@
   .wf-detail .c { color: #808878; }
   .wf-detail .err { color: #E5A69A; }
 
+  /* MCP Simulator */
+  .mcp-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px;
+  }
+  .mcp-canvas {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 10px; aspect-ratio: 4 / 3; min-height: 360px;
+  }
+  .mcp-canvas svg { width: 100%; height: 100%; display: block; }
+  .mcp-region { cursor: pointer; }
+  .mcp-region rect, .mcp-region polygon {
+    transition: fill .18s, stroke .18s;
+  }
+  .mcp-region:hover rect:first-child,
+  .mcp-region:hover polygon:first-child { stroke-width: 2.5; }
+  .mcp-region.active rect:first-child,
+  .mcp-region.active polygon:first-child {
+    fill: var(--green-bright); stroke: var(--green); stroke-width: 2.5;
+  }
+  .mcp-detail {
+    display: flex; flex-direction: column; gap: 14px;
+    max-height: 560px; overflow-y: auto;
+  }
+  .mcp-detail .mcp-title {
+    font-family: "Noto Serif SC", serif; font-size: 20px; font-weight: 700; color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .mcp-detail .mcp-section {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .mcp-detail .mcp-section .h {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; font-weight: 500;
+  }
+  .mcp-detail .mcp-section p { margin: 0; font-size: 13px; line-height: 1.65; color: var(--ink); }
+  .mcp-detail .mcp-code {
+    background: var(--code-bg); color: #D4E0C8; border-radius: 10px;
+    padding: 12px 14px; font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+    line-height: 1.6; overflow-x: auto; white-space: pre; margin: 0;
+  }
+  .mcp-detail .mcp-pitfalls { list-style: none; padding: 0; margin: 0; }
+  .mcp-detail .mcp-pitfalls li {
+    display: grid; grid-template-columns: 16px 1fr; gap: 8px; padding: 6px 0;
+    font-size: 13px; line-height: 1.55; color: var(--ink);
+  }
+  .mcp-detail .mcp-pitfalls li::before {
+    content: "▸"; color: var(--green); font-weight: 700;
+  }
+  .mcp-detail .mcp-empty {
+    padding: 40px 16px; text-align: center; color: var(--ink-soft);
+    font-family: "Noto Serif SC", serif; font-style: italic;
+    border: 1px dashed var(--line); border-radius: 10px;
+  }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -994,6 +1049,9 @@
     .ranked-item .bar, .ranked-item .sim { grid-column: 2; }
     .wf-grid { grid-template-columns: 1fr; }
     .wf-step-item { grid-template-columns: 20px 60px 1fr; gap: 8px; }
+    .mcp-grid { grid-template-columns: 1fr; }
+    .mcp-canvas { aspect-ratio: auto; min-height: 320px; }
+    .mcp-detail { max-height: none; }
   }
 
   /* Phone — wrap header into 2 rows, shrink everything */
@@ -5603,6 +5661,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       if (parts[1] === "prompt") return { page: "play-prompt" };
       if (parts[1] === "rag") return { page: "play-rag" };
       if (parts[1] === "workflow") return { page: "play-workflow" };
+      if (parts[1] === "mcp") return { page: "play-mcp" };
       return { page: "play-hub" };
     }
     if (parts[0] === "glossary") {
@@ -5627,7 +5686,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
-    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow") activeTab = "play";
+    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow" || route.page === "play-mcp") activeTab = "play";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
@@ -5653,6 +5712,13 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       nav.innerHTML = `
         <button class="n-btn" onclick="go('play')">← 实验</button>
         <span class="n-cur">agent workflow</span>
+      `;
+      return;
+    }
+    if (route.page === "play-mcp") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('play')">← 实验</button>
+        <span class="n-cur">mcp simulator</span>
       `;
       return;
     }
@@ -5901,6 +5967,11 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             <div class="label">03 · 已上线</div>
             <h3>Agent Workflow</h3>
             <p>播放一次 agent 的完整 trace: 成功版 + 翻车恢复版。能逐步看每一条 message 里到底是什么。呼应 Lesson 05 runtime 和 Lesson 07 tool calling。</p>
+          </a>
+          <a class="sim-card" href="#/play/mcp">
+            <div class="label">04 · 已上线</div>
+            <h3>MCP Simulator</h3>
+            <p>Host / Client / Server / Capabilities 四个区域, 点一下看它职责、代码示例、常见误区。呼应 Lesson 08 MCP。</p>
           </a>
         </div>
       </div>
@@ -6524,6 +6595,222 @@ ${promptBody}
     update();
   }
 
+  function renderPlayMCP() {
+    const regions = {
+      host: {
+        title: "MCP Host · 宿主 app",
+        role: "运行 LLM 的 app 本身 (Claude Desktop / Cursor / Zed / 你自己写的 agent)。它只需要懂一次 MCP 协议, 就能用上生态里所有 MCP server。",
+        code: `// Claude Desktop 的 config 示例
+// (~/Library/Application Support/Claude/config.json)
+{
+  "mcpServers": {
+    "slack":    { ... },
+    "github":   { ... },
+    "postgres": { ... }
+  }
+}
+// 启动时 host 为每个条目拉起一个子进程
+// 自家 client 和 server 握手, 拿到工具清单`,
+        pitfalls: [
+          "host 不一定是桌面 app — CLI 工具 / 后端服务都能当 host, 只要实现了 client 侧的 MCP 协议",
+          "一个 host 可以同时连多个 server, 每个 server 独立生命周期 (挂了不影响别人)",
+          "host 管用户授权 (哪些工具允许用 / 是否要人审批), 不要把这个推给 server 做",
+        ],
+      },
+      client: {
+        title: "MCP Client · 连接管理",
+        role: "host 里的一个库, 负责和一个 server 的 stdio 或 SSE 长连接。每连一个 server 起一个 client 实例; client 管握手、保活、list_tools、调用转发。",
+        code: `// 伪代码: host 内部的 client
+const client = new MCPClient();
+await client.connect({
+  transport: "stdio",
+  command: "npx", args: ["-y", "@mcp/slack"],
+});
+
+const tools = await client.listTools();
+// → [{ name: "send_message", schema: {...} }, ...]
+
+const result = await client.callTool("send_message", {
+  channel: "#general", text: "hello"
+});`,
+        pitfalls: [
+          "client 不是模型, 它只搬运协议消息; 真正'决定调哪个工具'是 LLM 做 (走 Lesson 07 tool_calling 那套)",
+          "一个 tool call 阻塞时别忘了超时 — server 可能挂了",
+          "tool_call_id 要在 client 层生成并关联 (Lesson 07 讲过), 不要用 server 返回的 id",
+        ],
+      },
+      server: {
+        title: "MCP Server · 包装一个具体服务",
+        role: "独立进程, 把一个具体服务 (Slack / GitHub / 你的 API) 包装成标准 MCP 接口。host/client 不懂业务, server 负责把 LLM 的意图翻译成真实 API 调用。",
+        code: `# 伪代码: 一个最小 server (Python SDK)
+from mcp.server import Server
+
+app = Server("slack-server")
+
+@app.tool()
+async def send_message(channel: str, text: str):
+    """发消息到指定 slack 频道"""
+    return await slack.chat.postMessage(channel, text)
+
+@app.resource("slack://channel/{id}")
+async def read_channel(id: str):
+    return await slack.conversations.history(id)
+
+if __name__ == "__main__":
+    app.run_stdio()`,
+        pitfalls: [
+          "server 和模型没关系 — 它只认 MCP 协议, 不懂 LLM, 不要在 server 里塞提示词",
+          "每个工具的描述 (schema / docstring) 要写清楚参数含义 + 返回格式 — 模型靠这段决定要不要调",
+          "敏感操作 (改生产库 / 转账) 要在 server 侧再校验一次权限, 不要信 host (Lesson 11)",
+        ],
+      },
+      caps: {
+        title: "Capabilities · tools / resources / prompts",
+        role: "server 对外暴露的三样东西。tools = 动词 (能做啥, 如 send_message); resources = 名词 (能读啥, 如 slack://channel/general); prompts = 模板 (打包好的使用方式, 如 summarize-channel)。",
+        code: `// client 侧看到的 server 能力目录:
+
+tools: [
+  { name: "send_message",
+    description: "发消息到频道",
+    schema: { channel: "string", text: "string" } },
+  { name: "list_channels", ... },
+]
+
+resources: [
+  { uri: "slack://channel/general",  mimeType: "text/plain" },
+  { uri: "slack://channel/eng",      mimeType: "text/plain" },
+]
+
+prompts: [
+  { name: "summarize-channel",
+    description: "总结一个频道的最近消息" },
+]`,
+        pitfalls: [
+          "90% 的 MCP server 只实现了 tools, resources 和 prompts 是可选的 — 不是必须",
+          "resources 是 '只读' 的 URI, 不会触发副作用; 要做副作用 (写入) 请用 tool",
+          "prompts 和 Lesson 03 的 skill 很像, 但 prompts 是 server 定义的, host 可以弹菜单让用户选",
+        ],
+      },
+    };
+
+    const state = { active: null };
+
+    app.innerHTML = `
+      <div class="play-page">
+        <div class="crumb"><a href="#/play">← 实验</a> / 04 · MCP Simulator</div>
+        <h1>MCP Simulator</h1>
+        <p class="lede">Lesson 08 讲过的 MCP 三件套 + 一组能力, 画成图。点任一区域, 右边看它的职责、代码骨架、常见误区。还没真跑 server, 只是让"谁管什么"落到眼睛里。</p>
+
+        <div class="mcp-grid">
+          <div class="mcp-canvas">
+            <svg viewBox="0 0 520 390" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="mcp-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
+                </marker>
+              </defs>
+
+              <!-- Title -->
+              <text x="260" y="22" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle" letter-spacing="0.1em">点一下任意区域 →</text>
+
+              <!-- Host (big container, top) -->
+              <g class="mcp-region" data-region="host">
+                <rect x="20" y="40" width="480" height="110" rx="12" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+                <text x="36" y="62" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">① MCP Host · 宿主 app</text>
+                <text x="36" y="80" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">Claude Desktop · Cursor · Zed · 你写的 agent</text>
+
+                <!-- Client inside Host -->
+                <g class="mcp-region" data-region="client">
+                  <rect x="40" y="95" width="440" height="42" rx="8" fill="#E4ECD6" stroke="#B9CDA7" stroke-width="1.5"/>
+                  <text x="54" y="114" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">② MCP Client · 连接管理</text>
+                  <text x="54" y="130" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">每个 server 一个 client 实例 · 管 stdio / SSE 长连接</text>
+                </g>
+              </g>
+
+              <!-- Arrow from Client down to Server -->
+              <line x1="260" y1="150" x2="260" y2="180" stroke="#6B6454" stroke-width="1.5" marker-end="url(#mcp-arrow)" stroke-dasharray="3 3"/>
+              <text x="270" y="170" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454">stdio / SSE</text>
+
+              <!-- Server -->
+              <g class="mcp-region" data-region="server">
+                <rect x="100" y="188" width="320" height="76" rx="10" fill="#FAF7EC" stroke="#7F99A8" stroke-width="1.8"/>
+                <text x="116" y="210" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2C2820">③ MCP Server · 独立进程</text>
+                <text x="116" y="226" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">把一个具体服务 (Slack / GitHub / 你的 API)</text>
+                <text x="116" y="240" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">包装成标准 MCP 接口</text>
+                <text x="116" y="256" font-family="JetBrains Mono, monospace" font-size="10" fill="#7F99A8">对外暴露三样 ↓</text>
+              </g>
+
+              <!-- Arrow down to Capabilities -->
+              <line x1="260" y1="264" x2="260" y2="285" stroke="#6B6454" stroke-width="1.5" marker-end="url(#mcp-arrow)"/>
+
+              <!-- Capabilities trio -->
+              <g class="mcp-region" data-region="caps">
+                <rect x="40" y="293" width="440" height="86" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+                <text x="56" y="314" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">④ Capabilities · 三样可选</text>
+
+                <rect x="56" y="326" width="130" height="42" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+                <text x="121" y="344" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">tools</text>
+                <text x="121" y="360" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">动词 · 能做啥</text>
+
+                <rect x="196" y="326" width="130" height="42" rx="6" fill="#CDD9E0" stroke="#7F99A8"/>
+                <text x="261" y="344" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2C2820" text-anchor="middle">resources</text>
+                <text x="261" y="360" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">名词 · 能读啥</text>
+
+                <rect x="336" y="326" width="130" height="42" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+                <text x="401" y="344" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314" text-anchor="middle">prompts</text>
+                <text x="401" y="360" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">模板 · 怎么用</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="mcp-detail" id="mcp-detail">
+            <div class="mcp-empty">点左边任一区域, 这里会显示它的职责、代码、常见误区。</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    function render() {
+      const detail = document.getElementById("mcp-detail");
+      if (!state.active) {
+        detail.innerHTML = `<div class="mcp-empty">点左边任一区域, 这里会显示它的职责、代码、常见误区。</div>`;
+        return;
+      }
+      const r = regions[state.active];
+      detail.innerHTML = `
+        <div>
+          <div class="mcp-title">${escapeHtml(r.title)}</div>
+        </div>
+        <div class="mcp-section">
+          <div class="h">职责</div>
+          <p>${escapeHtml(r.role)}</p>
+        </div>
+        <div class="mcp-section">
+          <div class="h">代码骨架</div>
+          <pre class="mcp-code">${escapeHtml(r.code)}</pre>
+        </div>
+        <div class="mcp-section">
+          <div class="h">常见误区</div>
+          <ul class="mcp-pitfalls">
+            ${r.pitfalls.map(p => `<li>${escapeHtml(p)}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+    }
+
+    document.querySelectorAll(".mcp-region").forEach(g => {
+      g.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = g.dataset.region;
+        state.active = key;
+        document.querySelectorAll(".mcp-region").forEach(x => x.classList.toggle("active", x.dataset.region === key));
+        render();
+      });
+    });
+
+    render();
+  }
+
   function route() {
     const r = parseRoute();
     renderNav(r);
@@ -6535,6 +6822,7 @@ ${promptBody}
     else if (r.page === "play-prompt") { lesson = null; renderPlayPrompt(); }
     else if (r.page === "play-rag") { lesson = null; renderPlayRag(); }
     else if (r.page === "play-workflow") { lesson = null; renderPlayWorkflow(); }
+    else if (r.page === "play-mcp") { lesson = null; renderPlayMCP(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
