@@ -731,10 +731,22 @@
   .term-page .block p { margin: 0; font-size: 15px; line-height: 1.6; }
   .term-page .block.concrete pre {
     background: var(--code-bg); color: #E4ECD6; margin: 6px 0 0;
-    padding: 14px 16px; border-radius: 8px; overflow-x: auto;
+    padding: 14px 60px 14px 16px; border-radius: 8px; overflow-x: auto;
     font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.55;
     white-space: pre;
   }
+  .code-wrap { position: relative; }
+  .code-wrap .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    padding: 4px 10px; border-radius: 6px;
+    background: #1A1812; color: #D4E0C8;
+    border: 1px solid rgba(250, 247, 236, 0.18);
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+    cursor: pointer; opacity: 0.75; transition: opacity .15s, background .15s;
+  }
+  .code-wrap:hover .copy-btn, .code-wrap .copy-btn:focus-visible { opacity: 1; }
+  .code-wrap .copy-btn:hover { background: #2A271C; }
+  .code-wrap .copy-btn.ok { opacity: 1; background: var(--green); color: #FAF7EC; border-color: var(--green); }
   .term-page .related-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .term-page .related-list a {
     display: inline-flex; padding: 6px 12px; border-radius: 8px;
@@ -1139,7 +1151,7 @@
   .mcp-detail .mcp-section p { margin: 0; font-size: 13px; line-height: 1.65; color: var(--ink); }
   .mcp-detail .mcp-code {
     background: var(--code-bg); color: #D4E0C8; border-radius: 10px;
-    padding: 12px 14px; font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+    padding: 12px 60px 12px 14px; font-family: "JetBrains Mono", monospace; font-size: 11.5px;
     line-height: 1.6; overflow-x: auto; white-space: pre; margin: 0;
   }
   .mcp-detail .mcp-pitfalls { list-style: none; padding: 0; margin: 0; }
@@ -4861,7 +4873,7 @@ jailbreak 常见套路:
 
         <div class="block concrete">
           <div class="label">具象化</div>
-          <pre>${escapeHtml(term.concrete)}</pre>
+          <div class="code-wrap"><pre>${escapeHtml(term.concrete)}</pre><button class="copy-btn" type="button" aria-label="复制代码">复制</button></div>
         </div>
 
         <div class="block">
@@ -6267,6 +6279,24 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     else if (e.key.toLowerCase() === "r") { replay(); }
   });
 
+  // Code copy button — delegated to one listener for all .code-wrap pre blocks.
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".copy-btn");
+    if (!btn) return;
+    const pre = btn.parentElement.querySelector("pre");
+    if (!pre) return;
+    try {
+      await navigator.clipboard.writeText(pre.textContent);
+      const old = btn.textContent;
+      btn.textContent = "已复制";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = old; btn.classList.remove("ok"); }, 1200);
+    } catch (_) {
+      btn.textContent = "复制失败";
+      setTimeout(() => { btn.textContent = "复制"; }, 1200);
+    }
+  });
+
   /* ============== PLAY (Simulators) ============== */
 
   function renderPlayHub() {
@@ -7114,7 +7144,7 @@ prompts: [
         </div>
         <div class="mcp-section">
           <div class="h">代码骨架</div>
-          <pre class="mcp-code">${escapeHtml(r.code)}</pre>
+          <div class="code-wrap"><pre class="mcp-code">${escapeHtml(r.code)}</pre><button class="copy-btn" type="button" aria-label="复制代码">复制</button></div>
         </div>
         <div class="mcp-section">
           <div class="h">常见误区</div>
