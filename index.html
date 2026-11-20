@@ -1030,6 +1030,71 @@
     border: 1px dashed var(--line); border-radius: 10px;
   }
 
+  /* Memory Simulator */
+  .mem-turns {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .mem-turns .preset.active { background: var(--green); color: var(--bg-panel); border-color: var(--green); }
+
+  .mem-ask {
+    padding: 14px 16px; margin-bottom: 18px;
+    background: var(--bg-panel); border-left: 3px solid var(--green); border-radius: 8px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .mem-ask .mem-ask-k { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+
+  .mem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .mem-col {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .mem-col h3 {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin: 0;
+  }
+  .mem-col.none h3 { color: #B08476; }
+  .mem-col.short h3 { color: #7B6314; }
+  .mem-col.long h3 { color: #3D5D3C; }
+  .mem-col .mem-sub {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft);
+    margin-top: -4px;
+  }
+
+  .mem-ctx {
+    background: var(--code-bg); color: #D4E0C8; border-radius: 8px;
+    padding: 10px 12px; font-family: "JetBrains Mono", monospace; font-size: 11px;
+    line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+  }
+  .mem-ctx .r-sys { color: #9BA8B5; }
+  .mem-ctx .r-user { color: #D4E0C8; }
+  .mem-ctx .r-asst { color: #F2D3CB; }
+  .mem-ctx .r-mem { color: #A6C19E; }
+  .mem-ctx .r-retr { color: #DCC673; }
+  .mem-ctx .r-hist { opacity: .55; }
+  .mem-ctx .r-cur { background: rgba(166, 193, 158, 0.18); border-radius: 3px; padding: 0 2px; }
+
+  .mem-reply {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; font-size: 13px; line-height: 1.55;
+  }
+  .mem-reply .k { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+
+  .mem-outcome {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px;
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700;
+    margin-top: auto; align-self: flex-start;
+  }
+  .mem-outcome.ok { background: var(--green-bright); color: var(--green); }
+  .mem-outcome.fail { background: #F9E3DC; color: #7B4530; }
+
+  .mem-tips {
+    margin-top: 18px; padding: 14px 18px; border: 1px dashed var(--line);
+    border-radius: 10px; background: var(--bg-panel);
+    font-size: 13px; line-height: 1.7; color: var(--ink-soft);
+  }
+  .mem-tips strong { color: var(--ink); font-weight: 600; }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -1052,6 +1117,7 @@
     .mcp-grid { grid-template-columns: 1fr; }
     .mcp-canvas { aspect-ratio: auto; min-height: 320px; }
     .mcp-detail { max-height: none; }
+    .mem-grid { grid-template-columns: 1fr; }
   }
 
   /* Phone — wrap header into 2 rows, shrink everything */
@@ -5662,6 +5728,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       if (parts[1] === "rag") return { page: "play-rag" };
       if (parts[1] === "workflow") return { page: "play-workflow" };
       if (parts[1] === "mcp") return { page: "play-mcp" };
+      if (parts[1] === "memory") return { page: "play-memory" };
       return { page: "play-hub" };
     }
     if (parts[0] === "glossary") {
@@ -5686,7 +5753,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
-    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow" || route.page === "play-mcp") activeTab = "play";
+    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow" || route.page === "play-mcp" || route.page === "play-memory") activeTab = "play";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
@@ -5719,6 +5786,13 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       nav.innerHTML = `
         <button class="n-btn" onclick="go('play')">← 实验</button>
         <span class="n-cur">mcp simulator</span>
+      `;
+      return;
+    }
+    if (route.page === "play-memory") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('play')">← 实验</button>
+        <span class="n-cur">memory simulator</span>
       `;
       return;
     }
@@ -5972,6 +6046,11 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             <div class="label">04 · 已上线</div>
             <h3>MCP Simulator</h3>
             <p>Host / Client / Server / Capabilities 四个区域, 点一下看它职责、代码示例、常见误区。呼应 Lesson 08 MCP。</p>
+          </a>
+          <a class="sim-card" href="#/play/memory">
+            <div class="label">05 · 已上线</div>
+            <h3>Memory Simulator</h3>
+            <p>三栏对照 (无 / 短期 / 长期), 同一段对话跑三轮, 看哪种 memory 能让模型"认得你"。呼应 Lesson 06 memory。</p>
           </a>
         </div>
       </div>
@@ -6811,6 +6890,187 @@ prompts: [
     render();
   }
 
+  function renderPlayMemory() {
+    // 三栏对照: 同一个用户问题, 三种 memory 策略分别看到什么 + 答成啥样
+    const turns = [
+      {
+        key: "t1",
+        label: "第 1 轮 · 刚开始",
+        ask: '"你好, 我叫张三, 爱吃辣, 不吃香菜。"',
+        cols: {
+          none: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "你好, 我叫张三, 爱吃辣, 不吃香菜。" },
+            ],
+            reply: '"你好张三! 记住了 (本轮上下文里), 爱吃辣, 不吃香菜。"',
+            outcome: "ok", outcomeText: "✓ 本轮当然记得",
+          },
+          short: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "你好, 我叫张三, 爱吃辣, 不吃香菜。" },
+            ],
+            reply: '"你好张三! 记住了, 爱吃辣, 不吃香菜。"',
+            outcome: "ok", outcomeText: "✓ 本轮记得",
+          },
+          long: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "你好, 我叫张三, 爱吃辣, 不吃香菜。" },
+              { role: "memory-write", text: 'extract → KV: { name: "张三", diet: ["辣"], avoid: ["香菜"] } → 写进持久存储' },
+            ],
+            reply: '"你好张三! 记住了。(偏好已写进长期存储)"',
+            outcome: "ok", outcomeText: "✓ 本轮记得 + 写入长期",
+          },
+        },
+      },
+      {
+        key: "t2",
+        label: "第 2 轮 · 3 分钟后 (同一 session)",
+        ask: '"我爱吃啥来着?"',
+        cols: {
+          none: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "我爱吃啥来着?" },
+            ],
+            reply: '"不好意思, 你没告诉我你的口味。"',
+            outcome: "fail", outcomeText: "✗ 完全不记得",
+          },
+          short: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", hist: true, text: "你好, 我叫张三, 爱吃辣, 不吃香菜。" },
+              { role: "assistant", hist: true, text: "你好张三! 记住了..." },
+              { role: "user", cur: true, text: "我爱吃啥来着?" },
+            ],
+            reply: '"爱吃辣, 不吃香菜。"',
+            outcome: "ok", outcomeText: "✓ context 里有历史",
+          },
+          long: {
+            ctx: [
+              { role: "system", text: 'system + [存储读出] 用户偏好 { name: "张三", diet: ["辣"], avoid: ["香菜"] }' },
+              { role: "user", cur: true, text: "我爱吃啥来着?" },
+            ],
+            reply: '"爱吃辣, 不吃香菜 (从长期存储读到)。"',
+            outcome: "ok", outcomeText: "✓ 从长期读出",
+          },
+        },
+      },
+      {
+        key: "t3",
+        label: "一周后 · 新 session, 新设备",
+        ask: '"我叫啥来着?"',
+        cols: {
+          none: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "我叫啥来着?" },
+            ],
+            reply: '"不知道, 你没告诉我。"',
+            outcome: "fail", outcomeText: "✗ 不记得",
+          },
+          short: {
+            ctx: [
+              { role: "system", text: "你是一个助手。" },
+              { role: "user", cur: true, text: "我叫啥来着?" },
+            ],
+            reply: '"不知道 — 新 session, 之前的 context 没了。"',
+            outcome: "fail", outcomeText: "✗ 换 session 就丢",
+          },
+          long: {
+            ctx: [
+              { role: "system", text: 'system + [存储读出] { name: "张三", diet: ["辣"], avoid: ["香菜"], last_seen: "2026-11-13" }' },
+              { role: "user", cur: true, text: "我叫啥来着?" },
+            ],
+            reply: '"你叫张三。(一周前你告诉我的, 存在长期)"',
+            outcome: "ok", outcomeText: "✓ 跨 session 认得",
+          },
+        },
+      },
+    ];
+
+    const COLS = [
+      { key: "none",  title: "① 无记忆",            sub: "每次调用都独立, 什么都不留" },
+      { key: "short", title: "② 短期 · context",   sub: "历史重发进 context (关 session = 没)" },
+      { key: "long",  title: "③ 长期 · 持久化",     sub: "外部 KV / 向量库, 按需读写" },
+    ];
+
+    const state = { turnKey: "t1" };
+
+    app.innerHTML = `
+      <div class="play-page">
+        <div class="crumb"><a href="#/play">← 实验</a> / 05 · Memory Simulator</div>
+        <h1>Memory Simulator</h1>
+        <p class="lede">同一段对话, 三种 memory 策略 (无 / 短期 context / 长期持久化) 分别看到什么、答成啥样。选一轮, 对比三栏。呼应 Lesson 06 memory。</p>
+
+        <div class="mem-ask">
+          <div class="mem-ask-k">本轮用户问</div>
+          <div id="mem-ask-text">"你好, 我叫张三, 爱吃辣, 不吃香菜。"</div>
+        </div>
+
+        <div class="presets mem-turns" id="mem-turns">
+          ${turns.map(t => `<button class="preset ${t.key===state.turnKey?'active':''}" data-turn="${t.key}">${escapeHtml(t.label)}</button>`).join("")}
+        </div>
+
+        <div class="mem-grid" id="mem-grid"></div>
+
+        <div class="mem-tips">
+          <strong>一句话</strong> · 短期 = 把历史塞回 context (Lesson 01 chat 里讲的"每轮重发");
+          长期 = 把关键事写进外部存储, 用的时候读出来拼进 system prompt (Lesson 06 memory 里的 KV / 摘要 / 检索式)。
+          模型永远只看 context, memory 的工程全在它外面。
+        </div>
+      </div>
+    `;
+
+    function fmtCtx(msgs) {
+      return msgs.map(m => {
+        const text = escapeHtml(m.text);
+        const histCls = m.hist ? "r-hist " : "";
+        const curCls = m.cur ? "r-cur " : "";
+        const roleMap = {
+          system: `<span class="r-sys">system</span>`,
+          user: `<span class="r-user">user</span>`,
+          assistant: `<span class="r-asst">assistant</span>`,
+          "memory-write": `<span class="r-mem">[write-mem]</span>`,
+        };
+        const roleLabel = roleMap[m.role] || m.role;
+        return `<span class="${histCls}${curCls}">${roleLabel}: ${text}</span>`;
+      }).join("\n");
+    }
+
+    function render() {
+      const turn = turns.find(t => t.key === state.turnKey);
+      document.getElementById("mem-ask-text").textContent = turn.ask;
+      document.getElementById("mem-grid").innerHTML = COLS.map(col => {
+        const c = turn.cols[col.key];
+        return `
+          <div class="mem-col ${col.key}">
+            <h3>${col.title}</h3>
+            <div class="mem-sub">${col.sub}</div>
+            <div class="mem-ctx">${fmtCtx(c.ctx)}</div>
+            <div class="mem-reply">
+              <div class="k">模型回答</div>
+              <div>${escapeHtml(c.reply)}</div>
+            </div>
+            <div class="mem-outcome ${c.outcome}">${c.outcomeText}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.querySelectorAll("#mem-turns .preset").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.turnKey = btn.dataset.turn;
+        document.querySelectorAll("#mem-turns .preset").forEach(b => b.classList.toggle("active", b.dataset.turn === state.turnKey));
+        render();
+      });
+    });
+
+    render();
+  }
+
   function route() {
     const r = parseRoute();
     renderNav(r);
@@ -6823,6 +7083,7 @@ prompts: [
     else if (r.page === "play-rag") { lesson = null; renderPlayRag(); }
     else if (r.page === "play-workflow") { lesson = null; renderPlayWorkflow(); }
     else if (r.page === "play-mcp") { lesson = null; renderPlayMCP(); }
+    else if (r.page === "play-memory") { lesson = null; renderPlayMemory(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
