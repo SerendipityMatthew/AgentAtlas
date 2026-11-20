@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Atlas · 一本关于 AI Agent 的小书</title>
-<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。10 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
+<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。11 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
 <meta name="theme-color" content="#F0ECE0">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F0ECE0'/%3E%3Cpath d='M16 6 L26 16 L16 26 L6 16 Z' fill='%233D5D3C'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。10 节深入课 + 41 词术语库 + 56 题测验。">
+<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。11 节深入课 + 41 词术语库 + 56 题测验。">
 <meta property="og:url" content="https://agentatlas-85r.pages.dev/">
 <meta property="og:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta name="twitter:description" content="10 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
+<meta name="twitter:description" content="11 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
 <meta name="twitter:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,6 +182,7 @@
   .home .card.c8 { background: linear-gradient(140deg, #FAF7EC 60%, #F5D8C4); }
   .home .card.c9 { background: linear-gradient(140deg, #FAF7EC 60%, #DAD5CE); }
   .home .card.c10 { background: linear-gradient(140deg, #FAF7EC 60%, #C9DDD7); }
+  .home .card.c11 { background: linear-gradient(140deg, #FAF7EC 60%, #E3D5E2); }
 
   .home .footer {
     margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line);
@@ -2340,7 +2341,7 @@
           body: `<p>把上面三种翻车的修复加回"原始 10 行", 你就有了一个能上生产的小 runner: 大约 20 行。</p>
             <p>多的: ① <code>for i in range(max_iter)</code> 封顶 · ② <code>with_retry</code> 包工具调用 · ③ <code>compress_if_full</code> 压缩旧消息。</p>
             <div class="callout"><div class="label"><span class="ic">✓</span>整本书连起来</div>
-            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人) → <strong>Tool Calling</strong>(模型发请求 vs 运行时执行) → <strong>MCP</strong>(把工具标准化成"插座") → <strong>RAG</strong>(外挂一本可查的书)。这就是 AI Agent 的全貌。</p></div>`,
+            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人) → <strong>Tool Calling</strong>(模型发请求 vs 运行时执行) → <strong>MCP</strong>(把工具标准化成"插座") → <strong>RAG</strong>(外挂一本可查的书) → <strong>Planning & ReAct</strong>(让它学会先想再做)。这就是 AI Agent 的全貌。</p></div>`,
           next: "看完了 ✓",
           stats: ["≤ max_iter", "全", "受控", "可运维"],
         },
@@ -3512,6 +3513,289 @@
             <p>先跑最朴素一版 (chunk=300, top-K=5, 纯向量, 不 rerank) 看效果 → 收 20 个真实 query 的烂答案 → 对症加 rerank / hybrid / 改 chunk 策略。别一上来就堆复杂架构。评估本身也难, 通常要 LLM-as-judge 或者人工打分。</p></div>`,
           next: "本节完成 ✓",
           stats: ["调优", "rerank / hybrid", "可观察 + 评估", "多个旋钮"],
+        },
+      ],
+    },
+
+    /* ---------- 10: PLANNING & REACT ---------- */
+    {
+      slug: "planning-react",
+      num: 10,
+      title: "planning & ReAct 是啥?",
+      short: "让 agent 学会 '先想再做' —— 两种控制流对比",
+      subtitle: "Lesson 05 讲的 agent runtime 是最朴素的 while 循环: 模型随便蹦, 蹦到 answer 停。遇到复杂任务容易跑偏。planning (先列计划) 和 ReAct (think→act→observe 循环) 是两种把循环写稳的办法。",
+      duration: "7 分钟", level: "进阶", stepCount: 4,
+      stats: ["◉ 执行模式", "◗ 决策点", "◱ 循环形态", "↻ 适应性"],
+      tlLabels: ["跑偏", "Plan-Execute", "ReAct 循环", "对比 + 选"],
+      learn: [
+        "为什么复杂任务直接给 agent 容易跑偏",
+        "Plan-then-execute: 先让模型列出步骤, 再按顺序执行",
+        "ReAct 模式: think → act → observe 循环, 每轮重新决定",
+        "两种模式的权衡 + 代码骨架 + 实际项目怎么混用",
+      ],
+      svg: `
+        <defs>
+          <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
+          </marker>
+          <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#B08476"/>
+          </marker>
+        </defs>
+
+        <!-- STEP 1: naive 跑偏 -->
+        <g data-reveal data-show="1">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">naive agent · 一上来就蹦, 容易跑偏</text>
+
+          <!-- Task -->
+          <rect x="60" y="105" width="680" height="54" rx="8" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="72" y="123" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314" font-weight="700">任务</text>
+          <text x="72" y="142" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">"帮我订周五下午从北京到上海最便宜的高铁, 挑靠窗座位, 然后发邮件通知团队。"</text>
+
+          <!-- Trace of naive agent -->
+          <g transform="translate(60, 175)">
+            <text x="0" y="0" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">naive agent 的 trace (每步直接 tool_call):</text>
+
+            <rect x="0" y="12" width="680" height="30" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="31" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">1. tool_call send_email(team, "正在订票")                                         → ok</text>
+
+            <rect x="0" y="48" width="680" height="30" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="67" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">2. tool_call book_train(from=北京, to=上海, date=Fri)                              → err: 没指定车次</text>
+
+            <rect x="0" y="84" width="680" height="30" rx="4" fill="#F9E3DC" stroke="#B08476"/>
+            <text x="10" y="103" font-family="JetBrains Mono, monospace" font-size="11" fill="#7B4530">3. tool_call book_train(train_id="G1")   ← 瞎编了一个车次                          → err: 车次不存在</text>
+
+            <rect x="0" y="120" width="680" height="30" rx="4" fill="#F9E3DC" stroke="#B08476"/>
+            <text x="10" y="139" font-family="JetBrains Mono, monospace" font-size="11" fill="#7B4530">4. 模型继续瞎试, max_iter 到了, 还没订成, 只发了一封错的邮件 ⚠</text>
+          </g>
+
+          <!-- KEY IDEA -->
+          <g transform="translate(60, 340)">
+            <rect x="0" y="0" width="680" height="135" rx="10" fill="#F9E3DC" stroke="#B08476" stroke-dasharray="4 3"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530">三个常见跑偏姿势</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 顺序错 — 没查就先发邮件 ("正在订" 其实还没订成)</text>
+            <text x="16" y="68" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 漏前置 — 直接 book, 没先 search, 参数全是瞎编</text>
+            <text x="16" y="88" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 陷循环 — 一个失败, 再试一次, 无止境 (撞 max_iter 才停)</text>
+            <text x="16" y="114" font-family="JetBrains Mono, monospace" font-size="11" fill="#6B6454">想治这个, 得给 agent 装个"脑子"。两种装法: planning / ReAct</text>
+          </g>
+        </g>
+
+        <!-- STEP 2: Planning (plan-then-execute) -->
+        <g data-reveal data-show="2">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">办法 A · Plan-then-execute · 先列计划再逐条执行</text>
+
+          <!-- Phase 1: Plan -->
+          <rect x="60" y="100" width="300" height="34" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="210" y="122" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#7B6314" text-anchor="middle">① Plan (让 LLM 列步骤)</text>
+
+          <rect x="60" y="142" width="300" height="200" rx="8" fill="#262319"/>
+          <text x="76" y="162" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8">plan = llm("列出完成这个任务的步骤"):</text>
+          <text x="76" y="184" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">1. search_trains(from=PEK, to=SHA,</text>
+          <text x="92" y="200" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">   date=Fri, time=afternoon)</text>
+          <text x="76" y="222" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">2. filter 最便宜 + 有靠窗</text>
+          <text x="76" y="244" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">3. book_train(train_id, seat="window")</text>
+          <text x="76" y="266" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">4. send_email(team, "已订: {order}")</text>
+          <text x="76" y="300" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">↑ 这步只调 LLM, 不执行, 只拿 "想法"</text>
+
+          <!-- Phase 2: Execute -->
+          <rect x="440" y="100" width="300" height="34" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+          <text x="590" y="122" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#3D5D3C" text-anchor="middle">② Execute (按顺序跑)</text>
+
+          <g transform="translate(440, 142)">
+            <rect x="0" y="0" width="300" height="34" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="21" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">1. search_trains(...) → [G1/G2/G3]</text>
+
+            <rect x="0" y="40" width="300" height="34" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="61" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">2. filter → G2 (¥553 · 15:20)</text>
+
+            <rect x="0" y="80" width="300" height="34" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="101" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">3. book_train(G2, seat="window") → ok</text>
+
+            <rect x="0" y="120" width="300" height="34" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="141" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">4. send_email(team, order) → ok</text>
+
+            <rect x="0" y="162" width="300" height="34" rx="4" fill="#FBF1C0" stroke="#DCC673"/>
+            <text x="10" y="183" font-family="JetBrains Mono, monospace" font-size="11" fill="#7B6314">某步 fail? 回头 replan(remaining)</text>
+          </g>
+
+          <!-- Callout -->
+          <g transform="translate(60, 395)">
+            <rect x="0" y="0" width="680" height="90" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">特点</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">+ 结构清晰, 可审计 (每步都能看、每步都能停、每步都能让人审批)</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">+ 不容易跑偏, 适合流程相对固定的任务 (订票 / 报销 / CI 发布)</text>
+            <text x="16" y="82" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">− 不好适应"中途变化" (本来想订火车, 查到当天停运, 整个 plan 作废)</text>
+          </g>
+        </g>
+
+        <!-- STEP 3: ReAct 循环 -->
+        <g data-reveal data-show="3">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">办法 B · ReAct · think → act → observe 循环</text>
+
+          <!-- Loop diagram -->
+          <g transform="translate(400, 230)">
+            <!-- Center -->
+            <circle cx="0" cy="0" r="55" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+            <text x="0" y="-8" font-family="Fraunces, serif" font-weight="700" font-size="14" fill="#3D5D3C" text-anchor="middle">ReAct</text>
+            <text x="0" y="10" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">每轮都重</text>
+            <text x="0" y="22" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">新决定</text>
+
+            <!-- Think -->
+            <rect x="-160" y="-110" width="100" height="42" rx="20" fill="#FBF1C0" stroke="#DCC673" stroke-width="1.5"/>
+            <text x="-110" y="-91" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314" text-anchor="middle">Think</text>
+            <text x="-110" y="-76" font-family="Noto Sans SC, sans-serif" font-size="10" fill="#2C2820" text-anchor="middle">想下一步</text>
+
+            <!-- Act -->
+            <rect x="60" y="-110" width="100" height="42" rx="20" fill="#E4ECD6" stroke="#B9CDA7" stroke-width="1.5"/>
+            <text x="110" y="-91" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">Act</text>
+            <text x="110" y="-76" font-family="Noto Sans SC, sans-serif" font-size="10" fill="#2C2820" text-anchor="middle">调一个工具</text>
+
+            <!-- Observe -->
+            <rect x="-50" y="70" width="100" height="42" rx="20" fill="#F2D3CB" stroke="#B08476" stroke-width="1.5"/>
+            <text x="0" y="89" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530" text-anchor="middle">Observe</text>
+            <text x="0" y="104" font-family="Noto Sans SC, sans-serif" font-size="10" fill="#2C2820" text-anchor="middle">看结果</text>
+
+            <!-- Arrows forming the loop -->
+            <path d="M -50 -89 Q 20 -89 60 -89" stroke="#6B6454" stroke-width="1.5" fill="none" marker-end="url(#arrow-head)"/>
+            <path d="M 110 -68 Q 110 10 50 70" stroke="#6B6454" stroke-width="1.5" fill="none" marker-end="url(#arrow-head)"/>
+            <path d="M -50 70 Q -110 10 -110 -68" stroke="#6B6454" stroke-width="1.5" fill="none" marker-end="url(#arrow-head)"/>
+          </g>
+
+          <!-- Trace example (left) -->
+          <g transform="translate(40, 105)">
+            <text x="0" y="0" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">同一个订票任务, ReAct 的 trace:</text>
+          </g>
+
+          <g transform="translate(40, 365)" font-family="JetBrains Mono, monospace" font-size="10">
+            <text x="0" y="0" fill="#7B6314" font-weight="700">think:</text>
+            <text x="46" y="0" fill="#2C2820">"要先查周五下午的车"</text>
+            <text x="0" y="16" fill="#3D5D3C" font-weight="700">act:</text>
+            <text x="32" y="16" fill="#2C2820">search_trains(...)</text>
+            <text x="0" y="32" fill="#7B4530" font-weight="700">obs:</text>
+            <text x="32" y="32" fill="#2C2820">[G1/G2/G3]</text>
+            <text x="0" y="52" fill="#7B6314" font-weight="700">think:</text>
+            <text x="46" y="52" fill="#2C2820">"G2 最便宜, 有靠窗, 订"</text>
+            <text x="0" y="68" fill="#3D5D3C" font-weight="700">act:</text>
+            <text x="32" y="68" fill="#2C2820">book_train(G2, seat="window")</text>
+            <text x="0" y="84" fill="#7B4530" font-weight="700">obs:</text>
+            <text x="32" y="84" fill="#2C2820">{ok, order: #ABC}</text>
+            <text x="0" y="104" fill="#7B6314" font-weight="700">think:</text>
+            <text x="46" y="104" fill="#2C2820">"订好了, 发邮件"</text>
+            <text x="0" y="120" fill="#3D5D3C" font-weight="700">act:</text>
+            <text x="32" y="120" fill="#2C2820">send_email(...) → 结束</text>
+          </g>
+
+          <!-- Callout (right) -->
+          <g transform="translate(440, 365)">
+            <rect x="0" y="0" width="320" height="120" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">特点</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">+ 每步看真实结果再决定下一步</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">+ 对中途意外适应性很强</text>
+            <text x="16" y="80" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">− 没整体视图, 可能原地打转</text>
+            <text x="16" y="98" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">− 必须配 max_iter 兜底</text>
+            <text x="16" y="116" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454">ReAct = Reason + Act (Yao et al. 2023)</text>
+          </g>
+        </g>
+
+        <!-- STEP 4: 对比 + 选 + 代码 -->
+        <g data-reveal data-show="4">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">怎么选 · 代码骨架 · 实战混用</text>
+
+          <!-- Comparison table -->
+          <rect x="60" y="100" width="680" height="190" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.2"/>
+
+          <g font-family="JetBrains Mono, monospace" font-size="11">
+            <!-- Header row -->
+            <text x="80" y="124" fill="#6B6454"></text>
+            <text x="300" y="124" fill="#7B6314" font-weight="700" text-anchor="middle">Plan-Execute</text>
+            <text x="530" y="124" fill="#3D5D3C" font-weight="700" text-anchor="middle">ReAct</text>
+            <line x1="76" y1="134" x2="724" y2="134" stroke="#A89D7E" stroke-dasharray="2 2"/>
+
+            <text x="80" y="156" fill="#6B6454">结构</text>
+            <text x="300" y="156" fill="#2C2820" text-anchor="middle">两段 · 先 plan 再 for-loop</text>
+            <text x="530" y="156" fill="#2C2820" text-anchor="middle">单段 · while 循环</text>
+
+            <text x="80" y="180" fill="#6B6454">适应变化</text>
+            <text x="300" y="180" fill="#B08476" text-anchor="middle">差 (要 replan)</text>
+            <text x="530" y="180" fill="#3D5D3C" text-anchor="middle">强 (天然响应)</text>
+
+            <text x="80" y="204" fill="#6B6454">可审计 / 停点</text>
+            <text x="300" y="204" fill="#3D5D3C" text-anchor="middle">清晰 (plan 一眼看完)</text>
+            <text x="530" y="204" fill="#B08476" text-anchor="middle">乱 (边跑边决定)</text>
+
+            <text x="80" y="228" fill="#6B6454">适合任务</text>
+            <text x="300" y="228" fill="#2C2820" text-anchor="middle">步骤固定 · 流程类</text>
+            <text x="530" y="228" fill="#2C2820" text-anchor="middle">探索式 · 调试式</text>
+
+            <text x="80" y="252" fill="#6B6454">调用次数</text>
+            <text x="300" y="252" fill="#2C2820" text-anchor="middle">1 次 plan + N 次 execute</text>
+            <text x="530" y="252" fill="#2C2820" text-anchor="middle">N 次来回</text>
+
+            <text x="80" y="276" fill="#6B6454">典型框架</text>
+            <text x="300" y="276" fill="#2C2820" text-anchor="middle">LangGraph plan 节点</text>
+            <text x="530" y="276" fill="#2C2820" text-anchor="middle">LangChain ReAct · AutoGPT</text>
+          </g>
+
+          <!-- 混合建议 -->
+          <g transform="translate(60, 310)">
+            <rect x="0" y="0" width="680" height="175" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">实战常见: 外 plan · 内 ReAct</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">生产级 agent 两种都用: 外层 plan 列出"5 个大阶段" (search / filter /</text>
+            <text x="16" y="66" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">book / notify / verify), 每个阶段内部用 ReAct 应对意外。</text>
+            <text x="16" y="88" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">这样既保留 plan 的结构感 (哪些阶段在跑、卡在哪), 又有 ReAct 的灵活。</text>
+
+            <text x="16" y="118" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">选的时候问自己</text>
+            <text x="16" y="138" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 任务步骤是不是基本固定? → 偏 plan</text>
+            <text x="16" y="156" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 是不是经常要根据中间结果变路径? → 偏 ReAct</text>
+            <text x="16" y="172" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 要给人看 / 要能中途停 / 要审批? → plan 占优 (起码外层)</text>
+          </g>
+        </g>
+      `,
+      steps: [
+        {
+          pill: "现象", pillClass: "",
+          title: "naive agent · 一上来就蹦, 容易跑偏",
+          body: `<p>Lesson 05 讲的 runtime 是最朴素的 while 循环: 模型爱 tool_call 就 tool_call, 爱答复就答复, 直到答复或撞上 max_iter。给简单任务 (查个天气、算个数) 够用。</p>
+            <p>一旦任务复杂一点, 就开始出事。看右边 SVG 的 trace: 任务是 "订车 + 发通知", naive agent 先发了封 "正在订" 的邮件, 然后不查就直接 book, 参数乱编, 最后 max_iter 撞光, 什么也没订成。</p>
+            <div class="callout"><div class="label"><span class="ic">💡</span>核心一句话</div>
+            <p>复杂任务直接丢给 naive agent, 三个经典姿势一定踩: <strong>顺序错</strong> / <strong>漏前置</strong> / <strong>陷循环</strong>。想治这个, 得给循环装"脑子"——两种装法: Planning / ReAct, 下面两步分别讲。</p></div>`,
+          next: "下一步: 先列计划再执行 →",
+          stats: ["Naive 直给", "无", "一次性瞎试", "差"],
+        },
+        {
+          pill: "办法 A", pillClass: "idea",
+          title: "Plan-then-execute · 先让 LLM 列步骤, 再按顺序跑",
+          body: `<p>第一种办法: 把 agent 分成明确两段。</p>
+            <p><strong>① Plan</strong>: 先调一次 LLM, 让它把任务拆成一个可执行的步骤列表 (一个 JSON 数组)。这一步<strong>只调 LLM, 不执行任何工具</strong>, 只是拿 "想法"。</p>
+            <p><strong>② Execute</strong>: 一个普通的 <code>for step in plan</code> 循环, 按顺序调 tool。某步失败? 回头调 LLM 重新 plan 剩下的部分 (replan)。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>特点</div>
+            <p>结构清晰, 可审计 —— plan 列出来人一眼看完, 每步都能停、都能让人审批, 适合流程相对固定的任务 (订票 / 报销 / CI 发布)。坏处是不好应对 "中途变化": 本来想订火车, 查到当天停运, 整个 plan 就作废, 要 replan。</p></div>`,
+          next: "下一步: ReAct 循环 →",
+          stats: ["Planning", "开头 plan 一次", "按 plan 顺序走", "中等 (需 replan)"],
+        },
+        {
+          pill: "办法 B", pillClass: "idea",
+          title: "ReAct · think → act → observe 循环",
+          body: `<p>第二种办法走另一条路: <strong>不预先定计划</strong>, 每一步都根据上一步的结果重新决定。每轮三件事:</p>
+            <p><strong>Think</strong>: 模型说出 "我现在想做什么" (一段自然语言的推理)。</p>
+            <p><strong>Act</strong>: 模型 emit 一个 tool_call —— 和 Lesson 07 讲的 tool calling 一模一样。</p>
+            <p><strong>Observe</strong>: 运行时跑完, 把结果塞回 messages。</p>
+            <p>再回 Think, 读新的 observation, 决定下一步。循环直到模型给出 answer 为止。</p>
+            <div class="callout"><div class="label"><span class="ic">🔑</span>特点</div>
+            <p>每步看真实结果再决定下一步, 对中途意外适应性很强——查到车停运, 下一轮它自然会想 "换个日期 / 换高铁"。坏处是没整体视图, 可能原地打转, 必须配 <code>max_iter</code> 兜底。<code>ReAct = Reason + Act</code>, Yao et al. 2023 的论文名字。</p></div>`,
+          next: "下一步: 两种怎么选 →",
+          stats: ["ReAct", "每一轮都决定", "think → act → observe 循环", "高"],
+        },
+        {
+          pill: "选择", pillClass: "tech",
+          title: "两种对比 + 实战混用 · 外 plan · 内 ReAct",
+          body: `<p>一张对比表 (右边 SVG):</p>
+            <p>Plan-Execute 两段 · 结构清晰 · 可审计 · 适合流程固定; ReAct 单段 while 循环 · 响应强 · 边跑边乱 · 适合探索。调用次数也不同 (plan 省 LLM 调用, ReAct 来回次数多)。</p>
+            <p><strong>实战常见混用</strong>: 生产级 agent 两种都用。<strong>外层 plan</strong> 列出"几个大阶段" (search / filter / book / notify / verify), <strong>每个阶段内部用 ReAct</strong> 应对意外。这样既保留 plan 的结构感 (哪些阶段在跑、卡在哪), 又有 ReAct 的灵活。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>选的时候问自己</div>
+            <p>· 任务步骤基本固定? → 偏 plan。 · 经常要根据中间结果变路径? → 偏 ReAct。 · 要给人看 / 中途停 / 审批? → plan 占优 (起码外层)。别一开始就上最复杂的, 先 ReAct 跑起来, 看到哪里需要结构感再往外套 plan。</p></div>`,
+          next: "本节完成 ✓",
+          stats: ["混合", "结合两者", "外 plan 内 ReAct", "最灵活"],
         },
       ],
     },
@@ -4847,7 +5131,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     const modeName = quizMode === "basic" ? "基础" : "深度";
     const modeTitle = `<em>${total} 题</em> · ${fullScore} 分 · ${modeName}`;
     const modeLede = quizMode === "basic"
-      ? `覆盖 10 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
+      ? `覆盖 11 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
       : `场景 / 辨析 / 取舍 / 调试, 比基础考难一个台阶。单选, 每题 ${points} 分, 没时限。`;
 
     const modeTabs = `
@@ -5074,7 +5358,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       const href = s && s < l.stepCount ? `#/${l.slug}/${s}` : `#/${l.slug}`;
       return `
       <a class="card c${i+1}" href="${href}">
-        <div class="num">0${l.num} · ${l.level}</div>
+        <div class="num">${String(l.num).padStart(2, "0")} · ${l.level}</div>
         <h3>${l.title}</h3>
         <p>${l.short}</p>
         <div class="foot">
@@ -5090,7 +5374,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
         <h1>一本关于 <em>AI Agent</em> 的小书</h1>
         <p class="lede">用插画和 4 步拆解, 把 chat、prompt、skill、agent、以及 agent 怎么运行的 —— 从头到尾讲一遍。</p>
         <div class="meta">
-          <span>◇ 10 节 · 约 63 分钟</span>
+          <span>◇ 11 节 · 约 70 分钟</span>
           <span>◇ 入门 → 进阶</span>
           <span>◇ 从非程序员到开发者, 都能看</span>
         </div>
@@ -5134,7 +5418,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     app.innerHTML = `
       <main>
         <section class="stage">
-          <div class="crumb"><a href="#/">◆ Agent Atlas</a>  /  0${lesson.num} · ${lesson.level} / 第 ${lesson.num} 节, 共 ${lessons.length} 节</div>
+          <div class="crumb"><a href="#/">◆ Agent Atlas</a>  /  ${String(lesson.num).padStart(2, "0")} · ${lesson.level} / 第 ${lesson.num} 节, 共 ${lessons.length} 节</div>
           <h1 class="title">${lesson.title}<span class="tags"><span class="tag yellow">⏱ ${lesson.duration}</span><span class="tag green">◈ ${lesson.level}</span><span class="tag blue">⋮ ${lesson.stepCount} 步</span></span></h1>
           <p class="subtitle">${lesson.subtitle}</p>
           <div class="stat-row">
