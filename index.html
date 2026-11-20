@@ -286,7 +286,19 @@
   .tag.yellow { background: var(--yellow); border-color: #DCC673; color: #7B6314; }
   .tag.green { background: var(--green-soft); border-color: #B9CDA7; color: var(--green); }
   .tag.blue { background: var(--blue); border-color: #A0B2BE; color: #3C5565; }
-  .subtitle { color: var(--ink-soft); font-size: 15px; margin: 0 0 18px; max-width: 640px; }
+  .subtitle { color: var(--ink-soft); font-size: 15px; margin: 0 0 14px; max-width: 640px; }
+  .prereq {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft); letter-spacing: 0.08em;
+    margin: 0 0 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  }
+  .prereq a {
+    color: var(--green); text-decoration: none; padding: 3px 9px;
+    border: 1px solid var(--line); border-radius: 6px;
+    font-family: "Noto Serif SC", serif; font-size: 12.5px; letter-spacing: 0;
+  }
+  .prereq a:hover { border-color: var(--green); background: var(--green-soft); }
+  .prereq .sep { color: var(--ink-soft); opacity: 0.5; }
 
   .stat-row {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
@@ -4660,6 +4672,22 @@ jailbreak 常见套路:
     "security":       ["prompt-injection", "tool-permission", "human-in-the-loop", "jailbreak"],
   };
 
+  // lesson slug -> slug(s) worth reading first (empty = no prereq)
+  const lessonPrereq = {
+    "llm":            [],
+    "chat":           ["llm"],
+    "prompt":         ["chat"],
+    "skill":          ["prompt"],
+    "agent":          ["chat"],
+    "runtime":        ["agent"],
+    "memory":         ["chat"],
+    "tool-calling":   ["agent"],
+    "mcp":            ["tool-calling"],
+    "rag":            ["chat", "memory"],
+    "planning-react": ["agent"],
+    "security":       ["agent", "tool-calling"],
+  };
+
   function renderGlossaryHome() {
     const cx = 400, cy = 300, hubR = 44, branchLen = 180;
     const mapGroups = groups.map(g => {
@@ -6018,6 +6046,10 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
           <div class="crumb"><a href="#/">◆ Agent Atlas</a>  /  ${String(lesson.num).padStart(2, "0")} · ${lesson.level} / 第 ${lesson.num} 节, 共 ${lessons.length} 节</div>
           <h1 class="title">${lesson.title}<span class="tags"><span class="tag yellow">⏱ ${lesson.duration}</span><span class="tag green">◈ ${lesson.level}</span><span class="tag blue">⋮ ${lesson.stepCount} 步</span></span></h1>
           <p class="subtitle">${lesson.subtitle}</p>
+          ${(() => {
+            const pr = (lessonPrereq[lesson.slug] || []).map(s => lessons.find(l => l.slug === s)).filter(Boolean);
+            return pr.length ? `<div class="prereq">前置 · ${pr.map(l => `<a href="#/${l.slug}">第 ${l.num} 节 · ${l.title}</a>`).join('<span class="sep">+</span>')}</div>` : "";
+          })()}
           <div class="stat-row">
             ${lesson.stats.map((k, j) => `<div class="stat"><div class="k">${k}</div><div class="v" id="s-${j}">—</div></div>`).join("")}
           </div>
