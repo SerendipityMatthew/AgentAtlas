@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Atlas · 一本关于 AI Agent 的小书</title>
-<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。7 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
+<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。8 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
 <meta name="theme-color" content="#F0ECE0">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F0ECE0'/%3E%3Cpath d='M16 6 L26 16 L16 26 L6 16 Z' fill='%233D5D3C'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。7 节深入课 + 41 词术语库 + 56 题测验。">
+<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。8 节深入课 + 41 词术语库 + 56 题测验。">
 <meta property="og:url" content="https://agentatlas-85r.pages.dev/">
 <meta property="og:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta name="twitter:description" content="7 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
+<meta name="twitter:description" content="8 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
 <meta name="twitter:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -179,6 +179,7 @@
   .home .card.c5 { background: linear-gradient(140deg, #FAF7EC 60%, #EFE5F3); }
   .home .card.c6 { background: linear-gradient(140deg, #FAF7EC 60%, #EDE2CE); }
   .home .card.c7 { background: linear-gradient(140deg, #FAF7EC 60%, #DDE6E8); }
+  .home .card.c8 { background: linear-gradient(140deg, #FAF7EC 60%, #F5D8C4); }
 
   .home .footer {
     margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line);
@@ -2337,7 +2338,7 @@
           body: `<p>把上面三种翻车的修复加回"原始 10 行", 你就有了一个能上生产的小 runner: 大约 20 行。</p>
             <p>多的: ① <code>for i in range(max_iter)</code> 封顶 · ② <code>with_retry</code> 包工具调用 · ③ <code>compress_if_full</code> 压缩旧消息。</p>
             <div class="callout"><div class="label"><span class="ic">✓</span>整本书连起来</div>
-            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人)。这就是 AI Agent 的全貌。</p></div>`,
+            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人) → <strong>Tool Calling</strong>(模型发请求 vs 运行时执行)。这就是 AI Agent 的全貌。</p></div>`,
           next: "看完了 ✓",
           stats: ["≤ max_iter", "全", "受控", "可运维"],
         },
@@ -2606,6 +2607,281 @@
             <p>一个像样的 agent 通常两套都要: memory 让它 "记得你是谁", RAG 让它 "知道事实"。架构上可以合, 概念上要分清, 不然评估和调试全会乱。</p></div>`,
           next: "本节完成 ✓",
           stats: ["Memory vs RAG", "都用向量库", "记你 vs 查事实", "合用"],
+        },
+      ],
+    },
+
+    /* ---------- 7: TOOL CALLING ---------- */
+    {
+      slug: "tool-calling",
+      num: 7,
+      title: "tool calling 到底怎么跑?",
+      short: "把'模型发请求'和'运行时执行'拆开 —— 这俩从不是一回事",
+      subtitle: "Lesson 04 说 agent 会'调工具', 但没说清细节。这一节把一次 tool call 的 4 步手把手拆开。核心: 模型只'写一段 JSON', 真的跑函数是你的代码干的事。",
+      duration: "7 分钟", level: "进阶", stepCount: 4,
+      stats: ["◉ 模型职责", "⚡ 运行时职责", "✉ 消息列表长度", "↻ 本轮进度"],
+      tlLabels: ["模型发请求", "运行时跑", "结果回塞", "模型继续"],
+      learn: [
+        "为什么说 '模型不会真的调函数' —— 它只写 JSON",
+        "一次 tool call 的 4 步 dance: 请求 / 执行 / 回塞 / 继续",
+        "权限 / 安全 / 重试 只能在 '运行时拦截' 这一步做",
+        "'function calling' / 'tool use' 这些名字背后是同一件事",
+      ],
+      svg: `
+        <defs>
+          <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
+          </marker>
+        </defs>
+
+        <!-- STEP 1: 模型发 tool_call JSON -->
+        <g data-reveal data-show="1">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">① 模型 "想" 调个工具 · 但其实只写了一段 JSON</text>
+
+          <!-- user message -->
+          <rect x="60" y="110" width="260" height="60" rx="8" fill="#E4ECD6" stroke="#B9CDA7"/>
+          <text x="76" y="128" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user</text>
+          <text x="76" y="150" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">帮我查一下北京今天的</text>
+          <text x="76" y="166" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">天气</text>
+
+          <!-- arrow to model -->
+          <path class="arrow" d="M 325 140 L 365 140" marker-end="url(#arrow-head)"/>
+
+          <!-- model -->
+          <polygon points="370,105 440,90 510,105 510,180 440,195 370,180" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+          <polygon points="370,105 440,120 510,105 440,90" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1" opacity="0.7"/>
+          <text x="440" y="140" font-family="Fraunces, serif" font-weight="700" font-size="14" fill="#3D5D3C" text-anchor="middle">LLM</text>
+          <text x="440" y="160" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#6B6454" text-anchor="middle">"我需要查天气"</text>
+
+          <!-- arrow to output -->
+          <path class="arrow" d="M 520 140 L 560 140" marker-end="url(#arrow-head)"/>
+
+          <!-- assistant tool_call message -->
+          <rect x="565" y="105" width="175" height="80" rx="8" fill="#FBF1C0" stroke="#DCC673" stroke-width="1.5"/>
+          <text x="580" y="123" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">assistant</text>
+          <text x="580" y="140" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">tool_call:</text>
+          <text x="580" y="156" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">{"name":"get_weather",</text>
+          <text x="580" y="170" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">"args":{"city":"北京"}}</text>
+
+          <!-- Annotation about this being ONLY JSON -->
+          <g transform="translate(60, 230)">
+            <rect x="0" y="0" width="680" height="70" rx="10" fill="#F9E3DC" stroke="#B08476" stroke-dasharray="4 3" stroke-width="1.5"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530">⚠ 重点</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">模型做的事 到这里就结束了 —— 它只是输出了上面那段 JSON。</text>
+            <text x="16" y="66" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">它没碰过网络, 没调过任何 API, 更没拿到天气数据。</text>
+          </g>
+
+          <!-- KEY IDEA -->
+          <g transform="translate(60, 320)">
+            <rect x="0" y="0" width="680" height="100" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">KEY IDEA</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">"模型会调工具" 其实是误传。模型本身永远只会写一段 JSON 说 "我</text>
+            <text x="16" y="66" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">想调 X, 参数是 Y"。真的拨 API 的, 是你的代码 (运行时)。</text>
+            <text x="16" y="86" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">把这两件事拆开, 后面所有的工程细节就通了。</text>
+          </g>
+        </g>
+
+        <!-- STEP 2: 运行时拦截并执行 -->
+        <g data-reveal data-show="2">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">② 你的代码拦下 JSON · 查注册表 · 真的跑</text>
+
+          <!-- tool_call JSON (from step 1) -->
+          <rect x="40" y="110" width="200" height="80" rx="8" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="52" y="128" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">assistant.tool_call</text>
+          <text x="52" y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">{"name":"get_weather",</text>
+          <text x="52" y="160" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">"args":{</text>
+          <text x="52" y="174" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">  "city":"北京"}}</text>
+
+          <!-- arrow -->
+          <path class="arrow" d="M 245 150 L 285 150" marker-end="url(#arrow-head)"/>
+
+          <!-- Runtime box (your code) -->
+          <rect x="290" y="105" width="220" height="200" rx="10" fill="#262319" stroke="#3A362A"/>
+          <text x="400" y="128" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8" text-anchor="middle" font-weight="700">你的代码 · runtime</text>
+          <text x="306" y="156" font-family="JetBrains Mono, monospace" font-size="10" fill="#CDD9E0">tools = {</text>
+          <text x="306" y="172" font-family="JetBrains Mono, monospace" font-size="10" fill="#F2D3CB">  "get_weather": getWeather,</text>
+          <text x="306" y="188" font-family="JetBrains Mono, monospace" font-size="10" fill="#CDD9E0">  "send_email":  sendEmail,</text>
+          <text x="306" y="204" font-family="JetBrains Mono, monospace" font-size="10" fill="#CDD9E0">  "book_flight": bookFlight,</text>
+          <text x="306" y="220" font-family="JetBrains Mono, monospace" font-size="10" fill="#CDD9E0">}</text>
+          <line x1="306" y1="232" x2="494" y2="232" stroke="#3A362A"/>
+          <text x="306" y="252" font-family="JetBrains Mono, monospace" font-size="10" fill="#D4E0C8">name = call["name"]</text>
+          <text x="306" y="268" font-family="JetBrains Mono, monospace" font-size="10" fill="#D4E0C8">fn = tools[name]</text>
+          <text x="306" y="284" font-family="JetBrains Mono, monospace" font-size="10" fill="#F2D3CB">result = fn(**call["args"])</text>
+
+          <!-- arrow to real API -->
+          <path class="arrow" d="M 515 200 L 555 200" marker-end="url(#arrow-head)"/>
+
+          <!-- real API -->
+          <rect x="560" y="140" width="180" height="120" rx="10" fill="#CDD9E0" stroke="#7F99A8" stroke-width="1.5"/>
+          <text x="650" y="162" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2C2820" text-anchor="middle">真的 API</text>
+          <text x="650" y="186" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">GET /api/weather</text>
+          <text x="650" y="202" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">?city=北京</text>
+          <line x1="580" y1="214" x2="720" y2="214" stroke="#7F99A8" stroke-dasharray="3 3"/>
+          <text x="650" y="234" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C" text-anchor="middle">{temp: 8,</text>
+          <text x="650" y="250" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C" text-anchor="middle">condition: "晴"}</text>
+
+          <!-- callout -->
+          <g transform="translate(60, 335)">
+            <rect x="0" y="0" width="680" height="110" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">开发者注脚</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">这一步是纯你的代码, 完全没模型参与。所以:</text>
+            <text x="16" y="64" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 权限校验 (这个用户能查天气吗?) 在这里做, 不是让模型自觉</text>
+            <text x="16" y="82" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 参数校验 (city 必须是字符串?) 在这里做, 不信模型的 JSON</text>
+            <text x="16" y="102" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 超时 / 重试 / 熔断 在这里做, 不是让模型重发 tool_call</text>
+          </g>
+        </g>
+
+        <!-- STEP 3: 结果塞回 messages -->
+        <g data-reveal data-show="3">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">③ 结果包成 tool 消息, 拼到 messages 末尾</text>
+
+          <!-- messages array -->
+          <text x="60" y="108" font-family="JetBrains Mono, monospace" font-size="11" fill="#6B6454" letter-spacing="0.08em">messages = [</text>
+
+          <!-- Message 1: user -->
+          <g transform="translate(76, 120)">
+            <rect x="0" y="0" width="648" height="34" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+            <text x="12" y="15" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user</text>
+            <text x="12" y="28" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">帮我查一下北京今天的天气</text>
+          </g>
+
+          <!-- Message 2: assistant tool_call -->
+          <g transform="translate(76, 162)">
+            <rect x="0" y="0" width="648" height="34" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+            <text x="12" y="15" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">assistant (tool_call)</text>
+            <text x="12" y="28" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">{"name":"get_weather", "args":{"city":"北京"}}</text>
+          </g>
+
+          <!-- Message 3: NEW tool result -->
+          <g transform="translate(76, 204)">
+            <rect x="0" y="0" width="648" height="44" rx="6" fill="#F2D3CB" stroke="#B08476" stroke-width="1.8"/>
+            <text x="12" y="16" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#7B4530">tool · NEW · 运行时拼的</text>
+            <text x="12" y="30" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">tool_call_id: call_abc123</text>
+            <text x="12" y="42" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">content: "{temp: 8, condition: \\"晴\\", city: \\"北京\\"}"</text>
+          </g>
+
+          <text x="60" y="270" font-family="JetBrains Mono, monospace" font-size="11" fill="#6B6454" letter-spacing="0.08em">]</text>
+
+          <!-- Arrow annotation to new entry -->
+          <path d="M 735 220 Q 760 220 760 175" stroke="#7B4530" stroke-width="1.2" fill="none" stroke-dasharray="3 3"/>
+          <text x="740" y="248" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B4530">↑ 这条</text>
+          <text x="740" y="262" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B4530">   是你加的</text>
+
+          <!-- Role list -->
+          <g transform="translate(60, 300)">
+            <text x="0" y="0" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" letter-spacing="0.08em">OpenAI / Anthropic 协议里 role 的类型:</text>
+            <text x="0" y="20" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">· <tspan fill="#3D5D3C" font-weight="700">user</tspan>      → 用户发的</text>
+            <text x="0" y="40" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">· <tspan fill="#7B6314" font-weight="700">assistant</tspan> → 模型回的 (可能是答复, 也可能是 tool_call)</text>
+            <text x="0" y="60" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">· <tspan fill="#7B4530" font-weight="700">tool</tspan>      → 运行时填的 "工具返回了啥"</text>
+            <text x="0" y="80" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">· <tspan fill="#6B6454" font-weight="700">system</tspan>    → 初始指令 (Lesson 02 讲过)</text>
+          </g>
+
+          <g transform="translate(60, 410)">
+            <rect x="0" y="0" width="680" height="80" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">关键认知</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">tool_call_id 把 tool_call 和 tool 两条消息"配对". 可能有多个</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">工具并发调, 靠 id 认领各自的结果, 不然模型会糊。</text>
+          </g>
+        </g>
+
+        <!-- STEP 4: 模型下一轮读结果 继续 -->
+        <g data-reveal data-show="4">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">④ 整个 messages 送回模型 · 模型读结果 决定下一步</text>
+
+          <!-- messages (updated) going back -->
+          <rect x="40" y="105" width="260" height="170" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="56" y="128" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6B6454">完整 messages (4 条)</text>
+          <g transform="translate(56, 140)">
+            <rect x="0" y="0" width="224" height="20" rx="3" fill="#E4ECD6"/>
+            <text x="8" y="14" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user: 查北京天气</text>
+            <rect x="0" y="24" width="224" height="20" rx="3" fill="#FBF1C0"/>
+            <text x="8" y="38" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">assistant: tool_call(get_weather)</text>
+            <rect x="0" y="48" width="224" height="20" rx="3" fill="#F2D3CB"/>
+            <text x="8" y="62" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B4530">tool: {temp: 8, 晴}</text>
+            <rect x="0" y="72" width="224" height="20" rx="3" fill="#E8DFC4" stroke="#A89D7E" stroke-dasharray="2 2"/>
+            <text x="8" y="86" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">assistant: ??? (模型要写这条)</text>
+          </g>
+          <text x="56" y="256" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">← 整段再送一遍给模型</text>
+
+          <!-- arrow to model -->
+          <path class="arrow" d="M 305 180 L 345 180" marker-end="url(#arrow-head)"/>
+
+          <!-- model -->
+          <polygon points="350,135 420,120 490,135 490,210 420,225 350,210" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+          <polygon points="350,135 420,150 490,135 420,120" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1" opacity="0.7"/>
+          <text x="420" y="170" font-family="Fraunces, serif" font-weight="700" font-size="14" fill="#3D5D3C" text-anchor="middle">LLM</text>
+          <text x="420" y="188" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#6B6454" text-anchor="middle">看到 tool 结果</text>
+          <text x="420" y="204" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#6B6454" text-anchor="middle">决定下一步</text>
+
+          <!-- arrow splits into two -->
+          <path class="arrow" d="M 500 160 Q 540 140 580 130" marker-end="url(#arrow-head)"/>
+          <path class="arrow" d="M 500 195 Q 540 220 580 240" marker-end="url(#arrow-head)"/>
+
+          <!-- Branch A: natural language answer -->
+          <rect x="585" y="105" width="170" height="60" rx="8" fill="#E4ECD6" stroke="#B9CDA7" stroke-width="1.5"/>
+          <text x="597" y="124" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C">A · 直接回答 (多数情况)</text>
+          <text x="597" y="142" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">"北京今天 8°C,</text>
+          <text x="597" y="156" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">晴, 适合出门。"</text>
+
+          <!-- Branch B: another tool call (loop) -->
+          <rect x="585" y="215" width="170" height="60" rx="8" fill="#FBF1C0" stroke="#DCC673" stroke-width="1.5"/>
+          <text x="597" y="234" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">B · 再调一个工具 → loop</text>
+          <text x="597" y="252" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">tool_call: get_aqi</text>
+          <text x="597" y="266" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">(回 step 2 再跑一遍)</text>
+
+          <!-- callout -->
+          <g transform="translate(60, 320)">
+            <rect x="0" y="0" width="680" height="100" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">开发者注脚</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">这就是 agent 循环: 模型发请求 → 运行时跑 → 结果回塞 → 模型继续,</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">直到模型不再发 tool_call 为止。Lesson 05 runtime 讲过这个 while 循环,</text>
+            <text x="16" y="80" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">这一节是其中每一轮的内部细节。"function calling" 就是这件事的别名。</text>
+          </g>
+        </g>
+      `,
+      steps: [
+        {
+          pill: "本质", pillClass: "",
+          title: "模型并不会 '真的' 调函数, 它只写一段 JSON",
+          body: `<p>你问 agent "查北京的天气", 它好像真的查了。其实模型做的只有一件事: 输出<strong>一段 JSON</strong>说 "我想调 get_weather, 参数 city=北京"。</p>
+            <p>就这。它没碰网络, 没调 API, 没拿到天气数据。写完那段 JSON, 模型这一轮就结束了。</p>
+            <div class="callout"><div class="label"><span class="ic">💡</span>核心一句话</div>
+            <p>"模型会调工具" 是误传。模型永远只写 "我想调什么" 的 JSON, 真的拨 API 是你的代码干的。把这两件事拆开, 后面所有东西就顺。</p></div>`,
+          next: "下一步: 那谁真的跑? →",
+          stats: ["写 tool_call JSON", "等", "2 条 (user + assistant)", "1/4"],
+        },
+        {
+          pill: "机制", pillClass: "idea",
+          title: "运行时拦下 JSON, 查注册表, 真的跑函数",
+          body: `<p>模型吐出 JSON 之后, 轮到<strong>你的代码</strong> (运行时) 接棒:</p>
+            <p>(1) 拦住这段 JSON, 不要塞回模型 —— 那是下一步。</p>
+            <p>(2) 从 JSON 里取 <code>name</code>, 到预先注册的 <code>tools</code> 表里查到真正的函数 <code>getWeather</code>。</p>
+            <p>(3) 把 <code>args</code> 展开, 正经调这个函数 —— 它可能发 HTTP 请求, 可能查数据库, 可能跑 shell。结果拿到一个真的返回值。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <p>这一步是纯你的代码, 完全没模型参与。所以: 权限校验、参数校验、超时、重试、熔断、审计日志 —— <strong>只能</strong>在这里做, 别指望模型自觉。</p></div>`,
+          next: "下一步: 结果怎么告诉模型 →",
+          stats: ["等", "跑真函数 + 校验", "2 条", "2/4"],
+        },
+        {
+          pill: "协议", pillClass: "idea",
+          title: "把工具结果包成 tool 消息, 塞回 messages",
+          body: `<p>函数跑完了, 结果怎么让模型知道? 简单: <strong>包成一条新 message, 拼到 messages 数组末尾</strong>, 这条消息的 role 叫 <code>tool</code>。</p>
+            <p>格式 (OpenAI / Anthropic 大同小异): <code>{role: "tool", tool_call_id: "call_abc123", content: "{temp: 8, ...}"}</code>。<code>tool_call_id</code> 把这条和刚才那条 <code>assistant.tool_call</code> 配对 —— 多个工具并发调时, 靠 id 认领各自的结果, 不然模型会糊。</p>
+            <div class="callout"><div class="label"><span class="ic">🔑</span>关键认知</div>
+            <p>messages 不是只有 user / assistant。还有 <code>tool</code> (运行时填) 和 <code>system</code> (初始指令)。四种 role 构成了整个"对话协议"。</p></div>`,
+          next: "下一步: 模型拿到结果以后 →",
+          stats: ["等", "拼 tool 消息", "3 条 (+tool)", "3/4"],
+        },
+        {
+          pill: "循环", pillClass: "tech",
+          title: "整段再送回模型, 它要么回答, 要么再调一个",
+          body: `<p>运行时把<strong>完整的、更新过的 messages</strong> (现在 3 条) 再发一次给模型。模型看到 tool 消息里的天气数据, 现在有两个选择:</p>
+            <p><strong>A · 直接写答复</strong> (最常见): 输出 "北京今天 8°C, 晴, 适合出门。" —— 结束。</p>
+            <p><strong>B · 再调一个工具</strong>: 输出另一段 tool_call JSON (比如 get_aqi 查空气质量) —— 回到 step 2, 再跑一轮。这就是 agent loop。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <p>"function calling" (OpenAI 命名) / "tool use" (Anthropic 命名) / "工具调用" —— 都是这同一件事。协议细节 (JSON 字段名、是否 streaming) 各家略不同, 这 4 步 dance 的本质全一样。</p></div>`,
+          next: "本节完成 ✓",
+          stats: ["读结果 + 回话", "等下一轮", "4 条 (+assistant)", "4/4 ✓"],
         },
       ],
     },
@@ -3941,7 +4217,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     const modeName = quizMode === "basic" ? "基础" : "深度";
     const modeTitle = `<em>${total} 题</em> · ${fullScore} 分 · ${modeName}`;
     const modeLede = quizMode === "basic"
-      ? `覆盖 7 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
+      ? `覆盖 8 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
       : `场景 / 辨析 / 取舍 / 调试, 比基础考难一个台阶。单选, 每题 ${points} 分, 没时限。`;
 
     const modeTabs = `
@@ -4184,7 +4460,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
         <h1>一本关于 <em>AI Agent</em> 的小书</h1>
         <p class="lede">用插画和 4 步拆解, 把 chat、prompt、skill、agent、以及 agent 怎么运行的 —— 从头到尾讲一遍。</p>
         <div class="meta">
-          <span>◇ 7 节 · 约 42 分钟</span>
+          <span>◇ 8 节 · 约 49 分钟</span>
           <span>◇ 入门 → 进阶</span>
           <span>◇ 从非程序员到开发者, 都能看</span>
         </div>
