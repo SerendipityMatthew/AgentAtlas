@@ -480,6 +480,16 @@
     background: var(--green); border-color: var(--green); color: #FAF7EC;
   }
   .learn li.done .box::after { content: "✓"; }
+  .learn.terms li { padding: 4px 0; display: block; }
+  .learn.terms li a {
+    color: var(--ink); text-decoration: none;
+    display: inline-flex; align-items: baseline; gap: 8px;
+  }
+  .learn.terms li a:hover { color: var(--green); }
+  .learn.terms .en {
+    color: var(--ink-soft);
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+  }
 
   /* End-of-lesson next-lesson card */
   .next-lesson {
@@ -4398,7 +4408,7 @@ Agent 跑长了, messages 累加, 撞上这条线就要:
   {"role": "system", "content": "你是一个 Python 专家。代码优先, 不道歉。"},
   {"role": "user",   "content": "怎么读 JSON 文件?"}
 ]`,
-      related: ["few-shot", "chain-of-thought", "hallucination"], deepLink: "prompt" },
+      related: ["few-shot", "chain-of-thought", "hallucination"] },
 
     { slug: "few-shot", group: "prompt", cn: "少样本提示", en: "few-shot",
       oneliner: '在 prompt 里放几个"输入 → 输出"的例子, 让模型照猫画虎。',
@@ -4552,7 +4562,7 @@ Step 4: 用评分模型指导原模型, 让它越来越像"人类喜欢的那个
 
 模型 (看到结果, 继续):
   "今天北京 15°C, 晴。"`,
-      related: ["function-calling", "mcp", "agent-loop"], deepLink: "agent" },
+      related: ["function-calling", "mcp", "agent-loop"] },
 
     { slug: "function-calling", group: "agent", cn: "函数调用", en: "function calling",
       oneliner: 'tool call 的标准化实现。你描述"有哪些函数、每个要啥参数", 模型按 JSON schema 生成调用。',
@@ -4579,7 +4589,7 @@ response = llm(messages, tools=tools)
 MCP client (Claude Desktop, Cursor, VSCode, Zed, ...): 发现并调用
 
 同一个 Slack server, Claude 能用, Cursor 也能用, 不用各写一遍。`,
-      related: ["tool-call", "function-calling", "agent-loop"], deepLink: "agent" },
+      related: ["tool-call", "function-calling", "agent-loop"] },
 
     { slug: "agent-loop", group: "agent", cn: "智能体循环", en: "agent loop",
       oneliner: "Agent 跑任务的核心控制流: LLM 决策 → 调工具 → 看结果 → 再决策, 直到完成。",
@@ -4591,7 +4601,7 @@ MCP client (Claude Desktop, Cursor, VSCode, Zed, ...): 发现并调用
   for call in resp.tool_calls:
     result = TOOLS[call.name](**call.args)
     messages.append({"role": "tool", "content": result})`,
-      related: ["tool-call", "context-window", "hallucination"], deepLink: "runtime" },
+      related: ["tool-call", "context-window", "hallucination"] },
 
     // EVAL
     { slug: "benchmark", group: "eval", cn: "基准测试", en: "benchmark",
@@ -4633,6 +4643,22 @@ jailbreak 常见套路:
 没有 eval, 没法说一个 agent 在"变好"还是"变坏"。`,
       related: ["benchmark", "jailbreak", "hallucination"] },
   ];
+
+  // lesson slug -> term slugs covered there (drives cross-link in both directions)
+  const lessonTerms = {
+    "llm":            ["token", "embedding", "attention", "fine-tuning"],
+    "chat":           ["context-window", "hallucination", "system-prompt"],
+    "prompt":         ["system-prompt", "few-shot", "chain-of-thought", "hallucination"],
+    "skill":          ["system-prompt", "few-shot", "chain-of-thought"],
+    "agent":          ["agent-loop", "tool-call", "function-calling", "react"],
+    "runtime":        ["agent-loop", "context-rot", "workflow-vs-agent", "tool-output-validation"],
+    "memory":         ["context-window", "embedding", "chunking", "rag"],
+    "tool-calling":   ["tool-call", "function-calling", "agent-loop", "tool-output-validation"],
+    "mcp":            ["mcp", "tool-call", "function-calling", "tool-permission"],
+    "rag":            ["rag", "embedding", "vector-db", "chunking"],
+    "planning-react": ["planning", "react", "agent-loop", "chain-of-thought"],
+    "security":       ["prompt-injection", "tool-permission", "human-in-the-loop", "jailbreak"],
+  };
 
   function renderGlossaryHome() {
     const cx = 400, cy = 300, hubR = 44, branchLen = 180;
@@ -4710,7 +4736,12 @@ jailbreak 常见套路:
   function renderTermPage(term) {
     const group = groups.find(g => g.slug === term.group);
     const relatedTerms = (term.related || []).map(slug => terms.find(t => t.slug === slug)).filter(Boolean);
-    const deepLesson = term.deepLink ? lessons.find(l => l.slug === term.deepLink) : null;
+    const inLessons = Object.keys(lessonTerms)
+      .filter(k => lessonTerms[k].includes(term.slug))
+      .map(k => lessons.find(l => l.slug === k))
+      .filter(Boolean);
+    const deepLesson = inLessons[0] || null;
+    const alsoIn = inLessons.slice(1);
 
     app.innerHTML = `
       <div class="term-page">
@@ -4747,9 +4778,18 @@ jailbreak 常见套路:
           <div class="deep-link">
             <div class="txt">
               <strong>深入课里有一整节在讲这个</strong><br>
-              <span style="color: var(--ink-soft); font-size: 12.5px">想看完整的 4 步拆解就点进去</span>
+              <span style="color: var(--ink-soft); font-size: 12.5px">第 ${deepLesson.num} 节 · ${deepLesson.title}</span>
             </div>
             <a href="#/${deepLesson.slug}">📖 看这一节 →</a>
+          </div>
+        ` : ""}
+
+        ${alsoIn.length ? `
+          <div class="block">
+            <div class="label"><span class="ic">📖</span>也在这几节出现</div>
+            <div class="related-list">
+              ${alsoIn.map(l => `<a href="#/${l.slug}">第 ${l.num} 节 · ${l.title}</a>`).join("")}
+            </div>
           </div>
         ` : ""}
       </div>
@@ -6024,6 +6064,17 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
               ${lesson.learn.map(t => `<li><span class="box"></span>${t}</li>`).join("")}
             </ul>
           </div>
+          ${(lessonTerms[lesson.slug] || []).length ? `
+          <div class="learn terms">
+            <h3>相关术语</h3>
+            <ul>
+              ${lessonTerms[lesson.slug].map(slug => {
+                const t = terms.find(x => x.slug === slug);
+                return t ? `<li><a href="#/glossary/${t.slug}">${t.cn}<span class="en">${t.en}</span></a></li>` : "";
+              }).join("")}
+            </ul>
+          </div>
+          ` : ""}
         </aside>
       </main>
     `;
