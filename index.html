@@ -302,7 +302,7 @@
 
   .stat-row {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-    margin: 14px 0 14px;
+    margin: 14px 0;
   }
   .stat {
     background: var(--bg-panel); border: 1px solid var(--line);
@@ -651,7 +651,7 @@
   }
 
   /* Term page */
-  .term-page { max-width: 820px; margin: 0 auto; padding: 30px 28px 60px; }
+  .term-page { max-width: 820px; margin: 0 auto; padding: 36px 28px 60px; }
   .term-page .back {
     font-family: "JetBrains Mono", monospace; font-size: 12px;
     color: var(--ink-soft); margin-bottom: 14px; display: inline-block;
@@ -718,7 +718,7 @@
   }
 
   /* Quiz */
-  .quiz-page { max-width: 820px; margin: 0 auto; padding: 32px 28px 80px; }
+  .quiz-page { max-width: 820px; margin: 0 auto; padding: 36px 28px 60px; }
   .quiz-page h1 {
     font-family: "Noto Serif SC", "Fraunces", serif;
     font-weight: 700; font-size: 38px; line-height: 1.15;
@@ -4798,7 +4798,7 @@ jailbreak 常见套路:
           <div class="related-list">
             ${relatedTerms.length
               ? relatedTerms.map(t => `<a href="#/glossary/${t.slug}">${t.cn} · ${t.en}</a>`).join("")
-              : '<p style="margin:0;color:var(--ink-soft);font-size:13px">(暂无相关词)</p>'}
+              : '<p style="margin:0;color:var(--ink-soft);font-size: 13px">(暂无相关词)</p>'}
           </div>
         </div>
 
