@@ -650,6 +650,46 @@
     color: var(--ink-soft);
   }
 
+  .pair-section { margin-top: 40px; padding-top: 28px; border-top: 1px dashed var(--line); }
+  .pair-section .head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--ink); }
+  .pair-section .head .dot {
+    width: 16px; height: 16px; border-radius: 5px;
+    background: var(--yellow-soft); border: 1.5px solid #DCC673;
+  }
+  .pair-section .head h2 {
+    font-family: "Noto Serif SC", "Fraunces", serif;
+    font-size: 20px; font-weight: 700; margin: 0;
+  }
+  .pair-section .head .count {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft); margin-left: auto;
+  }
+  .pair-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .pair-card {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 14px 16px; border-radius: 10px;
+    background: var(--bg-panel); border: 1px solid var(--line);
+    text-decoration: none; color: var(--ink);
+    transition: all .15s ease;
+  }
+  .pair-card:hover { border-color: var(--green); transform: translateY(-1px); }
+  .pair-names {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    font-family: "Noto Serif SC", serif; font-size: 14.5px; font-weight: 600;
+  }
+  .pair-names .vs {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--ink-soft); font-weight: 400;
+    padding: 1px 6px; border-radius: 4px; background: var(--bg);
+  }
+  .pair-diff {
+    font-size: 13px; color: var(--ink-soft); line-height: 1.5;
+  }
+  .pair-goto {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+    color: var(--green); margin-top: 2px; letter-spacing: 0.04em;
+  }
+
   /* Term page */
   .term-page { max-width: 820px; margin: 0 auto; padding: 36px 28px 60px; }
   .term-page .back {
@@ -4688,6 +4728,17 @@ jailbreak 常见套路:
     "security":       ["agent", "tool-calling"],
   };
 
+  // 7 对最容易混的概念 —— 每对指向课程里真的在讲清楚它的那一步
+  const conceptPairs = [
+    { a: "预训练",       b: "推理",            diff: "训练烧一次钱 · 推理无数次摊薄",           lesson: "llm",            step: 2 },
+    { a: "LLM",          b: "传统软件",        diff: "概率 + 无状态 · 确定 + 有状态",             lesson: "llm",            step: 4 },
+    { a: "Chat",         b: "Agent",           diff: "只能聊 · 带工具能动手还能自己循环",         lesson: "agent",          step: 1 },
+    { a: "Memory",       b: "RAG",             diff: "存你自己写过的 · 查别人准备好的",           lesson: "memory",         step: 4 },
+    { a: "MCP",          b: "Function Calling",diff: "管发现 (协议层) · 管执行 (模型接口)",       lesson: "mcp",            step: 4 },
+    { a: "闭卷 LLM",     b: "开卷 RAG",        diff: "靠记忆答 · 先查资料再答",                  lesson: "rag",            step: 1 },
+    { a: "Plan-Execute", b: "ReAct",           diff: "先列全部计划再跑 · 每步 think→act→observe", lesson: "planning-react", step: 4 },
+  ];
+
   function renderGlossaryHome() {
     const cx = 400, cy = 300, hubR = 44, branchLen = 180;
     const mapGroups = groups.map(g => {
@@ -4755,6 +4806,26 @@ jailbreak 常见套路:
           <div class="tip">点一个主题 → 跳到下面对应分组</div>
         </div>
         ${groupSections}
+
+        <section class="pair-section">
+          <div class="head">
+            <span class="dot"></span>
+            <h2>容易混的 7 对</h2>
+            <span class="count">点卡片去课里看</span>
+          </div>
+          <div class="pair-grid">
+            ${conceptPairs.map(p => {
+              const l = lessons.find(x => x.slug === p.lesson);
+              return `
+                <a class="pair-card" href="#/${p.lesson}/${p.step}">
+                  <div class="pair-names"><span class="a">${p.a}</span><span class="vs">vs</span><span class="b">${p.b}</span></div>
+                  <div class="pair-diff">${p.diff}</div>
+                  <div class="pair-goto">→ 第 ${l ? l.num : "?"} 节 · 第 ${p.step} 步</div>
+                </a>
+              `;
+            }).join("")}
+          </div>
+        </section>
       </div>
     `;
   }
