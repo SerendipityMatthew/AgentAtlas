@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Atlas · 一本关于 AI Agent 的小书</title>
-<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。8 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
+<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。9 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
 <meta name="theme-color" content="#F0ECE0">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F0ECE0'/%3E%3Cpath d='M16 6 L26 16 L16 26 L6 16 Z' fill='%233D5D3C'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。8 节深入课 + 41 词术语库 + 56 题测验。">
+<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。9 节深入课 + 41 词术语库 + 56 题测验。">
 <meta property="og:url" content="https://agentatlas-85r.pages.dev/">
 <meta property="og:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta name="twitter:description" content="8 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
+<meta name="twitter:description" content="9 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
 <meta name="twitter:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -180,6 +180,7 @@
   .home .card.c6 { background: linear-gradient(140deg, #FAF7EC 60%, #EDE2CE); }
   .home .card.c7 { background: linear-gradient(140deg, #FAF7EC 60%, #DDE6E8); }
   .home .card.c8 { background: linear-gradient(140deg, #FAF7EC 60%, #F5D8C4); }
+  .home .card.c9 { background: linear-gradient(140deg, #FAF7EC 60%, #DAD5CE); }
 
   .home .footer {
     margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line);
@@ -2338,7 +2339,7 @@
           body: `<p>把上面三种翻车的修复加回"原始 10 行", 你就有了一个能上生产的小 runner: 大约 20 行。</p>
             <p>多的: ① <code>for i in range(max_iter)</code> 封顶 · ② <code>with_retry</code> 包工具调用 · ③ <code>compress_if_full</code> 压缩旧消息。</p>
             <div class="callout"><div class="label"><span class="ic">✓</span>整本书连起来</div>
-            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人) → <strong>Tool Calling</strong>(模型发请求 vs 运行时执行)。这就是 AI Agent 的全貌。</p></div>`,
+            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人) → <strong>Tool Calling</strong>(模型发请求 vs 运行时执行) → <strong>MCP</strong>(把工具标准化成"插座")。这就是 AI Agent 的全貌。</p></div>`,
           next: "看完了 ✓",
           stats: ["≤ max_iter", "全", "受控", "可运维"],
         },
@@ -2882,6 +2883,310 @@
             <p>"function calling" (OpenAI 命名) / "tool use" (Anthropic 命名) / "工具调用" —— 都是这同一件事。协议细节 (JSON 字段名、是否 streaming) 各家略不同, 这 4 步 dance 的本质全一样。</p></div>`,
           next: "本节完成 ✓",
           stats: ["读结果 + 回话", "等下一轮", "4 条 (+assistant)", "4/4 ✓"],
+        },
+      ],
+    },
+
+    /* ---------- 8: MCP ---------- */
+    {
+      slug: "mcp",
+      num: 8,
+      title: "什么是 MCP?",
+      short: "统一的 '工具插座' —— 让任何 agent 和任何服务都能对上",
+      subtitle: "Lesson 07 讲了 tool calling: LLM 怎么请求 + 运行时怎么执行。这节讲外面那一层: Host / Client / Server 三件套, 和它跟 function calling 的分工。",
+      duration: "7 分钟", level: "进阶", stepCount: 4,
+      stats: ["◉ 集成数量", "⚡ 协议层", "◈ 连接方式", "↻ 复用性"],
+      tlLabels: ["胶水痛", "三角协议", "Slack 示例", "vs FC"],
+      learn: [
+        "为什么 LLM 应用需要一个 '工具协议' (N × M 集成的痛)",
+        "MCP 的三件套: Host (宿主 app) / Client (连接) / Server (封装服务)",
+        "一个具体 MCP server 长什么样 (以 Slack 为例)",
+        "MCP 和 function calling 的分工: 一个管发现, 一个管执行",
+      ],
+      svg: `
+        <defs>
+          <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
+          </marker>
+          <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#B08476"/>
+          </marker>
+        </defs>
+
+        <!-- STEP 1: N × M 胶水痛 -->
+        <g data-reveal data-show="1">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">没 MCP 之前 · 每个 app × 每个服务 都要自己写</text>
+
+          <!-- Apps (left) -->
+          <g font-family="JetBrains Mono, monospace" font-size="11">
+            <rect x="60" y="110" width="140" height="36" rx="8" fill="#E4ECD6" stroke="#B9CDA7"/>
+            <text x="130" y="134" fill="#3D5D3C" text-anchor="middle">Claude Desktop</text>
+            <rect x="60" y="160" width="140" height="36" rx="8" fill="#E4ECD6" stroke="#B9CDA7"/>
+            <text x="130" y="184" fill="#3D5D3C" text-anchor="middle">Cursor</text>
+            <rect x="60" y="210" width="140" height="36" rx="8" fill="#E4ECD6" stroke="#B9CDA7"/>
+            <text x="130" y="234" fill="#3D5D3C" text-anchor="middle">Zed</text>
+            <rect x="60" y="260" width="140" height="36" rx="8" fill="#E4ECD6" stroke="#B9CDA7"/>
+            <text x="130" y="284" fill="#3D5D3C" text-anchor="middle">你自己写的 agent</text>
+          </g>
+          <text x="130" y="105" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">N 个 LLM 应用</text>
+
+          <!-- Services (right) -->
+          <g font-family="JetBrains Mono, monospace" font-size="11">
+            <rect x="600" y="110" width="140" height="36" rx="8" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="670" y="134" fill="#7B4530" text-anchor="middle">Slack</text>
+            <rect x="600" y="160" width="140" height="36" rx="8" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="670" y="184" fill="#7B4530" text-anchor="middle">GitHub</text>
+            <rect x="600" y="210" width="140" height="36" rx="8" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="670" y="234" fill="#7B4530" text-anchor="middle">Postgres</text>
+            <rect x="600" y="260" width="140" height="36" rx="8" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="670" y="284" fill="#7B4530" text-anchor="middle">内部 wiki / API</text>
+          </g>
+          <text x="670" y="105" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">M 个外部服务</text>
+
+          <!-- Chaos lines (N × M = 16 crisscross) -->
+          <g stroke="#B08476" stroke-width="0.8" fill="none" opacity="0.55" stroke-dasharray="2 2">
+            <line x1="200" y1="128" x2="600" y2="128"/>
+            <line x1="200" y1="128" x2="600" y2="178"/>
+            <line x1="200" y1="128" x2="600" y2="228"/>
+            <line x1="200" y1="128" x2="600" y2="278"/>
+            <line x1="200" y1="178" x2="600" y2="128"/>
+            <line x1="200" y1="178" x2="600" y2="178"/>
+            <line x1="200" y1="178" x2="600" y2="228"/>
+            <line x1="200" y1="178" x2="600" y2="278"/>
+            <line x1="200" y1="228" x2="600" y2="128"/>
+            <line x1="200" y1="228" x2="600" y2="178"/>
+            <line x1="200" y1="228" x2="600" y2="228"/>
+            <line x1="200" y1="228" x2="600" y2="278"/>
+            <line x1="200" y1="278" x2="600" y2="128"/>
+            <line x1="200" y1="278" x2="600" y2="178"/>
+            <line x1="200" y1="278" x2="600" y2="228"/>
+            <line x1="200" y1="278" x2="600" y2="278"/>
+          </g>
+
+          <!-- Center annotation -->
+          <rect x="310" y="195" width="180" height="24" rx="12" fill="#F9E3DC" stroke="#B08476" stroke-dasharray="3 2"/>
+          <text x="400" y="211" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530" text-anchor="middle">每根线都要自己写</text>
+
+          <!-- Formula + KEY IDEA -->
+          <g transform="translate(60, 330)">
+            <rect x="0" y="0" width="680" height="30" rx="6" fill="#262319"/>
+            <text x="340" y="20" font-family="JetBrains Mono, monospace" font-size="13" fill="#F2D3CB" text-anchor="middle">N apps × M services = N × M 份自定义胶水代码</text>
+          </g>
+          <g transform="translate(60, 375)">
+            <rect x="0" y="0" width="680" height="110" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">KEY IDEA</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">N × M 问题是集成行业的老问题 —— 加一个新 app 就要重写所有</text>
+            <text x="16" y="66" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">集成, 加一个新服务就要所有 app 都适配。</text>
+            <text x="16" y="88" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">MCP 就是在中间加一层协议, 把 N × M 变成 N + M —— 接下来讲。</text>
+          </g>
+        </g>
+
+        <!-- STEP 2: Host / Client / Server 三角 -->
+        <g data-reveal data-show="2">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">加一层标准协议 · 每端只认它, 不认对面是谁</text>
+
+          <!-- Host box (big container) -->
+          <rect x="40" y="100" width="340" height="260" rx="12" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+          <text x="56" y="124" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">① Host · 宿主 app</text>
+          <text x="56" y="140" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">Claude Desktop / Cursor / Zed / 你的 agent</text>
+
+          <!-- Client inside Host -->
+          <rect x="70" y="160" width="280" height="180" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-width="1.5"/>
+          <text x="86" y="182" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">② MCP Client · 连接管理</text>
+          <text x="86" y="198" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">host 里的一个库, 每个 server 配一个 client 实例</text>
+
+          <g transform="translate(86, 215)">
+            <rect x="0" y="0" width="248" height="22" rx="4" fill="#FAF7EC" stroke="#B9CDA7"/>
+            <text x="8" y="15" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">client #1 ↔ slack-server</text>
+            <rect x="0" y="27" width="248" height="22" rx="4" fill="#FAF7EC" stroke="#B9CDA7"/>
+            <text x="8" y="42" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">client #2 ↔ github-server</text>
+            <rect x="0" y="54" width="248" height="22" rx="4" fill="#FAF7EC" stroke="#B9CDA7"/>
+            <text x="8" y="69" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">client #3 ↔ postgres-server</text>
+            <rect x="0" y="81" width="248" height="22" rx="4" fill="#FAF7EC" stroke="#B9CDA7"/>
+            <text x="8" y="96" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">client #4 ↔ your-server</text>
+          </g>
+
+          <!-- Arrows to servers -->
+          <path class="arrow" d="M 385 200 L 435 200" marker-end="url(#arrow-head)"/>
+          <text x="410" y="190" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">stdio / SSE</text>
+
+          <!-- Servers (right column) -->
+          <rect x="440" y="110" width="320" height="68" rx="10" fill="#FAF7EC" stroke="#7F99A8" stroke-width="1.5"/>
+          <text x="600" y="132" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2C2820" text-anchor="middle">③ MCP Server · 包装一个服务</text>
+          <text x="455" y="150" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">独立进程, 对外暴露三样东西:</text>
+          <text x="455" y="167" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820">tools (能做啥) · resources (能读啥) · prompts (模板)</text>
+
+          <g transform="translate(440, 190)" font-family="JetBrains Mono, monospace" font-size="10">
+            <rect x="0" y="0" width="320" height="34" rx="6" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="12" y="14" fill="#7B4530" font-weight="700">slack-server</text>
+            <text x="12" y="28" fill="#2C2820">send_message · list_channels · read_history</text>
+            <rect x="0" y="40" width="320" height="34" rx="6" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="12" y="54" fill="#7B4530" font-weight="700">github-server</text>
+            <text x="12" y="68" fill="#2C2820">list_issues · create_pr · get_file</text>
+            <rect x="0" y="80" width="320" height="34" rx="6" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="12" y="94" fill="#7B4530" font-weight="700">postgres-server</text>
+            <text x="12" y="108" fill="#2C2820">query · list_tables · describe</text>
+            <rect x="0" y="120" width="320" height="34" rx="6" fill="#F2D3CB" stroke="#B08476"/>
+            <text x="12" y="134" fill="#7B4530" font-weight="700">your-server</text>
+            <text x="12" y="148" fill="#2C2820">(你自己写, 发给别人也能用)</text>
+          </g>
+
+          <!-- Callout -->
+          <g transform="translate(60, 395)">
+            <rect x="0" y="0" width="680" height="90" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">类比 USB</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">USB 之前: 每种设备自带一种接口 (键盘口 / 鼠标口 / 打印口...)</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">USB 之后: 一种接口接所有设备。MCP 对 LLM 应用 ≈ USB 对外设。</text>
+            <text x="16" y="82" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">Anthropic 2024-11 发起, 已有多家 host / server 实现</text>
+          </g>
+        </g>
+
+        <!-- STEP 3: Slack server 具体示例 -->
+        <g data-reveal data-show="3">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">具体一个 server 长啥样 · 以 Slack 为例</text>
+
+          <!-- Config -->
+          <text x="60" y="108" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">① 在 host 的 config 里加一行:</text>
+          <rect x="60" y="118" width="680" height="88" rx="8" fill="#262319" stroke="#3A362A"/>
+          <text x="76" y="140" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8">{ "mcpServers": {</text>
+          <text x="92" y="158" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">"slack": {</text>
+          <text x="108" y="176" font-family="JetBrains Mono, monospace" font-size="11" fill="#CDD9E0">"command": "npx", "args": ["-y", "@mcp/slack"],</text>
+          <text x="108" y="194" font-family="JetBrains Mono, monospace" font-size="11" fill="#CDD9E0">"env": { "SLACK_TOKEN": "xoxb-..." }</text>
+          <text x="92" y="200" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">}</text>
+          <text x="76" y="200" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8">}}</text>
+
+          <!-- Flow -->
+          <text x="60" y="230" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">② Host 启动时 fork 子进程 跑 server, client 握手, 拿到 tool 清单:</text>
+
+          <g transform="translate(60, 245)">
+            <rect x="0" y="0" width="190" height="80" rx="8" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.5"/>
+            <text x="95" y="20" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">Claude Desktop</text>
+            <text x="95" y="38" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">(host + client)</text>
+            <text x="95" y="60" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">list_tools()</text>
+            <text x="95" y="74" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">→ ...</text>
+
+            <path class="arrow" d="M 195 40 L 245 40" marker-end="url(#arrow-head)"/>
+            <path d="M 245 60 L 195 60" stroke="#B08476" stroke-width="1.2" marker-end="url(#arrow-red)" fill="none"/>
+
+            <rect x="250" y="0" width="330" height="80" rx="8" fill="#F2D3CB" stroke="#B08476" stroke-width="1.5"/>
+            <text x="415" y="20" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530" text-anchor="middle">slack-server (子进程)</text>
+            <text x="415" y="38" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">send_message(channel, text)</text>
+            <text x="415" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">list_channels()</text>
+            <text x="415" y="70" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">read_history(channel, limit)</text>
+
+            <path class="arrow" d="M 585 40 L 630 40" marker-end="url(#arrow-head)"/>
+            <rect x="635" y="20" width="120" height="40" rx="6" fill="#CDD9E0" stroke="#7F99A8"/>
+            <text x="695" y="37" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">Slack REST API</text>
+            <text x="695" y="52" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">(用 SLACK_TOKEN)</text>
+          </g>
+
+          <!-- End-user flow -->
+          <text x="60" y="355" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">③ 用户问 "总结 #general 最近消息", LLM 就能 tool_call send_message 等 (回 Lesson 07):</text>
+
+          <g transform="translate(60, 370)">
+            <rect x="0" y="0" width="680" height="120" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">端到端</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">1. LLM: tool_call(read_history, channel="general", limit=20)</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">2. client 转给 slack-server → server 调 Slack API 拿消息 → 回 LLM</text>
+            <text x="16" y="80" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">3. LLM 读完, 写一段总结 (或再 tool_call send_message 发到别的频道)</text>
+            <text x="16" y="104" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">host 不懂 Slack · server 不懂 LLM · 中间靠 MCP 协议对齐</text>
+          </g>
+        </g>
+
+        <!-- STEP 4: MCP vs function calling -->
+        <g data-reveal data-show="4">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">和 function calling 的分工 · 什么时候用</text>
+
+          <!-- Left: FC only -->
+          <rect x="60" y="105" width="320" height="34" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="220" y="128" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#7B6314" text-anchor="middle">只用 function calling</text>
+
+          <g transform="translate(76, 155)" font-family="JetBrains Mono, monospace" font-size="11">
+            <text x="0" y="0" fill="#2C2820" font-weight="700">LLM</text>
+            <text x="30" y="0" fill="#6B6454">↔ 你的 agent 代码</text>
+            <text x="0" y="22" fill="#6B6454">     ↔ 你写死的几个 tool</text>
+            <line x1="0" y1="35" x2="288" y2="35" stroke="#DCC673" stroke-dasharray="2 2"/>
+            <text x="0" y="55" fill="#3D5D3C">+ 轻量, 一个文件就能起</text>
+            <text x="0" y="75" fill="#3D5D3C">+ 自己写死, 完全掌控</text>
+            <text x="0" y="95" fill="#B08476">− 换个 agent 项目要重写</text>
+            <text x="0" y="115" fill="#B08476">− 没法让别人 "装上你的 tool"</text>
+          </g>
+
+          <!-- Right: MCP -->
+          <rect x="420" y="105" width="320" height="34" rx="6" fill="#DAD5CE" stroke="#A89D7E"/>
+          <text x="580" y="128" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#3D5D3C" text-anchor="middle">function calling + MCP</text>
+
+          <g transform="translate(436, 155)" font-family="JetBrains Mono, monospace" font-size="11">
+            <text x="0" y="0" fill="#2C2820" font-weight="700">LLM</text>
+            <text x="30" y="0" fill="#6B6454">↔ 你的 agent 代码</text>
+            <text x="0" y="18" fill="#6B6454">     ↔ MCP Client</text>
+            <text x="0" y="36" fill="#6B6454">          ↔ M 个独立 server</text>
+            <line x1="0" y1="48" x2="288" y2="48" stroke="#A89D7E" stroke-dasharray="2 2"/>
+            <text x="0" y="68" fill="#3D5D3C">+ 每个 server 独立维护 / 复用</text>
+            <text x="0" y="88" fill="#3D5D3C">+ 任何 MCP host 都能装上</text>
+            <text x="0" y="108" fill="#B08476">− 多一层, 启动有子进程开销</text>
+            <text x="0" y="128" fill="#B08476">− host 得支持 (Claude Desktop 等)</text>
+          </g>
+
+          <!-- Decision box -->
+          <g transform="translate(60, 310)">
+            <rect x="0" y="0" width="680" height="180" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">什么时候用 MCP</text>
+            <text x="16" y="46" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 你的 agent 要连好几个外部系统 (Slack + GitHub + 内部 wiki)</text>
+            <text x="16" y="64" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 你想让别人也能用你写的 integration (发布为 MCP server)</text>
+            <text x="16" y="82" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 你用的 host 已经支持 MCP (Claude Desktop / Cursor / Zed)</text>
+            <text x="16" y="110" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530">反过来不用 MCP 的时候</text>
+            <text x="16" y="132" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 一个小 agent + 一两个 custom tool —— 直接 function call 更轻</text>
+            <text x="16" y="150" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">· 后端 web service 自己管所有工具 —— 没 host / client 这层</text>
+            <text x="16" y="168" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">厂商归属: Anthropic 2024-11 发起, 多家实现, 协议开源</text>
+          </g>
+        </g>
+      `,
+      steps: [
+        {
+          pill: "痛点", pillClass: "",
+          title: "没 MCP 之前: N × M 份胶水代码",
+          body: `<p>想象一下: 4 个 LLM 应用 (Claude Desktop / Cursor / Zed / 你自己写的 agent) 各自想连 4 个外部服务 (Slack / GitHub / Postgres / 内部 API)。</p>
+            <p>每家 app 都得为每个服务<strong>各写一份胶水代码</strong>——怎么 OAuth、怎么分页、怎么处理报错, 全自己写。Slack 被包了 4 遍, 每遍略有不同。加一个新 app = 要给所有服务重写集成。加一个新服务 = 所有 app 都要适配。</p>
+            <div class="callout"><div class="label"><span class="ic">💡</span>核心一句话</div>
+            <p>N apps × M services = N × M 份代码。集成行业的老问题, 现在轮到 LLM 应用吃苦头。MCP 想把 N × M 变成 N + M。</p></div>`,
+          next: "下一步: 怎么变成 N + M →",
+          stats: ["N × M 乱", "无 (每家自己写)", "各自胶水", "不能"],
+        },
+        {
+          pill: "三角", pillClass: "idea",
+          title: "Host · Client · Server 三件套",
+          body: `<p>MCP 的解法: 在 host (app) 和服务之间加<strong>一层标准协议</strong>, 三个角色各司其职。</p>
+            <p><strong>① Host</strong>: 运行 LLM 的 app 本身 (Claude Desktop / Cursor / Zed / 你写的 agent)。它只需要懂一次 MCP, 就能用上所有 MCP server。</p>
+            <p><strong>② Client</strong>: host 里的一个库。每连一个 server 起一个 client 实例, 管一条 stdio 或 SSE 长连接。</p>
+            <p><strong>③ Server</strong>: 一个独立进程, 把某个具体服务 (Slack / 数据库 / 你的 API) 包装成标准接口, 对外暴露 <code>tools</code> (能做啥) + <code>resources</code> (能读啥) + <code>prompts</code> (模板)。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>类比 USB</div>
+            <p>USB 之前每种外设自带一种口, USB 之后一种口接所有。MCP 对 LLM 应用 ≈ USB 对外设: host 只认协议, 不认对面是 Slack 还是 Postgres。</p></div>`,
+          next: "下一步: 一个真的 server →",
+          stats: ["N + M 清", "MCP 加一层", "统一 client ↔ server", "能"],
+        },
+        {
+          pill: "示例", pillClass: "idea",
+          title: "一个真的 server 长啥样: Slack",
+          body: `<p>举 Slack 为例, 把三件套串起来跑一次:</p>
+            <p><strong>① 配置</strong>: 在 Claude Desktop 的 config 加一段, 告诉它 "slack 这个 server 怎么起" —— 通常是 <code>npx @mcp/slack</code>, 加上 SLACK_TOKEN 环境变量。</p>
+            <p><strong>② 启动</strong>: Claude Desktop 启动时 fork 一个子进程跑 slack-server, 自家 client 跟它握手, 调 <code>list_tools()</code> 拿到清单 —— <code>send_message</code> / <code>list_channels</code> / <code>read_history</code>。</p>
+            <p><strong>③ 用</strong>: 用户问 "总结 #general 最近消息", LLM 看到这些 tool 可用, 就 emit tool_call(read_history, channel="general", limit=20) —— 剩下的和 Lesson 07 一模一样 (只是执行方从 "你的代码" 换成了 "通过 client 转给 server")。</p>
+            <div class="callout"><div class="label"><span class="ic">🔑</span>分工</div>
+            <p>host 不懂 Slack 的 OAuth 和分页, server 不懂 LLM 协议, 两边只认 MCP。写 slack-server 的人和写 Claude Desktop 的人互不认识, 也能对上。</p></div>`,
+          next: "下一步: 和 function calling 怎么分 →",
+          stats: ["1 host · M server", "stdio / SSE", "子进程 / 长连接", "每个 server 都复用"],
+        },
+        {
+          pill: "分工", pillClass: "tech",
+          title: "MCP 和 function calling · 一个管发现, 一个管执行",
+          body: `<p>Lesson 07 讲的 function calling 是 "模型 → 一段 JSON → 你的代码跑函数"。MCP <strong>没有替代</strong>它, 而是在外面加了一层: <strong>怎么发现有哪些 tool 能用</strong>, <strong>怎么连到各个 server 上</strong>。</p>
+            <p><strong>只用 FC</strong>: 你的 agent 代码里写死几个 tool, LLM 从里面挑。轻量, 掌控强, 但换个 agent 项目要重写, 也没法让别人 "装上你的 tool"。</p>
+            <p><strong>FC + MCP</strong>: 你的 agent 通过 client 连多个独立 server, 每个 server 对外暴露自己的 tool。多一层, 但每个 server 独立维护 / 复用, 任何 MCP host 都能装上。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <p>什么时候用 MCP: 要连多个外部系统 / 想发布给别人用 / host 已支持。什么时候不用: 一个小 agent 几个 custom tool 直接 FC 就好; 后端 web service 自己管所有工具, 没 host 这层。协议是 Anthropic 2024-11 发起, 开源, 多家实现。</p></div>`,
+          next: "本节完成 ✓",
+          stats: ["FC vs MCP", "FC 协议内 / MCP 协议外", "直接 / 发现", "FC 轻 · MCP 复用"],
         },
       ],
     },
@@ -4217,7 +4522,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     const modeName = quizMode === "basic" ? "基础" : "深度";
     const modeTitle = `<em>${total} 题</em> · ${fullScore} 分 · ${modeName}`;
     const modeLede = quizMode === "basic"
-      ? `覆盖 8 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
+      ? `覆盖 9 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
       : `场景 / 辨析 / 取舍 / 调试, 比基础考难一个台阶。单选, 每题 ${points} 分, 没时限。`;
 
     const modeTabs = `
@@ -4460,7 +4765,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
         <h1>一本关于 <em>AI Agent</em> 的小书</h1>
         <p class="lede">用插画和 4 步拆解, 把 chat、prompt、skill、agent、以及 agent 怎么运行的 —— 从头到尾讲一遍。</p>
         <div class="meta">
-          <span>◇ 8 节 · 约 49 分钟</span>
+          <span>◇ 9 节 · 约 56 分钟</span>
           <span>◇ 入门 → 进阶</span>
           <span>◇ 从非程序员到开发者, 都能看</span>
         </div>
