@@ -911,6 +911,70 @@
   }
   .rag-tips strong { color: var(--ink); font-weight: 600; }
 
+  /* Workflow Simulator */
+  .wf-controls {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; margin: 16px 0;
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+  }
+  .wf-controls .wf-btn {
+    width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); background: var(--bg-panel); border-radius: 8px;
+    font-family: "JetBrains Mono", monospace; font-size: 14px; cursor: pointer; color: var(--ink);
+  }
+  .wf-controls .wf-btn:hover:not(:disabled) { background: var(--green-soft); border-color: #B9CDA7; }
+  .wf-controls .wf-btn:disabled { opacity: .3; cursor: default; }
+  .wf-controls .wf-btn.play { background: var(--green); color: var(--bg-panel); border-color: var(--green); }
+  .wf-controls .wf-step {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft);
+    margin-left: auto;
+  }
+  .wf-controls .wf-step strong { color: var(--ink); font-weight: 700; }
+
+  .wf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .wf-timeline { display: flex; flex-direction: column; gap: 4px; }
+  .wf-step-item {
+    display: grid; grid-template-columns: 24px 70px 1fr; gap: 10px; align-items: start;
+    padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg-panel); font-size: 12px; line-height: 1.5;
+    cursor: pointer; opacity: .45;
+    transition: opacity .18s, background .18s, border-color .18s;
+  }
+  .wf-step-item:hover { opacity: .85; }
+  .wf-step-item.done { opacity: .85; }
+  .wf-step-item.current { opacity: 1; border-color: var(--green); background: var(--green-bright); }
+  .wf-step-item .dot {
+    width: 14px; height: 14px; border: 1.8px solid var(--ink-soft); border-radius: 50%;
+    margin-top: 2px; background: var(--bg-panel);
+  }
+  .wf-step-item.done .dot { background: var(--ink-soft); border-color: var(--ink-soft); }
+  .wf-step-item.current .dot { background: var(--green); border-color: var(--green); }
+  .wf-step-item .wf-role {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft); font-weight: 700;
+  }
+  .wf-step-item.role-user .wf-role { color: #3D5D3C; }
+  .wf-step-item.role-assistant .wf-role { color: #7B6314; }
+  .wf-step-item.role-tool .wf-role { color: #7B4530; }
+  .wf-step-item.error .wf-role { color: #B08476; }
+  .wf-step-item .wf-label {
+    color: var(--ink); overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word;
+  }
+
+  .wf-detail {
+    background: var(--code-bg); color: #D4E0C8;
+    border-radius: 10px; padding: 16px 18px; min-height: 240px;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .wf-detail .k { color: #A6C19E; }
+  .wf-detail .s { color: #F2D3CB; }
+  .wf-detail .n { color: #E8C070; }
+  .wf-detail .c { color: #808878; }
+  .wf-detail .err { color: #E5A69A; }
+
   @media (max-width: 920px) {
     main { grid-template-columns: 1fr; }
     aside.panel { position: static; }
@@ -928,6 +992,8 @@
     .rag-controls { grid-template-columns: 1fr; gap: 14px; }
     .ranked-item { grid-template-columns: 30px 1fr; gap: 8px; }
     .ranked-item .bar, .ranked-item .sim { grid-column: 2; }
+    .wf-grid { grid-template-columns: 1fr; }
+    .wf-step-item { grid-template-columns: 20px 60px 1fr; gap: 8px; }
   }
 
   /* Phone — wrap header into 2 rows, shrink everything */
@@ -5536,6 +5602,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     if (parts[0] === "play") {
       if (parts[1] === "prompt") return { page: "play-prompt" };
       if (parts[1] === "rag") return { page: "play-rag" };
+      if (parts[1] === "workflow") return { page: "play-workflow" };
       return { page: "play-hub" };
     }
     if (parts[0] === "glossary") {
@@ -5560,7 +5627,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     let activeTab = "courses";
     if (route.page === "glossary-home" || route.page === "term") activeTab = "glossary";
     else if (route.page === "quiz") activeTab = "quiz";
-    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag") activeTab = "play";
+    else if (route.page === "play-hub" || route.page === "play-prompt" || route.page === "play-rag" || route.page === "play-workflow") activeTab = "play";
     document.querySelector(`#top-tabs [data-tab="${activeTab}"]`)?.classList.add("active");
 
     nav.innerHTML = "";
@@ -5579,6 +5646,13 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
       nav.innerHTML = `
         <button class="n-btn" onclick="go('play')">← 实验</button>
         <span class="n-cur">rag simulator</span>
+      `;
+      return;
+    }
+    if (route.page === "play-workflow") {
+      nav.innerHTML = `
+        <button class="n-btn" onclick="go('play')">← 实验</button>
+        <span class="n-cur">agent workflow</span>
       `;
       return;
     }
@@ -5823,11 +5897,11 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
             <h3>RAG Simulator</h3>
             <p>给 LLM 一本员工手册, 调 chunk 大小和 top-K, 看检索结果和模型答案怎么跟着变。呼应术语库里的 RAG / chunking / embedding。</p>
           </a>
-          <div class="sim-card soon">
-            <div class="label">03 · 排期中</div>
+          <a class="sim-card" href="#/play/workflow">
+            <div class="label">03 · 已上线</div>
             <h3>Agent Workflow</h3>
-            <p>播放一次 ReAct 循环的时间线, 含"翻车模式"。</p>
-          </div>
+            <p>播放一次 agent 的完整 trace: 成功版 + 翻车恢复版。能逐步看每一条 message 里到底是什么。呼应 Lesson 05 runtime 和 Lesson 07 tool calling。</p>
+          </a>
         </div>
       </div>
     `;
@@ -6132,6 +6206,324 @@ ${promptBody}
     update();
   }
 
+  function renderPlayWorkflow() {
+    const traces = {
+      success: {
+        label: "成功 · 订周五 15:00 去北京的高铁",
+        messages: [
+          {
+            role: "user",
+            label: '"订一张周五下午 15:00 左右去北京的高铁, 预算 ¥1000 以内, 要靠窗。"',
+            detail: {
+              role: "user",
+              content: "订一张周五下午 15:00 左右去北京的高铁, 预算 ¥1000 以内, 要靠窗。",
+            },
+          },
+          {
+            role: "assistant",
+            label: 'think: "要先查周五下午的车" · tool_call(search_trains)',
+            detail: {
+              role: "assistant",
+              thought: "要先查周五下午的车, 才能挑。",
+              tool_calls: [{
+                id: "call_a1",
+                name: "search_trains",
+                arguments: { from: "上海", to: "北京", date: "Fri", hour_near: 15 },
+              }],
+            },
+          },
+          {
+            role: "tool",
+            label: "3 条候选: G2 ¥553 14:50 (靠窗有) · G12 ¥553 15:20 · G28 ¥820 15:40 (靠窗)",
+            detail: {
+              role: "tool",
+              tool_call_id: "call_a1",
+              content: [
+                { id: "G2",  price: 553, time: "14:50", seats_avail: ["window", "aisle"] },
+                { id: "G12", price: 553, time: "15:20", seats_avail: ["aisle"] },
+                { id: "G28", price: 820, time: "15:40", seats_avail: ["window"] },
+              ],
+            },
+          },
+          {
+            role: "assistant",
+            label: 'think: "G2 便宜, 时间合适, 有靠窗 → 订" · tool_call(book_train)',
+            detail: {
+              role: "assistant",
+              thought: "G2 价格 553 在预算内, 时间 14:50 接近 15:00, 还有 'window' 位可选。优先它。",
+              tool_calls: [{
+                id: "call_a2",
+                name: "book_train",
+                arguments: { train_id: "G2", seat_pref: "window" },
+              }],
+            },
+          },
+          {
+            role: "tool",
+            label: "{ok: true, order_id: ORD-9f3a, seat: 5A, price: 553}",
+            detail: {
+              role: "tool",
+              tool_call_id: "call_a2",
+              content: { ok: true, order_id: "ORD-9f3a", seat: "5A", price: 553, pnr: "RK8-21M" },
+            },
+          },
+          {
+            role: "assistant",
+            label: '"订好了: G2 周五 14:50, 靠窗 5A, ¥553, 订单号 ORD-9f3a。要帮您发邮件通知团队吗?"',
+            detail: {
+              role: "assistant",
+              content: "订好了: G2 周五 14:50, 靠窗 5A, ¥553, 订单号 ORD-9f3a (PNR: RK8-21M)。要帮您发邮件通知团队吗?",
+            },
+          },
+        ],
+      },
+      recovery: {
+        label: "翻车恢复 · 文件不存在, agent 自我纠正",
+        messages: [
+          {
+            role: "user",
+            label: '"把 /tmp/report.csv 发到 pat@company.com"',
+            detail: { role: "user", content: "把 /tmp/report.csv 发到 pat@company.com" },
+          },
+          {
+            role: "assistant",
+            label: 'think: "先读文件" · tool_call(read_file)',
+            detail: {
+              role: "assistant",
+              thought: "先读文件内容, 然后发邮件。",
+              tool_calls: [{ id: "c1", name: "read_file", arguments: { path: "/tmp/report.csv" } }],
+            },
+          },
+          {
+            role: "tool",
+            error: true,
+            label: 'ERROR: ENOENT · 文件不存在 ⚠',
+            detail: {
+              role: "tool",
+              tool_call_id: "c1",
+              is_error: true,
+              content: { error: "ENOENT", message: "No such file or directory: /tmp/report.csv" },
+            },
+          },
+          {
+            role: "assistant",
+            label: 'think: "文件不在? 可能日期加后缀了, 先列目录看看" · tool_call(list_dir)',
+            detail: {
+              role: "assistant",
+              thought: "ENOENT 说明路径错了。可能文件名带日期后缀 (常见模式)。先 list_dir 看看 /tmp 里有啥。",
+              tool_calls: [{ id: "c2", name: "list_dir", arguments: { path: "/tmp" } }],
+            },
+          },
+          {
+            role: "tool",
+            label: '[ "report-2026-11-20.csv", "session.log", "cache/" ]',
+            detail: {
+              role: "tool",
+              tool_call_id: "c2",
+              content: ["report-2026-11-20.csv", "session.log", "cache/"],
+            },
+          },
+          {
+            role: "assistant",
+            label: 'think: "找到了 — report-2026-11-20.csv, 重读" · tool_call(read_file)',
+            detail: {
+              role: "assistant",
+              thought: "找到了, 实际文件是 report-2026-11-20.csv (带今天日期)。重新读。",
+              tool_calls: [{ id: "c3", name: "read_file", arguments: { path: "/tmp/report-2026-11-20.csv" } }],
+            },
+          },
+          {
+            role: "tool",
+            label: '"date,revenue\\n2026-11-15,1200\\n2026-11-16,980\\n..."',
+            detail: {
+              role: "tool",
+              tool_call_id: "c3",
+              content: "date,revenue\n2026-11-15,1200\n2026-11-16,980\n2026-11-17,1430\n2026-11-18,1105\n2026-11-19,1322\n2026-11-20,1056\n",
+            },
+          },
+          {
+            role: "assistant",
+            label: 'think: "读到了, 走 send_email 并附件" · tool_call(send_email)',
+            detail: {
+              role: "assistant",
+              thought: "读到了 6 天销售数据。走 send_email, 带上附件。",
+              tool_calls: [{
+                id: "c4",
+                name: "send_email",
+                arguments: {
+                  to: "pat@company.com",
+                  subject: "每日销售 · 本周",
+                  body: "附件是过去 6 天的销售明细。",
+                  attach: "/tmp/report-2026-11-20.csv",
+                },
+              }],
+            },
+          },
+          {
+            role: "tool",
+            label: "{ok: true, msg_id: mail_9f4b}",
+            detail: {
+              role: "tool",
+              tool_call_id: "c4",
+              content: { ok: true, msg_id: "mail_9f4b" },
+            },
+          },
+          {
+            role: "assistant",
+            label: '"已发给 pat@company.com。你给的路径 /tmp/report.csv 不存在, 我找到了带日期后缀的版本 report-2026-11-20.csv 并发出。下次直接告诉我带日期的名字更稳。"',
+            detail: {
+              role: "assistant",
+              content: "已发给 pat@company.com (msg_id mail_9f4b)。附带一句: 你给的路径 /tmp/report.csv 不存在, 我 list_dir 后找到了带日期后缀的 report-2026-11-20.csv, 用它发了。下次直接告诉我带日期的名字更稳。",
+            },
+          },
+        ],
+      },
+    };
+
+    const state = { traceKey: "success", cur: 0, playing: false, timer: null };
+
+    app.innerHTML = `
+      <div class="play-page">
+        <div class="crumb"><a href="#/play">← 实验</a> / 03 · Agent Workflow</div>
+        <h1>Agent Workflow Simulator</h1>
+        <p class="lede">一次 agent 任务里, messages 数组怎么一步步长。选 trace, 按 ▶ 自动播放, 或者 ⏭ 一步步看。每一步右边会把当前这条 message 的完整 JSON 摊出来。</p>
+
+        <div class="box" style="margin-bottom: 16px;">
+          <div class="b-head">选 trace</div>
+          <div class="presets" id="wf-traces">
+            ${Object.entries(traces).map(([k, t], i) => `<button class="preset ${k===state.traceKey?'active':''}" data-trace="${k}">${t.label}</button>`).join("")}
+          </div>
+        </div>
+
+        <div class="wf-controls">
+          <button class="wf-btn" id="wf-prev" title="上一步">⏮</button>
+          <button class="wf-btn play" id="wf-play" title="播放 / 暂停">▶</button>
+          <button class="wf-btn" id="wf-next" title="下一步">⏭</button>
+          <button class="wf-btn" id="wf-reset" title="回第一步">↺</button>
+          <span class="wf-step">第 <strong id="wf-step-i">1</strong> / <strong id="wf-step-n">6</strong> 步</span>
+        </div>
+
+        <div class="wf-grid">
+          <div>
+            <div class="b-head" style="margin-bottom: 10px;">时间线 (点任一步跳转)</div>
+            <div class="wf-timeline" id="wf-timeline"></div>
+          </div>
+          <div>
+            <div class="b-head" style="margin-bottom: 10px;">当前 message · 完整 JSON</div>
+            <div class="wf-detail" id="wf-detail"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    function msgs() { return traces[state.traceKey].messages; }
+
+    function fmtDetail(obj) {
+      // minimal JSON-ish formatter with tiny syntax coloring
+      const json = JSON.stringify(obj, null, 2);
+      return json
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/("[a-zA-Z_][a-zA-Z0-9_]*")(\s*:)/g, '<span class="k">$1</span>$2')
+        .replace(/:\s*(".*?")/g, ': <span class="s">$1</span>')
+        .replace(/:\s*(true|false|null)/g, ': <span class="n">$1</span>')
+        .replace(/:\s*(-?\d+(?:\.\d+)?)/g, ': <span class="n">$1</span>')
+        .replace(/(&quot;error&quot;|is_error)/g, '<span class="err">$1</span>');
+    }
+
+    function renderTimeline() {
+      const list = msgs();
+      document.getElementById("wf-timeline").innerHTML = list.map((m, i) => {
+        const cls = [
+          "wf-step-item",
+          "role-" + m.role,
+          m.error ? "error" : "",
+          i < state.cur ? "done" : "",
+          i === state.cur ? "current" : "",
+        ].filter(Boolean).join(" ");
+        return `
+          <div class="${cls}" data-i="${i}">
+            <div class="dot"></div>
+            <div class="wf-role">t=${i+1} ${m.role}${m.error ? " ⚠" : ""}</div>
+            <div class="wf-label">${escapeHtml(m.label)}</div>
+          </div>
+        `;
+      }).join("");
+      document.querySelectorAll("#wf-timeline .wf-step-item").forEach(el => {
+        el.addEventListener("click", () => {
+          state.cur = parseInt(el.dataset.i, 10);
+          pause();
+          update();
+        });
+      });
+    }
+
+    function renderDetail() {
+      const m = msgs()[state.cur];
+      document.getElementById("wf-detail").innerHTML = fmtDetail(m.detail);
+    }
+
+    function update() {
+      const list = msgs();
+      document.getElementById("wf-step-i").textContent = state.cur + 1;
+      document.getElementById("wf-step-n").textContent = list.length;
+      document.getElementById("wf-prev").disabled = state.cur === 0;
+      document.getElementById("wf-next").disabled = state.cur >= list.length - 1;
+      document.getElementById("wf-play").textContent = state.playing ? "▋" : "▶";
+      renderTimeline();
+      renderDetail();
+    }
+
+    function play() {
+      if (state.cur >= msgs().length - 1) state.cur = 0;
+      state.playing = true;
+      update();
+      state.timer = setInterval(() => {
+        if (state.cur < msgs().length - 1) {
+          state.cur++;
+          update();
+        } else {
+          pause();
+        }
+      }, 1300);
+    }
+
+    function pause() {
+      state.playing = false;
+      if (state.timer) { clearInterval(state.timer); state.timer = null; }
+      const btn = document.getElementById("wf-play");
+      if (btn) btn.textContent = "▶";
+    }
+
+    document.querySelectorAll("#wf-traces .preset").forEach(btn => {
+      btn.addEventListener("click", () => {
+        pause();
+        state.traceKey = btn.dataset.trace;
+        state.cur = 0;
+        document.querySelectorAll("#wf-traces .preset").forEach(b => b.classList.toggle("active", b.dataset.trace === state.traceKey));
+        update();
+      });
+    });
+
+    document.getElementById("wf-prev").addEventListener("click", () => {
+      pause();
+      if (state.cur > 0) { state.cur--; update(); }
+    });
+    document.getElementById("wf-next").addEventListener("click", () => {
+      pause();
+      if (state.cur < msgs().length - 1) { state.cur++; update(); }
+    });
+    document.getElementById("wf-play").addEventListener("click", () => {
+      state.playing ? pause() : play();
+    });
+    document.getElementById("wf-reset").addEventListener("click", () => {
+      pause();
+      state.cur = 0;
+      update();
+    });
+
+    update();
+  }
+
   function route() {
     const r = parseRoute();
     renderNav(r);
@@ -6142,6 +6534,7 @@ ${promptBody}
     else if (r.page === "play-hub") { lesson = null; renderPlayHub(); }
     else if (r.page === "play-prompt") { lesson = null; renderPlayPrompt(); }
     else if (r.page === "play-rag") { lesson = null; renderPlayRag(); }
+    else if (r.page === "play-workflow") { lesson = null; renderPlayWorkflow(); }
     else { renderLesson(r); }
     window.scrollTo(0, 0);
   }
