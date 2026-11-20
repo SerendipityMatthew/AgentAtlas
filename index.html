@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Atlas · 一本关于 AI Agent 的小书</title>
-<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。6 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
+<meta name="description" content="一本可读、可查、可实验的 AI Agent 入门小书。7 节深入课 + 41 词术语库 + 56 题测验，中文编辑体设计，面向开发者与好奇的朋友。">
 <meta name="theme-color" content="#F0ECE0">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F0ECE0'/%3E%3Cpath d='M16 6 L26 16 L16 26 L6 16 Z' fill='%233D5D3C'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。6 节深入课 + 41 词术语库 + 56 题测验。">
+<meta property="og:description" content="一本可读、可查、可实验的 AI Agent 入门小书。7 节深入课 + 41 词术语库 + 56 题测验。">
 <meta property="og:url" content="https://agentatlas-85r.pages.dev/">
 <meta property="og:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Agent Atlas · 一本关于 AI Agent 的小书">
-<meta name="twitter:description" content="6 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
+<meta name="twitter:description" content="7 节深入课 · 41 词术语库 · 56 题测验，中文 AI Agent 入门。">
 <meta name="twitter:image" content="https://agentatlas-85r.pages.dev/og.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,6 +178,7 @@
   .home .card.c4 { background: linear-gradient(140deg, #FAF7EC 60%, #E3EBF0); }
   .home .card.c5 { background: linear-gradient(140deg, #FAF7EC 60%, #EFE5F3); }
   .home .card.c6 { background: linear-gradient(140deg, #FAF7EC 60%, #EDE2CE); }
+  .home .card.c7 { background: linear-gradient(140deg, #FAF7EC 60%, #DDE6E8); }
 
   .home .footer {
     margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line);
@@ -2335,10 +2336,276 @@
           title: "把补丁打回去, 就是能用的 runner",
           body: `<p>把上面三种翻车的修复加回"原始 10 行", 你就有了一个能上生产的小 runner: 大约 20 行。</p>
             <p>多的: ① <code>for i in range(max_iter)</code> 封顶 · ② <code>with_retry</code> 包工具调用 · ③ <code>compress_if_full</code> 压缩旧消息。</p>
-            <div class="callout"><div class="label"><span class="ic">✓</span>五节连起来</div>
-            <p><strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳)。这就是 AI Agent 的全貌。</p></div>`,
+            <div class="callout"><div class="label"><span class="ic">✓</span>整本书连起来</div>
+            <p><strong>LLM</strong>(模型本身) → <strong>Chat</strong>(消息列表) → <strong>Prompt</strong>(system 塑形) → <strong>Skill</strong>(prompt 打包) → <strong>Agent</strong>(加工具 + 循环) → <strong>Runtime</strong>(把循环写稳) → <strong>Memory</strong>(跨会话认人)。这就是 AI Agent 的全貌。</p></div>`,
           next: "看完了 ✓",
           stats: ["≤ max_iter", "全", "受控", "可运维"],
+        },
+      ],
+    },
+
+    /* ---------- 6: MEMORY ---------- */
+    {
+      slug: "memory",
+      num: 6,
+      title: "什么是 memory?",
+      short: "模型不记事, '记忆' 全是外面工程做的",
+      subtitle: "模型本身每次调用都失忆。你以为的 '它记得我' 是工程做出来的——短期靠 context, 长期靠外部存。",
+      duration: "6 分钟", level: "进阶", stepCount: 4,
+      stats: ["◯ 记忆层级", "◗ 存哪里", "◱ 保留窗口", "◈ 代价"],
+      tlLabels: ["无状态", "短 vs 长", "三种长存", "vs RAG"],
+      learn: [
+        "为什么说 LLM '没有记忆' —— 它两次调用之间真的什么都不记",
+        "短期 (context 内) vs 长期 (外部存) 两种记忆的差别",
+        "长期的三种做法: 结构化 KV / 对话摘要 / 检索式",
+        "memory 和 RAG 技术栈相同, 为什么它们是两件事",
+      ],
+      svg: `
+        <defs>
+          <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#3D5D3C"/>
+          </marker>
+        </defs>
+
+        <!-- STEP 1: 无状态 · 两次调用 -->
+        <g data-reveal data-show="1">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">模型本身 · 两次调用之间, 什么都不记</text>
+
+          <!-- Call 1 -->
+          <rect x="60" y="105" width="230" height="240" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="175" y="128" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6B6454" text-anchor="middle">调用 #1 · 10:00:00</text>
+          <rect x="78" y="146" width="194" height="36" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+          <text x="88" y="162" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user</text>
+          <text x="88" y="176" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">我叫张三</text>
+          <path class="arrow" d="M 175 190 L 175 210" marker-end="url(#arrow-head)"/>
+          <polygon points="135,215 215,215 215,255 135,255" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.5"/>
+          <text x="175" y="242" font-family="Fraunces, serif" font-weight="700" font-size="13" fill="#3D5D3C" text-anchor="middle">LLM</text>
+          <path class="arrow" d="M 175 262 L 175 282" marker-end="url(#arrow-head)"/>
+          <rect x="78" y="287" width="194" height="36" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="88" y="303" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B6314">assistant</text>
+          <text x="88" y="317" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">好的, 张三</text>
+
+          <!-- Gap in middle -->
+          <text x="400" y="195" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B4530" text-anchor="middle" letter-spacing="0.08em">请求之间</text>
+          <rect x="325" y="210" width="150" height="80" rx="10" fill="#F9E3DC" stroke="#B08476" stroke-dasharray="4 3" stroke-width="1.5"/>
+          <text x="400" y="240" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820" text-anchor="middle">模型自己</text>
+          <text x="400" y="258" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820" text-anchor="middle">什么都不记</text>
+          <text x="400" y="278" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B4530" text-anchor="middle">stateless</text>
+
+          <!-- Call 2 -->
+          <rect x="510" y="105" width="230" height="240" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="625" y="128" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6B6454" text-anchor="middle">调用 #2 · 10:03:42</text>
+          <rect x="528" y="146" width="194" height="36" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+          <text x="538" y="162" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user</text>
+          <text x="538" y="176" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">我叫啥?</text>
+          <path class="arrow" d="M 625 190 L 625 210" marker-end="url(#arrow-head)"/>
+          <polygon points="585,215 665,215 665,255 585,255" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.5"/>
+          <text x="625" y="242" font-family="Fraunces, serif" font-weight="700" font-size="13" fill="#3D5D3C" text-anchor="middle">LLM</text>
+          <path class="arrow" d="M 625 262 L 625 282" marker-end="url(#arrow-head)"/>
+          <rect x="528" y="287" width="194" height="36" rx="6" fill="#F9E3DC" stroke="#B08476"/>
+          <text x="538" y="303" font-family="JetBrains Mono, monospace" font-size="10" fill="#7B4530">assistant</text>
+          <text x="538" y="317" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#2C2820">我不知道, 你没告诉我</text>
+
+          <!-- KEY IDEA -->
+          <g transform="translate(140, 390)">
+            <rect x="0" y="0" width="520" height="100" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">KEY IDEA</text>
+            <text x="16" y="48" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">LLM 本身是 stateless。两次调用之间, 模型自己什么都不记。</text>
+            <text x="16" y="68" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">你以为的 "它记得我", 全是外面工程做的 —— 短期靠 context 窗口,</text>
+            <text x="16" y="88" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">长期靠外部存储。这就是 memory 的全部话题。</text>
+          </g>
+        </g>
+
+        <!-- STEP 2: 短期 vs 长期 -->
+        <g data-reveal data-show="2">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">短期: 这次对话 · 长期: 跨会话跨设备</text>
+
+          <!-- Short-term: context window -->
+          <rect x="60" y="105" width="400" height="285" rx="10" fill="#FAF7EC" stroke="#3D5D3C" stroke-width="1.8"/>
+          <text x="76" y="128" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">短期 · context window (~128K tokens)</text>
+          <text x="76" y="144" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">这次调用发给模型的全部内容</text>
+          <g transform="translate(76, 158)">
+            <rect x="0" y="0" width="368" height="24" rx="4" fill="#E8DFC4"/>
+            <text x="10" y="16" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">system: 你是一个助手, 用户叫张三...</text>
+            <rect x="0" y="30" width="368" height="24" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="46" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user: 帮我订下周三的会议室</text>
+            <rect x="0" y="60" width="368" height="24" rx="4" fill="#FBF1C0"/>
+            <text x="10" y="76" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">assistant: 好的, 我来查...</text>
+            <rect x="0" y="90" width="368" height="24" rx="4" fill="#E4ECD6"/>
+            <text x="10" y="106" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">user: 下午 2 点行吗?</text>
+            <rect x="0" y="120" width="368" height="24" rx="4" fill="#FBF1C0"/>
+            <text x="10" y="136" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">assistant: 2 点可以订到 ...</text>
+          </g>
+          <text x="76" y="330" font-family="JetBrains Mono, monospace" font-size="10" fill="#B08476">⚠ 关会话 / 新 session = 全没了</text>
+
+          <!-- Long-term: external storage -->
+          <rect x="520" y="140" width="220" height="200" rx="10" fill="#FAF7EC" stroke="#7F99A8" stroke-width="1.8"/>
+          <text x="630" y="162" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2C2820" text-anchor="middle">长期 · 外部存储</text>
+          <ellipse cx="630" cy="195" rx="50" ry="10" fill="#CDD9E0" stroke="#7F99A8"/>
+          <path d="M 580 195 L 580 260 A 50 10 0 0 0 680 260 L 680 195" fill="#CDD9E0" stroke="#7F99A8"/>
+          <ellipse cx="630" cy="195" rx="50" ry="10" fill="none" stroke="#7F99A8"/>
+          <text x="630" y="233" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820" text-anchor="middle">KV / vector</text>
+          <text x="630" y="249" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820" text-anchor="middle">/ files</text>
+          <text x="630" y="290" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#3D5D3C" text-anchor="middle">跨 session 存在</text>
+          <text x="630" y="308" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">按需读, 按需写</text>
+
+          <!-- Arrows between -->
+          <path class="arrow" d="M 465 228 L 515 228" marker-end="url(#arrow-head)"/>
+          <text x="490" y="222" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">write</text>
+          <path class="arrow" d="M 515 270 L 465 270" marker-end="url(#arrow-head)"/>
+          <text x="490" y="286" font-family="JetBrains Mono, monospace" font-size="9" fill="#6B6454" text-anchor="middle">read</text>
+
+          <!-- Callout -->
+          <g transform="translate(140, 410)">
+            <rect x="0" y="0" width="520" height="80" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">开发者注脚</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">所有 memory 系统归根结底都是 "怎么把合适的东西写进 / 读回 context"。</text>
+            <text x="16" y="64" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">模型本身永远只看 context, memory 的工程全在它之外。</text>
+          </g>
+        </g>
+
+        <!-- STEP 3: 三种长存做法 -->
+        <g data-reveal data-show="3">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">长期记忆的三种常见做法</text>
+
+          <!-- ① KV -->
+          <rect x="40" y="100" width="240" height="250" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="160" y="122" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">① 结构化 KV</text>
+          <text x="160" y="140" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">像 ChatGPT 的 user memory</text>
+          <rect x="56" y="155" width="208" height="140" rx="6" fill="#262319"/>
+          <text x="68" y="178" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8">{</text>
+          <text x="82" y="198" font-family="JetBrains Mono, monospace" font-size="11" fill="#CDD9E0">"name": "张三",</text>
+          <text x="82" y="218" font-family="JetBrains Mono, monospace" font-size="11" fill="#CDD9E0">"diet": "不吃辣",</text>
+          <text x="82" y="238" font-family="JetBrains Mono, monospace" font-size="11" fill="#CDD9E0">"job": "designer",</text>
+          <text x="82" y="258" font-family="JetBrains Mono, monospace" font-size="11" fill="#F2D3CB">"city": "Shanghai"</text>
+          <text x="68" y="278" font-family="JetBrains Mono, monospace" font-size="11" fill="#D4E0C8">}</text>
+          <text x="160" y="315" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C" text-anchor="middle">+ 精确查, 占 token 少</text>
+          <text x="160" y="332" font-family="JetBrains Mono, monospace" font-size="10" fill="#B08476" text-anchor="middle">− 要先想好结构</text>
+
+          <!-- ② Summary -->
+          <rect x="290" y="100" width="220" height="250" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="400" y="122" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">② 对话摘要</text>
+          <text x="400" y="140" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">LLM 自己定期总结一段</text>
+          <rect x="306" y="155" width="188" height="140" rx="6" fill="#FBF1C0" stroke="#DCC673"/>
+          <text x="316" y="175" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">过去 50 轮里:</text>
+          <text x="316" y="195" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">- 用户在做 Y 项目</text>
+          <text x="316" y="213" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">- 卡在部署这步</text>
+          <text x="316" y="231" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">- 用 Rust + wasm</text>
+          <text x="316" y="249" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">- 偏好简洁答案</text>
+          <text x="316" y="267" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#2C2820">- 不喜欢长篇大论</text>
+          <text x="316" y="285" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">...</text>
+          <text x="400" y="315" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C" text-anchor="middle">+ 塞 system 即用</text>
+          <text x="400" y="332" font-family="JetBrains Mono, monospace" font-size="10" fill="#B08476" text-anchor="middle">− 摘错就丢细节</text>
+
+          <!-- ③ Retrieval -->
+          <rect x="520" y="100" width="240" height="250" rx="10" fill="#FAF7EC" stroke="#A89D7E" stroke-width="1.5"/>
+          <text x="640" y="122" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C" text-anchor="middle">③ 检索式</text>
+          <text x="640" y="140" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">全部对话入向量库, 按需捞</text>
+          <ellipse cx="640" cy="175" rx="60" ry="10" fill="#CDD9E0" stroke="#7F99A8"/>
+          <path d="M 580 175 L 580 235 A 60 10 0 0 0 700 235 L 700 175" fill="#CDD9E0" stroke="#7F99A8"/>
+          <ellipse cx="640" cy="175" rx="60" ry="10" fill="none" stroke="#7F99A8"/>
+          <text x="640" y="207" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">全部过往</text>
+          <text x="640" y="223" font-family="JetBrains Mono, monospace" font-size="10" fill="#2C2820" text-anchor="middle">对话片段</text>
+          <text x="640" y="270" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454" text-anchor="middle">新问题 → 相关片段</text>
+          <path class="arrow" d="M 600 280 L 680 280" marker-end="url(#arrow-head)"/>
+          <text x="640" y="315" font-family="JetBrains Mono, monospace" font-size="10" fill="#3D5D3C" text-anchor="middle">+ 原汁原味, 可追溯</text>
+          <text x="640" y="332" font-family="JetBrains Mono, monospace" font-size="10" fill="#B08476" text-anchor="middle">− 慢, 可能检索偏</text>
+
+          <!-- Callout -->
+          <g transform="translate(140, 400)">
+            <rect x="0" y="0" width="520" height="90" rx="10" fill="#E4ECD6" stroke="#B9CDA7" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#3D5D3C">实战常见</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">生产里经常三种一起用: KV 存 "用户是谁"、摘要存 "最近在搞什么"、</text>
+            <text x="16" y="62" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">检索式存 "去年某次具体对话"。ChatGPT 自己就是这个组合。</text>
+            <text x="16" y="82" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B6454">读的时候都是拼进 system prompt, 让模型"看到"。</text>
+          </g>
+        </g>
+
+        <!-- STEP 4: Memory vs RAG -->
+        <g data-reveal data-show="4">
+          <text x="400" y="78" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B6454" text-anchor="middle" letter-spacing="0.08em">Memory 和 RAG · 同一套技术, 两件事</text>
+
+          <!-- Memory column -->
+          <rect x="60" y="105" width="320" height="34" rx="6" fill="#E4ECD6" stroke="#B9CDA7"/>
+          <text x="220" y="128" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#3D5D3C" text-anchor="middle">Memory</text>
+          <text x="76" y="168" font-family="Noto Sans SC, sans-serif" font-size="14" font-weight="700" fill="#2C2820">记 "你"</text>
+          <text x="76" y="195" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 你是谁 (name, 职业)</text>
+          <text x="76" y="215" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 你偏好什么 (不吃辣)</text>
+          <text x="76" y="235" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 你和它的过往</text>
+          <text x="76" y="268" font-family="JetBrains Mono, monospace" font-size="11" fill="#3D5D3C">目的: 个性化</text>
+          <text x="76" y="288" font-family="JetBrains Mono, monospace" font-size="11" fill="#3D5D3C">内容: 过往互动</text>
+          <text x="76" y="308" font-family="JetBrains Mono, monospace" font-size="11" fill="#3D5D3C">来源: 自己攒</text>
+          <text x="76" y="328" font-family="JetBrains Mono, monospace" font-size="11" fill="#3D5D3C">目标: 它 "认识你"</text>
+
+          <!-- Divider -->
+          <line x1="400" y1="110" x2="400" y2="345" stroke="#B9CDA7" stroke-width="1" stroke-dasharray="3 4"/>
+
+          <!-- RAG column -->
+          <rect x="420" y="105" width="320" height="34" rx="6" fill="#CDD9E0" stroke="#7F99A8"/>
+          <text x="580" y="128" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#2C2820" text-anchor="middle">RAG</text>
+          <text x="436" y="168" font-family="Noto Sans SC, sans-serif" font-size="14" font-weight="700" fill="#2C2820">查 "知识"</text>
+          <text x="436" y="195" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 公司文档</text>
+          <text x="436" y="215" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 产品手册</text>
+          <text x="436" y="235" font-family="Noto Sans SC, sans-serif" font-size="12" fill="#6B6454">◉ 法律条文</text>
+          <text x="436" y="268" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">目的: 准确回答</text>
+          <text x="436" y="288" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">内容: 外部事实</text>
+          <text x="436" y="308" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">来源: 别人给</text>
+          <text x="436" y="328" font-family="JetBrains Mono, monospace" font-size="11" fill="#2C2820">目标: 它 "有知识"</text>
+
+          <!-- Callout -->
+          <g transform="translate(140, 390)">
+            <rect x="0" y="0" width="520" height="110" rx="10" fill="#FBF1C0" stroke="#DCC673" stroke-dasharray="4 3"/>
+            <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#7B6314">开发者注脚</text>
+            <text x="16" y="44" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">技术栈常常重叠 (向量库 / embedding / 检索), 但是:</text>
+            <text x="16" y="64" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">memory 答 "我是谁的助手", RAG 答 "退款政策是什么"。</text>
+            <text x="16" y="88" font-family="Noto Sans SC, sans-serif" font-size="13" fill="#2C2820">一个像样的 agent 通常两套都要, 架构可合, 概念要分。</text>
+          </g>
+        </g>
+      `,
+      steps: [
+        {
+          pill: "现状", pillClass: "",
+          title: "模型本身每次调用都失忆",
+          body: `<p>你问 ChatGPT "我叫张三", 几分钟后新开一轮问 "我叫啥?", 它可能答 "你没告诉我"。这不是 bug——<strong>LLM 本身是 stateless (无状态) 的</strong>, 两次调用之间, 模型自己什么都不记。</p>
+            <p>Lesson 01 chat 里讲过, "它记得你刚说的话" 是因为前端把历史一起重发了。那是<strong>短期</strong>伎俩, 只能在一次对话里。关了窗口 / 换设备 / 新 session, 全没了。</p>
+            <div class="callout"><div class="label"><span class="ic">💡</span>核心一句话</div>
+            <p>模型本身没有 memory。"它记得我" 全是外面工程做的 —— 短期靠 context 窗口, 长期靠外部存储。</p></div>`,
+          next: "下一步: 短期 vs 长期 →",
+          stats: ["无", "—", "单次调用", "—"],
+        },
+        {
+          pill: "分层", pillClass: "idea",
+          title: "短期在 context 里, 长期在外部",
+          body: `<p>Memory 分两层:</p>
+            <p><strong>短期</strong>——塞在 context window 里 (那个 128K 的大窗口)。system prompt、本次对话历史、临时笔记, 都在里面。模型看得见, 但<strong>关会话 = 全没</strong>。</p>
+            <p><strong>长期</strong>——存在外部 (数据库、向量库、文件)。跨 session / 跨设备保留, 要用的时候 读出来 → 拼到 system prompt 里 送给模型。模型其实还是只在读 context, 只是 context 的某些部分来自 "之前存的"。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <p>所有 memory 系统归根结底都是 "怎么把合适的东西写进 / 读回 context"。模型本身永远只看 context, memory 的工程全在它之外。</p></div>`,
+          next: "下一步: 长期存怎么做 →",
+          stats: ["短期 / 长期", "context / 外部", "本轮 / 跨 session", "token / 存储"],
+        },
+        {
+          pill: "做法", pillClass: "idea",
+          title: "长期记忆的三种常见做法",
+          body: `<p>长期 memory 怎么存? 实战基本三种:</p>
+            <p><strong>一 · 结构化 KV</strong>——像 ChatGPT 的 user memory。存 <code>"name": "张三"</code> <code>"diet": "不吃辣"</code>。精确、占 token 少, 但要先想好结构, 非结构化的东西塞不进去。</p>
+            <p><strong>二 · 对话摘要</strong>——定期让 LLM 自己总结 "过去 50 轮里用户在做什么、偏好什么"。摘要本身塞进 system prompt。开箱即用, 坏处是摘错了就丢细节。</p>
+            <p><strong>三 · 检索式</strong>——把所有过往对话都 embed 存进向量库, 新问题来了先检索相关历史 (本质上就是 RAG, 只是索引的是对话历史不是文档)。原汁原味、可追溯, 但慢, 而且可能检索偏。</p>
+            <div class="callout"><div class="label"><span class="ic">🔑</span>实战常见</div>
+            <p>生产里经常三种一起用: KV 存 "用户是谁"、摘要存 "最近在搞什么"、检索式存 "去年某次具体对话"。ChatGPT 自己就是这个组合。</p></div>`,
+          next: "下一步: 和 RAG 的区别 →",
+          stats: ["长期", "KV·摘要·检索", "持久", "读写开销"],
+        },
+        {
+          pill: "边界", pillClass: "tech",
+          title: "Memory 和 RAG · 同一套技术, 两件事",
+          body: `<p>Memory 和 RAG 技术栈常常重叠——都用 embedding、都查向量库、都把检索结果拼进 prompt。区别不在技术, 在<strong>查的是什么</strong>:</p>
+            <p><strong>RAG</strong> 查 "知识"——公司文档、产品手册、法律条文、API 文档。外部客观事实, 用来回答 "这事是什么" 这种问题。</p>
+            <p><strong>Memory</strong> 记 "你"——你是谁、你偏好什么、你和它的过往互动。主观、个性化, 用来让 agent 认得你, 不要每次从头介绍自己。</p>
+            <div class="callout yellow"><div class="label"><span class="ic">⚙</span>开发者注脚</div>
+            <p>一个像样的 agent 通常两套都要: memory 让它 "记得你是谁", RAG 让它 "知道事实"。架构上可以合, 概念上要分清, 不然评估和调试全会乱。</p></div>`,
+          next: "本节完成 ✓",
+          stats: ["Memory vs RAG", "都用向量库", "记你 vs 查事实", "合用"],
         },
       ],
     },
@@ -3674,7 +3941,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
     const modeName = quizMode === "basic" ? "基础" : "深度";
     const modeTitle = `<em>${total} 题</em> · ${fullScore} 分 · ${modeName}`;
     const modeLede = quizMode === "basic"
-      ? `覆盖 6 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
+      ? `覆盖 7 节深入课 + 全部 ${terms.length} 个术语(含 context / loop / reasoning 等热词)。单选, 每题 ${points} 分, 没时限。`
       : `场景 / 辨析 / 取舍 / 调试, 比基础考难一个台阶。单选, 每题 ${points} 分, 没时限。`;
 
     const modeTabs = `
@@ -3917,7 +4184,7 @@ Claude Code / Cursor 的 bash/exec 工具都有权限模型:
         <h1>一本关于 <em>AI Agent</em> 的小书</h1>
         <p class="lede">用插画和 4 步拆解, 把 chat、prompt、skill、agent、以及 agent 怎么运行的 —— 从头到尾讲一遍。</p>
         <div class="meta">
-          <span>◇ 6 节 · 约 36 分钟</span>
+          <span>◇ 7 节 · 约 42 分钟</span>
           <span>◇ 入门 → 进阶</span>
           <span>◇ 从非程序员到开发者, 都能看</span>
         </div>
