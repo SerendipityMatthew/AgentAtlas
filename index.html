@@ -5317,6 +5317,178 @@ await run("去 example-report.corp/login, 用 me@co.com 登录, 导出 '上周�
 - 多步计划 (lesson 10): 复杂任务先让 Claude 列计划 ("1. 登录 2. 选日期 3. 点导出"), 再按计划一步步走, 比纯 ReAct 稳
 - MCP 化 (lesson 8): 把 browser 工具包成 MCP server, 其他 agent 也能直接用, 不用复制一遍代码`,
     },
+
+    {
+      slug: "mcp-weather",
+      num: 4,
+      title: "MCP 天气",
+      oneliner: "写一个 MCP server, 让 Claude Desktop / Cursor / 你的 agent 都能'查天气'",
+      difficulty: "入门",
+      duration: "约 10 分钟读完",
+      tags: ["MCP", "tool", "server"],
+      req: `手里几个 agent (Claude Desktop 聊 / Cursor 里写代码的 copilot / 自己跑的脚本) 都想查天气。
+不想:
+- 每个 agent 复制粘贴一遍 OpenWeather API 代码
+- 每换一个厂商 API 就 N 份地方改
+- 让每个 agent 都存一份 API key
+
+想:
+- 写一次 server, 任何 MCP-compatible agent 直接用
+- API key / rate limit / 错误处理只在 server 里管一次
+- 加能力 (加 "历史天气" / "空气质量") 就改 server 一个地方
+
+这就是 lesson 8 讲的 MCP 的典型用法: 从 N×M 收敛到 N+M.`,
+      arch: `[Claude Desktop]  ─┐
+[Cursor]          ─┼→ [MCP Client (内置)] ──stdio/SSE── [你写的 weather MCP Server] → [OpenWeather API]
+[你的脚本 agent]  ─┘
+
+三件套 (lesson 8):
+- Host: Claude Desktop / Cursor / 你的 agent runtime
+- Client: 每个 Host 自带的, 讲 MCP 协议
+- Server: 你写的这个 Python/TS 进程, 暴露 get_weather + get_forecast
+
+server 对外的 capabilities (术语库):
+- tools:     get_weather(city) / get_forecast(city, days)
+- resources: 可选 — 常用城市列表, 让 agent 不用输入全名就能检索
+- prompts:   可选 — "weather_briefing" 模板, 一键生成当天播报`,
+      flow: `离线准备:
+1. OpenWeather 申请 API key, 放环境变量
+2. 写 server.py (下面骨架), 实现 2-3 个 tool
+3. 在 Claude Desktop config 里登记: ~/Library/Application Support/Claude/claude_desktop_config.json
+4. 重启 Claude Desktop, 它会自动起子进程跑 server
+
+运行时 (每次问):
+5. 你跟 Claude 说 "北京今天穿什么?"
+6. Claude 看到 tools 里有 get_weather → 发 JSON { name: "get_weather", input: { city: "Beijing" } }
+7. Claude Desktop 的 client 收到 → stdio 发给你的 server
+8. server 查 OpenWeather → 返回 {"temp": 8, "desc": "多云"}
+9. client 把结果塞回 messages → Claude 生成 "外面 8°, 穿外套"`,
+      concepts: `- MCP 三件套 (lesson 8): host / client / server, 各管一段
+- MCP tools (术语库): server 暴露的函数, agent 用 JSON schema 发现和调用
+- tool calling 差别 (lesson 8 第 4 步): function calling 是 agent ↔ 本地函数; MCP 是跨进程、可复用、可发现的工具协议
+- Capabilities 三类 (lesson 8): tools (动词) / resources (名词) / prompts (模板)
+- stdio vs SSE: 本地进程走 stdio (Claude Desktop 默认); 远程 server 走 SSE / HTTP (如公司共享 server)`,
+      code: {
+        py: `# weather_server.py — 50 行, 用官方 mcp SDK
+# pip install mcp httpx
+import os, httpx
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("weather")  # server 名字
+KEY = os.environ["OPENWEATHER_KEY"]  # 启动时就必须有
+
+@mcp.tool()
+async def get_weather(city: str) -> dict:
+    """查指定城市当前天气. city 是英文或拼音."""
+    async with httpx.AsyncClient(timeout=5) as c:
+        r = await c.get(
+            "https://api.openweathermap.org/data/2.5/weather",
+            params={"q": city, "appid": KEY, "units": "metric", "lang": "zh_cn"},
+        )
+        r.raise_for_status()
+        d = r.json()
+    return {
+        "city": d["name"],
+        "temp_c": d["main"]["temp"],
+        "desc": d["weather"][0]["description"],
+        "humidity": d["main"]["humidity"],
+    }
+
+@mcp.tool()
+async def get_forecast(city: str, days: int = 3) -> list:
+    """未来 N 天 (1-5). 返回每天 {date, temp_min, temp_max, desc}."""
+    # 省略 — 同一个 API 的 /forecast 端点, 做一下按天聚合
+    ...
+
+if __name__ == "__main__":
+    mcp.run()  # 默认 stdio, Claude Desktop 用这个
+
+# claude_desktop_config.json 里加一段:
+# {
+#   "mcpServers": {
+#     "weather": {
+#       "command": "python",
+#       "args": ["/abs/path/to/weather_server.py"],
+#       "env": {"OPENWEATHER_KEY": "sk-..."}
+#     }
+#   }
+# }`,
+        ts: `// weather-server.ts — 50 行, 用 @modelcontextprotocol/sdk
+// npm i @modelcontextprotocol/sdk zod
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "weather", version: "0.1.0" });
+const KEY = process.env.OPENWEATHER_KEY!;
+
+server.tool(
+  "get_weather",
+  "查指定城市当前天气. city 是英文或拼音.",
+  { city: z.string() },
+  async ({ city }) => {
+    const u = new URL("https://api.openweathermap.org/data/2.5/weather");
+    u.searchParams.set("q", city);
+    u.searchParams.set("appid", KEY);
+    u.searchParams.set("units", "metric");
+    u.searchParams.set("lang", "zh_cn");
+    const r = await fetch(u, { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) throw new Error(\`weather api \${r.status}\`);
+    const d: any = await r.json();
+    return {
+      content: [{ type: "text", text: JSON.stringify({
+        city: d.name,
+        temp_c: d.main.temp,
+        desc: d.weather[0].description,
+        humidity: d.main.humidity,
+      }) }],
+    };
+  }
+);
+
+server.tool(
+  "get_forecast",
+  "未来 N 天 (1-5)",
+  { city: z.string(), days: z.number().default(3) },
+  async ({ city, days }) => {
+    // 省略 — 同 API 的 /forecast, 按天聚合
+    return { content: [{ type: "text", text: "..." }] };
+  }
+);
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+
+// claude_desktop_config.json:
+// {
+//   "mcpServers": {
+//     "weather": {
+//       "command": "node",
+//       "args": ["/abs/path/to/weather-server.js"],
+//       "env": { "OPENWEATHER_KEY": "sk-..." }
+//     }
+//   }
+// }`
+      },
+      pitfalls: `- schema 没写对 → agent 要么看不到你的 tool, 要么 call 的时候参数错: 用 zod / pydantic 严格描述, 多写 description
+- 超时 → OpenWeather 慢了半秒整个 Claude 回复就卡住: httpx.AsyncClient(timeout=5), 失败就抛给 client, 让 agent 自己重试或说"查不到"
+- API key 拼错 / 没设 → server 启动秒挂, Claude Desktop 只显示 "server disconnected" 什么线索都没: 启动时 os.environ[KEY] 直接抛, 日志 stderr 看一眼就知道
+- 并发 → 一次调好几次 get_weather, server 没做并发限制可能打爆 API: 加 asyncio.Semaphore(5)
+- stdio 日志别写 stdout → stdio 是协议通道, 任何 print 都污染协议. 全部日志走 stderr (logging.basicConfig(stream=sys.stderr))
+- 单 process 多 server → Claude Desktop 会给每个 server 起独立进程, 别指望共享内存. 想共享就 docker compose 起一个常驻 server 走 SSE`,
+      security: `- API key 永远走 env, 别写在 config 里 commit 上 GitHub (Claude Desktop config 里 "env" 字段是 key 存放处)
+- rate limit 自己扛 → 别把 OpenWeather 的 429 透传给 agent, 自己 asyncio.Queue 限流到 60 次/分钟
+- 别做通用 HTTP proxy → "帮我请求 http://evil.com" 这种 tool 永远不写. 只暴露具体业务的 tool, agent 没法乱来
+- 输入校验 → city 字段再怎么说也应该 .strip() + 限制长度, 别把用户输入直接拼到 URL 里 (OpenWeather 还好, 自家 API 可能 SQL 注入)
+- Claude Desktop 启 server 时的权限: 以你用户身份跑, 能读你所有文件. 高敏感时跑在 container 里 (future MCP 会支持)
+- lesson 11 的四层防线对 server 也适用: 别 trust 网页返回的内容 (OpenWeather 不会, 但如果你 server 爬别的网页, 要)`,
+      extend: `- 加 resources (lesson 8): 暴露 "cities://favorites" 列表, 给 agent 自动补全常用城市 — agent 不用问你"杭州叫啥英文"
+- 加 prompts (lesson 8): 预置 "weather_briefing(city, time)" 模板, 让 agent 输出统一风格的天气播报
+- 换成远程 SSE → 公司内部所有人共用一个 server, 走 HTTPS + auth, 用的是官方 SSE transport
+- 组合多 server → weather + gmail + calendar 三个 server 同时挂, agent 自动做 "看天气 → 查日历 → 发邮件提醒" 这种串联
+- 用 FastMCP 的 Context 对象 (python SDK 新 API): 做 progress reporting, 长查询时 agent 能看到进度
+- E6 (多 agent 协作) 里会讲, 多 agent 系统的 "工具共享" 实际上就是共享 MCP server`,
+    },
   ];
 
   function renderGlossaryHome() {
@@ -7948,7 +8120,7 @@ prompts: [
       </a>
     `).join("");
 
-    const soon = ["MCP 天气", "代码审查", "多 Agent 协作"].map(t => `
+    const soon = ["代码审查", "多 Agent 协作"].map(t => `
       <div class="case-card soon">
         <div class="num">?? · 待写</div>
         <h3>${t}</h3>
